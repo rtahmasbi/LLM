@@ -1,4 +1,11 @@
 # LLM
+I havce covered these topics
+## langchain
+## loRA
+## OpenAI
+## Llama
+
+
 
 
 # fine-tune
