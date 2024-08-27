@@ -234,6 +234,11 @@ https://github.com/microsoft/LoRA/tree/main
 https://medium.com/data-science-in-your-pocket/lora-for-fine-tuning-llms-explained-with-codes-and-example-62a7ac5a3578
 
 
+https://mlabonne.github.io/blog/posts/Fine_Tune_Your_Own_Llama_2_Model_in_a_Colab_Notebook.html
+
+https://colab.research.google.com/drive/1PEQyJO1-f6j0S_XJ8DV50NkpzasXkrzd?usp=sharing
+
+
 # LoraConfig
 ## TaskType
 ```
