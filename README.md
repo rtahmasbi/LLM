@@ -9,6 +9,23 @@ I havce covered these topics
 
 
 # fine-tune
+
+## paper
+LoRA: Low-Rank Adaptation of Large Language Models
+
+https://arxiv.org/abs/2106.09685
+
+## paper explaned
+https://athekunal.medium.com/lora-low-rank-adaptation-paper-in-depth-explanation-417f5fa40668
+
+Rather than optimizing the parameters of the dense layers, we can represent them in lower dimensions using SVD (Singular Value Decomposition) and then do gradient descent to optimize the weights at lower dimensions.
+
+- matrix weights -> Matrix rank decomposition
+- \delta = BA
+- W_0 + \delta = W_0 + B A
+- h = W_0 x + \delta x = W_0 x + B A x = (W_0 + BA) x
+
+
 ## install
 `pip install peft`
 
