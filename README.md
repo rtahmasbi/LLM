@@ -184,6 +184,25 @@ good to check
 https://towardsdatascience.com/fine-tune-your-own-llama-2-model-in-a-colab-notebook-df9823a04a32
 
 
+## LoRA from scratch
+https://lightning.ai/lightning-ai/studios/code-lora-from-scratch
+
+
+```py
+class LoRALayer(torch.nn.Module):
+    def __init__(self, in_dim, out_dim, rank, alpha):
+        super().__init__()
+        std_dev = 1 / torch.sqrt(torch.tensor(rank).float())
+        self.A = torch.nn.Parameter(torch.randn(in_dim, rank) * std_dev)
+        self.B = torch.nn.Parameter(torch.zeros(rank, out_dim))
+        self.alpha = alpha
+
+    def forward(self, x):
+        x = self.alpha * (x @ self.A @ self.B)
+        return x
+```
+
+
 
 ## more
 https://github.com/Lightning-AI/litgpt
@@ -206,6 +225,14 @@ https://huggingface.co/docs/peft/en/index
 
 
 https://huggingface.co/docs/peft/en/quicktour
+
+
+https://github.com/cloneofsimo/lora
+
+https://github.com/microsoft/LoRA/tree/main
+
+
+https://medium.com/data-science-in-your-pocket/lora-for-fine-tuning-llms-explained-with-codes-and-example-62a7ac5a3578
 
 
 # LoraConfig
