@@ -1,7 +1,9 @@
 # LLM
 
-# install
-pip install peft
+
+# fine-tune
+## install
+`pip install peft`
 
 
 
@@ -159,23 +161,24 @@ if __name__ == "__main__":
 
 
 
-# LoRA
+# Good examples
+## databricks
 https://www.databricks.com/blog/efficient-fine-tuning-lora-guide-llms
+
 databricks provides evaluation before qnd after LoRA
 
-# LoRA
+
+# medium
 https://medium.com/@nischal.345/customizing-large-language-models-fine-tuning-and-retrieval-augmented-generation-ab619b846535
 
 good to check
 
-# LoRA on Colab
+## LoRA on Colab
 https://towardsdatascience.com/fine-tune-your-own-llama-2-model-in-a-colab-notebook-df9823a04a32
 
 
-################################################################################
-################################################################################
-################################################################################
-# more
+
+## more
 https://github.com/Lightning-AI/litgpt
 
 
@@ -197,11 +200,10 @@ https://huggingface.co/docs/peft/en/index
 
 https://huggingface.co/docs/peft/en/quicktour
 
-################################################################################
-################################################################################
-################################################################################
+
 # LoraConfig
 ## TaskType
+```
 TaskType.CAUSAL_LM
 TaskType.QUESTION_ANS
 TaskType.SEQ_CLS
@@ -209,7 +211,7 @@ TaskType.mro()
 TaskType.FEATURE_EXTRACTION
 TaskType.SEQ_2_SEQ_LM
 TaskType.TOKEN_CLS           
-
+```
 
 - Causal language models are frequently used for text generation.
 - Masked language modeling predicts a masked token in a sequence, and the model can attend to tokens bidirectionally. This means the model has full access to the tokens on the left and right. Masked language modeling is great for tasks that require a good contextual understanding of an entire sequence. BERT is an example of a masked language model.
@@ -218,6 +220,7 @@ TaskType.TOKEN_CLS
 
 
 ## target_modules
+```py
 model = AutoModelForCausalLM.from_pretrained("some-model-checkpoint")
 print(model)
 >
@@ -247,13 +250,13 @@ LlamaForCausalLM(
   )
   (lm_head): Linear(in_features=4096, out_features=51200, bias=False)
 )
-
+```
 
 -- If only targeting attention blocks of the model
-target_modules = ["q_proj", "v_proj"]
+`target_modules = ["q_proj", "v_proj"]`
 
 -- If targeting all linear layers
-target_modules = ['q_proj','k_proj','v_proj','o_proj','gate_proj','down_proj', 'up_proj','lm_head']
+`target_modules = ['q_proj','k_proj','v_proj','o_proj','gate_proj','down_proj', 'up_proj','lm_head']`
 
 
 
@@ -262,28 +265,31 @@ target_modules = ['q_proj','k_proj','v_proj','o_proj','gate_proj','down_proj', '
 ################################################################################
 ################################################################################
 # trainer
+```py
 from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 trainer = Seq2SeqTrainer(...)
 trainer.train()
 trainer.model.save_pretrained(peft_model_id)
 tokenizer.save_pretrained(peft_model_id)
+```
 
 ## trainer.xx
+```py
 from datasets import load_from_disk
 ds = load_from_disk("path")
 train_dataset=ds,
+```
 
 
-################################################################################
-################################################################################
-################################################################################
+
 # facebook/opt-350m
 https://huggingface.co/facebook/opt-350m
 
 https://github.com/huggingface/
 
 
-pip install tf-keras
+`pip install tf-keras`
+
 
 ```py
 from transformers import pipeline
@@ -298,10 +304,8 @@ generator("What are we having for dinner?")
 
 
 
-################################################################################
-################################################################################
-################################################################################
 # datasets
+```py
 from datasets import list_datasets
 list_datasets()
 >
@@ -313,9 +317,10 @@ list_datasets()
  'ag_news',
  ...
 ]
-
+```
 
 ## load local datasset
+```py
 from datasets import load_dataset
 ds = load_dataset('csv', data_files='path/to/local/my_dataset.csv')
 
@@ -328,7 +333,7 @@ ds = load_dataset('path/to/local/loading_script/loading_script.py', split='train
 
 from datasets import load_from_disk
 ds = load_from_disk('path/to/dataset/directory')
-
+```
 
 
 
