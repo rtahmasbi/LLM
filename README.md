@@ -26,7 +26,8 @@ import fire
 import torch
 import transformers
 from datasets import load_dataset
-​
+​from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
+
 ​
 from peft import (
     LoraConfig,
@@ -78,7 +79,7 @@ def train(
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
     tokenizer.pad_token_id = 0
 ​
-      Add this for training LoRA
+    #  Add this for training LoRA
 ​
       config = LoraConfig(
           r=lora_r,
@@ -216,8 +217,6 @@ https://lightning.ai/pages/community/lora-insights/
 
 
 https://huggingface.co/docs/peft/en/index
-
-
 
 
 
