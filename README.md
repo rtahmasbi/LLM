@@ -1,8 +1,15 @@
 # LLM
 I havce covered these topics
+
 ## langchain
-## loRA
+[link](langchain/ex1.py)
+
+## LoRA - QLoRA
+
+## RAG
+
 ## OpenAI
+
 ## Llama
 
 
