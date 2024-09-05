@@ -69,7 +69,54 @@ curl https://api.openai.com/v1/chat/completions \
 
 # fine-tuning
 https://platform.openai.com/docs/guides/fine-tuning
+
+
 You need to prepare data and upload it to OpenAI, they will take care of the rest.
+
+## format
+The conversational chat format is required to fine-tune gpt-4o-mini and gpt-3.5-turbo:
+```
+{"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "What's the capital of France?"}, {"role": "assistant", "content": "Paris, as if everyone doesn't know that already."}]}
+{"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "Who wrote 'Romeo and Juliet'?"}, {"role": "assistant", "content": "Oh, just some guy named William Shakespeare. Ever heard of him?"}]}
+{"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "How far is the Moon from Earth?"}, {"role": "assistant", "content": "Around 384,400 kilometers. Give or take a few, like that really matters."}]}
+```
+
+For babbage-002 and davinci-002, you can follow the prompt completion pair format as shown below:
+```
+{"prompt": "<prompt text>", "completion": "<ideal generated text>"}
+{"prompt": "<prompt text>", "completion": "<ideal generated text>"}
+{"prompt": "<prompt text>", "completion": "<ideal generated text>"}
+```
+
+
+Multi-turn chat examples:
+```
+{"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "What's the capital of France?"}, {"role": "assistant", "content": "Paris", "weight": 0}, {"role": "user", "content": "Can you be more sarcastic?"}, {"role": "assistant", "content": "Paris, as if everyone doesn't know that already.", "weight": 1}]}
+{"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "Who wrote 'Romeo and Juliet'?"}, {"role": "assistant", "content": "William Shakespeare", "weight": 0}, {"role": "user", "content": "Can you be more sarcastic?"}, {"role": "assistant", "content": "Oh, just some guy named William Shakespeare. Ever heard of him?", "weight": 1}]}
+{"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "How far is the Moon from Earth?"}, {"role": "assistant", "content": "384,400 kilometers", "weight": 0}, {"role": "user", "content": "Can you be more sarcastic?"}, {"role": "assistant", "content": "Around 384,400 kilometers. Give or take a few, like that really matters.", "weight": 1}]}
+```
+
+
+```py
+from openai import OpenAI
+client = OpenAI()
+
+client.files.create(
+  file=open("mydata.jsonl", "rb"),
+  purpose="fine-tune"
+)
+
+```
+and
+```py
+from openai import OpenAI
+client = OpenAI()
+
+client.fine_tuning.jobs.create(
+  training_file="file-abc123", 
+  model="gpt-4o-mini"
+)
+```
 
 
 
@@ -77,9 +124,10 @@ You need to prepare data and upload it to OpenAI, they will take care of the res
 https://openai.com/pricing
 
 
-# client.images.generate()
+# images.generate()
 It will return teh url for the generated image.
 
+## generate image
 ```py
 
 from openai import OpenAI
@@ -95,5 +143,23 @@ response = client.images.generate(
 
 image_url = response.data[0].url
 print(image_url)
+
+```
+
+
+## adding mask
+```py
+from openai import OpenAI
+client = OpenAI()
+
+response = client.images.edit((
+  model="dall-e-2",
+  image=open("sunlit_lounge.png", "rb"),
+  mask=open("mask.png", "rb"),
+  prompt="A sunlit indoor lounge area with a pool containing a flamingo",
+  n=1,
+  size="1024x1024"
+)
+image_url = response.data[0].url
 
 ```
