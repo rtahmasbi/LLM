@@ -41,6 +41,7 @@ response.choices[0].message.content
 from openai import OpenAI
 client = OpenAI()
 
+# text from https://nvd.nist.gov/vuln/detail/CVE-2023-4863
 text = "Heap buffer overflow in libwebp in Google Chrome prior to 116.0.5845.187 and libwebp 1.3.2 allowed a remote attacker to perform an out of bounds memory write via a crafted HTML page. (Chromium security severity: Critical)"
 
 response = client.chat.completions.create(
@@ -52,8 +53,15 @@ response = client.chat.completions.create(
 )
 
 response.choices[0].message.content
-'The vulnerable library mentioned in the statement is libwebp. The vulnerability specifically relates to a heap buffer overflow in libwebp, which impacts Google Chrome versions prior to 116.0.5845.187 and libwebp 1.3.2. This vulnerability allows a remote attacker to perform an out-of-bounds memory write via a crafted HTML page. This issue has been classified as having a critical severity by the Chromium security team.'
 
+"""
+The vulnerable library mentioned in the statement is libwebp. The vulnerability
+specifically relates to a heap buffer overflow in libwebp, which impacts Google
+Chrome versions prior to 116.0.5845.187 and libwebp 1.3.2. This vulnerability
+allows a remote attacker to perform an out-of-bounds memory write via a crafted
+HTML page. This issue has been classified as having a critical severity by the
+Chromium security team.'
+"""
 ```
 
 
@@ -69,6 +77,21 @@ models = client.models.list()
 for m in models:
    print(m)
 
+
+"""
+Model(id='gpt-4-1106-preview', created=1698957206, object='model', owned_by='system')
+Model(id='text-embedding-3-small', created=1705948997, object='model', owned_by='system')
+Model(id='dall-e-2', created=1698798177, object='model', owned_by='system')
+Model(id='tts-1-hd-1106', created=1699053533, object='model', owned_by='system')
+Model(id='tts-1-hd', created=1699046015, object='model', owned_by='system')
+Model(id='dall-e-3', created=1698785189, object='model', owned_by='system')
+Model(id='whisper-1', created=1677532384, object='model', owned_by='openai-internal')
+Model(id='gpt-4o-2024-05-13', created=1715368132, object='model', owned_by='system')
+Model(id='gpt-4-turbo', created=1712361441, object='model', owned_by='system')
+Model(id='gpt-4-turbo-2024-04-09', created=1712601677, object='model', owned_by='system')
+Model(id='gpt-4-0125-preview', created=1706037612, object='model', owned_by='system')
+Model(id='gpt-3.5-turbo', created=1677610602, object='model', owned_by='openai')
+"""
 ```
 
 

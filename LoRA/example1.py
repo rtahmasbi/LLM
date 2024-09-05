@@ -21,7 +21,6 @@ template = """Below is an instruction that describes a task. Write a response th
 
 ### Instruction:
 
-{}
 
 ### Response:\n"""
 
@@ -42,17 +41,14 @@ from transformers import LlamaTokenizer, LlamaForCausalLM
 
 model_path = 'openlm-research/open_llama_3b_v2'
 tokenizer = LlamaTokenizer.from_pretrained(model_path)
-model = LlamaForCausalLM.from_pretrained(
-model_path, load_in_8bit=True, device_map='auto',
-)
+# pip install accelerate for load_in_8bit
+model = LlamaForCausalLM.from_pretrained(model_path, load_in_8bit=True, device_map='auto')
 
 #Pass in a prompt and infer with the model
 prompt = 'Q: Create a detailed description for the following product: Corelogic Smooth Mouse, belonging to category: Optical Mouse\nA:'
 input_ids = tokenizer(prompt, return_tensors="pt").input_ids
 
-generation_output = model.generate(
-input_ids=input_ids, max_new_tokens=128
-)
+generation_output = model.generate(input_ids=input_ids, max_new_tokens=128)
 
 print(tokenizer.decode(generation_output[0]))
 
@@ -66,9 +62,7 @@ Create a detailed description for the following product: Corelogic Smooth Mouse,
 ### Response:"""
 input_ids = tokenizer(prompt, return_tensors="pt").input_ids
 
-generation_output = model.generate(
-input_ids=input_ids, max_new_tokens=128
-)
+generation_output = model.generate(input_ids=input_ids, max_new_tokens=128)
 
 print(tokenizer.decode(generation_output[0]))
 
@@ -89,7 +83,8 @@ target_modules = target_modules,
 lora_alpha=8,
 lora_dropout=0.05,
 bias="none",
-task_type="CAUSAL_LM",}
+task_type="CAUSAL_LM",
+)
 
 
 import re

@@ -26,7 +26,14 @@ pipeline = transformers.pipeline(
 
 pipeline("Hey how are you doing today?")
 
+"""
+[{'generated_text': 'Hey how are you doing today? I am new to this forum and I am looking for a good forum to get some help and advice from other members.
+I am new to this forum and I am looking for a good forum to get some help and advice from other members.
+Hello and welcome to the forum. Please introduce yourself to the members here in the New Member Introductions forum.'}]
+"""
 ```
+On CPU, `Llama-3-8B` took 1 min using 20GB RAM.
+
 
 
 ## Llama-3-8B-Instruct
@@ -70,8 +77,13 @@ outputs = pipeline(
 )
 print(outputs[0]["generated_text"][len(prompt):])
 
-#>> Arrrr, me hearty! Me name be Captain Chatbot, the scurviest chatbot to ever sail the Seven Seas! Me and me crew o' code have been scourin' the digital waters fer years, seekin' out landlubbers like yerself to swab the decks with a bit o' conversation! So hoist the colors, me hearty, and let's set sail fer a swashbucklin' good time!
-
+"""
+Arrrr, me hearty! Me name be Captain Chatbot, the scurviest chatbot to ever
+sail the Seven Seas! Me and me crew o' code have been scourin' the digital
+waters fer years, seekin' out landlubbers like yerself to swab the decks with
+a bit o' conversation! So hoist the colors, me hearty, and let's set sail fer
+a swashbucklin' good time!
+"""
 ```
 
 It took more than 1 min on CPU!!!
@@ -86,8 +98,43 @@ model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id, load_in_8bit=True, device_map='auto')
+# pip install accelerate for load_in_8bit
+
+
+prompt = 'Q: Create a detailed description for the following product: Corelogic Smooth Mouse, belonging to category: Optical Mouse\nA:'
+input_ids = tokenizer(prompt, return_tensors="pt").input_ids
+
+generation_output = model.generate(input_ids=input_ids, max_new_tokens=128)
+print(tokenizer.decode(generation_output[0]))
+
+"""
+<|begin_of_text|>Q: Create a detailed description for the following product: Corelogic Smooth Mouse, belonging to category: Optical Mouse
+A: Introducing the Corelogic Smooth Mouse, a revolutionary optical mouse designed to provide exceptional performance and accuracy. This cutting-edge device is engineered to deliver a seamless and intuitive user experience, making it an essential accessory for anyone looking to upgrade their computing experience.
+
+Design and Build:
+The Corelogic Smooth Mouse boasts a sleek and ergonomic design, crafted to fit comfortably in the palm of your hand. The mouse is built with high-quality materials, ensuring durability and resistance to wear and tear. The smooth, rounded edges and contoured shape provide a secure grip, allowing for precise control and reduced fatigue during extended use.
+
+Optical Technology:
+At the heart of the
+"""
+
+
+# or prompt can have prompt
+
+prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+Create a detailed description for the following product: Corelogic Smooth Mouse, belonging to category: Optical Mouse
+
+### Response:"""
+
 
 ```
+
+It took around one minute to run on CPU!
+
+For Llama-3-8B-Instruct, it used 53GB of CPU RAM.
 
 For the 75B model, it needs 145GB of CPU RAM!
 
