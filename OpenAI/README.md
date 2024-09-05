@@ -34,6 +34,28 @@ response.choices[0].message.content
 
 ```
 
+## example 2:
+
+```py
+
+from openai import OpenAI
+client = OpenAI()
+
+text = "Heap buffer overflow in libwebp in Google Chrome prior to 116.0.5845.187 and libwebp 1.3.2 allowed a remote attacker to perform an out of bounds memory write via a crafted HTML page. (Chromium security severity: Critical)"
+
+response = client.chat.completions.create(
+  model="gpt-3.5-turbo",
+  messages=[
+    {"role": "system", "content": "You are a cybersecurity assistant."},
+    {"role": "user", "content": f"what are the valnarable libraries or packeges in this statement: {text}"}
+  ]
+)
+
+response.choices[0].message.content
+'The vulnerable library mentioned in the statement is libwebp. The vulnerability specifically relates to a heap buffer overflow in libwebp, which impacts Google Chrome versions prior to 116.0.5845.187 and libwebp 1.3.2. This vulnerability allows a remote attacker to perform an out-of-bounds memory write via a crafted HTML page. This issue has been classified as having a critical severity by the Chromium security team.'
+
+```
+
 
 
 ## get list of all OpenAI models
@@ -125,7 +147,7 @@ https://openai.com/pricing
 
 
 # images.generate()
-It will return teh url for the generated image.
+It will return the url for the generated image.
 
 ## generate image
 ```py

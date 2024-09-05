@@ -359,7 +359,7 @@ https://github.com/huggingface/
 ```py
 from transformers import pipeline
 generator = pipeline('text-generation', model="facebook/opt-350m", do_sample=True, num_return_sequences=5)
-# , do_sample=True makes teh answer random
+# , do_sample=True makes the answer random
 generator("What are we having for dinner?")
 
 
