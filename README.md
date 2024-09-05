@@ -7,12 +7,17 @@ I have covered these topics. You can go to each topic and see examples there.
 ## LoRA - QLoRA
 
 ## RAG
+[link](RAG/)
 
 ## OpenAI
 [link](OpenAI/)
 
 ## Llama
 [link](Llama/)
+
+## Other LLM's
+[link](Other_LLMs/)
+
 
 
 
