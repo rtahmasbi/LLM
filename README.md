@@ -2,7 +2,7 @@
 I havce covered these topics
 
 ## langchain
-[link](langchain/ex1.py)
+[link](langchain/)
 
 ## LoRA - QLoRA
 
