@@ -70,3 +70,5 @@ while True:
 
 
 ```
+
+The speed is reasonable running on CPU!!!
