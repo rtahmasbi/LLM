@@ -18,8 +18,12 @@ import torch
 model_id = "meta-llama/Meta-Llama-3-8B"
 
 pipeline = transformers.pipeline(
-    "text-generation", model=model_id, model_kwargs={"torch_dtype": torch.bfloat16}, device_map="auto"
+    "text-generation",
+    model=model_id,
+    model_kwargs={"torch_dtype": torch.bfloat16},
+    device_map="auto",
 )
+
 pipeline("Hey how are you doing today?")
 
 ```
@@ -78,8 +82,12 @@ It took more than 1 min on CPU!!!
 ```py
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
+model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)
 
 ```
+
 For the 75B model, it needs 145GB of CPU RAM!
+

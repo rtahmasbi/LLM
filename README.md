@@ -1,5 +1,5 @@
 # LLM
-I havce covered these topics
+I have covered these topics. You can go to each topic and see examples there.
 
 ## langchain
 [link](langchain/)
@@ -9,8 +9,10 @@ I havce covered these topics
 ## RAG
 
 ## OpenAI
+[link](OpenAI/)
 
 ## Llama
+[link](Llama/)
 
 
 
@@ -359,8 +361,6 @@ from transformers import pipeline
 generator = pipeline('text-generation', model="facebook/opt-350m", do_sample=True, num_return_sequences=5)
 # , do_sample=True makes teh answer random
 generator("What are we having for dinner?")
-
-
 
 
 ```
