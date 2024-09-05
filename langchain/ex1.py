@@ -12,19 +12,24 @@ export LANGCHAIN_API_KEY="..."
 
 
 """
+# STEP1: pick LLM
 
-
+## llama2
 from langchain_community.llms import Ollama
 llm = Ollama(model="llama2")
 
 llm.invoke("how can langsmith help with testing?")
 
-# or
+
+## ChatOpenAI
 
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI()
-llm.invoke("how can langsmith help with testing?")
+llm.invoke("What is the best way to learn LLM?")
+
+
+# STEP2: make a prompt
 
 from langchain_core.prompts import ChatPromptTemplate
 prompt = ChatPromptTemplate.from_messages([
