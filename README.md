@@ -403,3 +403,9 @@ ds = load_from_disk('path/to/dataset/directory')
 # LoRA SEQ_2_SEQ_LM fine tune
 https://heidloff.net/article/fine-tuning-llm-lora-small-gpu/
 
+
+
+# perplexity
+Perplexity evaluates a language model's ability to predict the next word or character based on the context of previous words or characters. A lower perplexity score indicates better predictive performance.
+
+https://klu.ai/glossary/perplexity
