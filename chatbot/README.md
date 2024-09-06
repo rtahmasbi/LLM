@@ -58,17 +58,21 @@ Answer:
 prompt = PromptTemplate(template=template, input_variables=["question"])
 
 # Create an LLMChain to manage interactions with the prompt and model
-#llm_chain = LLMChain(prompt=prompt, llm=llm) --> depricated
+# llm_chain = LLMChain(prompt=prompt, llm=llm) --> depricated
 
 chain = prompt | llm
 
 print("Chatbot initialized, ready to chat...")
 while True:
     question = input("> ")
-    answer = llm_chain.run(question)
-    print(answer, '\n')
+    #answer = llm_chain.run(question)
+    answer = chain.invoke({"question": question})
+    print(answer)
 
 
 ```
+
+
+`llama-2-7b-chat.Q4_0.gguf` just uses 4GB in CPU RAM
 
 The speed is reasonable running on CPU!!!
