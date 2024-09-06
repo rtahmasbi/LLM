@@ -1,22 +1,17 @@
 # LLM
 I have covered these topics. You can go to each topic and see examples there.
 
-## langchain
-[link](langchain/)
+## [langchain](langchain/)
 
 ## LoRA - QLoRA
 
-## RAG
-[link](RAG/)
+## [RAG](RAG/)
 
-## OpenAI
-[link](OpenAI/)
+## [OpenAI](OpenAI/)
 
-## Llama
-[link](Llama/)
+## [Llama](Llama/)
 
-## Other LLM's
-[link](Other_LLMs/)
+## [Other LLM's](Other_LLMs/)
 
 
 
