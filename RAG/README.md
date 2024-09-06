@@ -214,3 +214,8 @@ for document in response["context"]:
 ```
 
 
+# Metrics for RAG pattern
+## RAGAS
+https://github.com/explodinggradients/ragas/blob/main/src/ragas/metrics/_faithfulness.py
+
+Faithfulness and Answer Relevancy
