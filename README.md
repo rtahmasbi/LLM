@@ -409,3 +409,43 @@ https://heidloff.net/article/fine-tuning-llm-lora-small-gpu/
 Perplexity evaluates a language model's ability to predict the next word or character based on the context of previous words or characters. A lower perplexity score indicates better predictive performance.
 
 https://klu.ai/glossary/perplexity
+
+
+
+
+# some useful links
+https://github.com/Barnacle-ai/awesome-llm-list
+
+https://github.com/horseee/Awesome-Efficient-LLM
+
+https://github.com/rmovva/LLM-publication-patterns-public
+
+https://github.com/HenryHZY/Awesome-Multimodal-LLM
+
+https://github.com/DefTruth/Awesome-LLM-Inference
+
+
+
+
+
+
+https://www.crewai.com/
+
+https://autogen-studio.com/
+
+
+# Standard Set of Metrics for Evaluating LLMs
+https://www.linkedin.com/pulse/evaluating-large-language-models-llms-standard-set-metrics-biswas-ecjlc/
+
+- Perplexity
+- Accuracy
+- F1-score
+- ROUGE score
+- BLEU score
+- METEOR score
+- Question Answering Metrics
+- Sentiment Analysis Metrics
+- Named Entity Recognition Metrics
+- Contextualized Word Embeddings
+
+
