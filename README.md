@@ -12,6 +12,7 @@ I have covered these topics. You can go to each topic and see examples there.
 ## [Llama](Llama/)
 
 ## [Other LLM's](Other_LLMs/)
+- TinyLlama
 
 
 
@@ -447,5 +448,11 @@ https://www.linkedin.com/pulse/evaluating-large-language-models-llms-standard-se
 - Sentiment Analysis Metrics
 - Named Entity Recognition Metrics
 - Contextualized Word Embeddings
+- BERTScore
 
 
+While BLEU and ROUGE assess text similarity by analyzing matching n-gram statistics between the generated text and the reference text, BERTScore assesses similarity in the embedding space by assigning a score that reflects how closely the generated text aligns with the reference text in that space.
+
+
+# Judging LLM-as-a-Judge
+https://arxiv.org/pdf/2306.05685

@@ -76,3 +76,10 @@ while True:
 `llama-2-7b-chat.Q4_0.gguf` just uses 4GB in CPU RAM
 
 The speed is reasonable running on CPU!!!
+
+
+# another good example
+https://github.com/NischalSuresh/chat-with-your-data-llm/blob/main/chatbot_Llama.ipynb
+
+They use Gradio Interface
+
