@@ -18,3 +18,11 @@ export LANGCHAIN_TRACING_V2="true"
 export LANGCHAIN_API_KEY="..."
 
 ```
+
+# main modules
+```py
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+
+```
+
