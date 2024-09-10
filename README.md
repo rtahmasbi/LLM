@@ -20,6 +20,9 @@ I have covered these topics. You can go to each topic and see examples there.
 
 ## [vLLM](vLLM/)
 
+## [Graph](graph/)
+- query from graph database, such as neo4j with cypher
+- building the knowledge graphs with `LLMGraphTransformer`
 
 
 
