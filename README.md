@@ -13,6 +13,8 @@ I have covered these topics. You can go to each topic and see examples there.
 - QLoRA
 
 ## [RAG](RAG/)
+- langchain_chroma
+- vectorstore
 
 ## [OpenAI](OpenAI/)
 
@@ -21,11 +23,16 @@ I have covered these topics. You can go to each topic and see examples there.
 ## [Other LLM's](Other_LLMs/)
 - TinyLlama
 - Mistral
+- facebook/opt-350m
 
-## [Reinforcement Learning from Human Feedback (RLHF)](RLHF/)
+
+## [Reinforcement Learning](RLHF/)
+- [Reinforcement Learning from Human Feedback (RLHF)](RLHF/)
+- Reinforcement learning from AI feedback (RLAIF)
 
 
 ## [vLLM](vLLM/)
+- PagedAttention
 
 ## [Graph](graph/)
 - query from graph database, such as neo4j with cypher
@@ -35,24 +42,6 @@ I have covered these topics. You can go to each topic and see examples there.
 
 
 
-
-# facebook/opt-350m
-https://huggingface.co/facebook/opt-350m
-
-https://github.com/huggingface/
-
-
-`pip install tf-keras`
-
-
-```py
-from transformers import pipeline
-generator = pipeline('text-generation', model="facebook/opt-350m", do_sample=True, num_return_sequences=5)
-# , do_sample=True makes the answer random
-generator("What are we having for dinner?")
-
-
-```
 
 
 
@@ -142,6 +131,5 @@ https://arxiv.org/pdf/2306.05685
 
 
 
-# Reinforcement learning from AI feedback (RLAIF)
 
 
