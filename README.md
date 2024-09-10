@@ -13,7 +13,9 @@ I have covered these topics. You can go to each topic and see examples there.
 
 ## [Other LLM's](Other_LLMs/)
 - TinyLlama
+- Mistral
 
+## [Reinforcement Learning from Human Feedback (RLHF)](RLHF/)
 
 
 
@@ -456,3 +458,10 @@ While BLEU and ROUGE assess text similarity by analyzing matching n-gram statist
 
 # Judging LLM-as-a-Judge
 https://arxiv.org/pdf/2306.05685
+
+
+
+
+# Reinforcement learning from AI feedback (RLAIF)
+
+
