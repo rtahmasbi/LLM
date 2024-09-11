@@ -334,3 +334,8 @@ https://heidloff.net/article/fine-tuning-llm-lora-small-gpu/
 
 # axolotl
 https://github.com/axolotl-ai-cloud/axolotl
+
+## finetune lora
+```
+accelerate launch -m axolotl.cli.train examples/openllama-3b/lora.yml
+```

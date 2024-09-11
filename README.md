@@ -11,7 +11,7 @@ I have covered these topics. You can go to each topic and see examples there.
 ## [Fine Tune](FineTune/)
 - LoRA
 - QLoRA
-- axolotl
+- [axolotl](https://github.com/axolotl-ai-cloud/axolotl)
 
 ## [RAG](RAG/)
 - langchain_chroma
