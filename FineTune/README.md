@@ -332,3 +332,5 @@ train_dataset=ds,
 https://heidloff.net/article/fine-tuning-llm-lora-small-gpu/
 
 
+# axolotl
+https://github.com/axolotl-ai-cloud/axolotl
