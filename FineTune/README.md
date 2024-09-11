@@ -371,7 +371,11 @@ https://www.youtube.com/watch?v=mrKuDK9dGlg&ab_channel=AIAnytime
 ## Multi-GPU
 https://github.com/AIAnytime/Multi-GPU-Fine-Training-LLMs
 
+
 ```
+accelerate
+deepspeed
+
 trainer = SFTTrainer
 LoraConfig
 BitsAndBytesConfig

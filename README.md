@@ -193,6 +193,8 @@ DeepSpeed is a deep learning optimization library that makes distributed trainin
 
 DeepSpeed uses Accelerate.
 
+https://deepspeed.readthedocs.io/en/latest/zero3.html
+
 
 # gradio
 https://www.gradio.app/

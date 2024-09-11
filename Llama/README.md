@@ -138,3 +138,8 @@ For Llama-3-8B-Instruct, it used 53GB of CPU RAM.
 
 For the 75B model, it needs 145GB of CPU RAM!
 
+
+
+# llama-2-7b-vs-llama-2-7b-chat
+https://www.kaggle.com/code/patriciabrezeanu/llama-2-7b-vs-llama-2-7b-chat
+
