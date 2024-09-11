@@ -335,7 +335,44 @@ https://heidloff.net/article/fine-tuning-llm-lora-small-gpu/
 # axolotl
 https://github.com/axolotl-ai-cloud/axolotl
 
+- Works with single GPU or multiple GPUs via FSDP or Deepspeed
+- Easily run with Docker locally or on the cloud
+- Supports fullfinetune, lora, qlora, relora, and gptq
+
+
 ## finetune lora
 ```
 accelerate launch -m axolotl.cli.train examples/openllama-3b/lora.yml
+
+```
+
+```
+python -m axolotl.cli.preprocess your_config.yml
+accelerate launch -m axolotl.cli.train examples/llama-2/config.yml --deepspeed deepspeed_configs/zero1.json
+python -m axolotl.cli.inference examples/your_config.yml --lora_model_dir="./lora-output-dir"
+
+```
+
+- axolotl.cli.train
+- axolotl.cli.preprocess
+- axolotl.cli.inference
+- axolotl.cli.merge_lora
+- axolotl.cli.merge_sharded_fsdp_weights
+
+
+## parameters
+- lora_r:32 --> lora rank
+- 
+
+## video
+https://www.youtube.com/watch?v=mrKuDK9dGlg&ab_channel=AIAnytime
+
+
+## Multi-GPU
+https://github.com/AIAnytime/Multi-GPU-Fine-Training-LLMs
+
+```
+trainer = SFTTrainer
+LoraConfig
+BitsAndBytesConfig
 ```

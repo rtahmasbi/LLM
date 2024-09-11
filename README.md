@@ -132,6 +132,82 @@ While BLEU and ROUGE assess text similarity by analyzing matching n-gram statist
 https://arxiv.org/pdf/2306.05685
 
 
+# cloud GPU
+https://www.runpod.io/console/console/pods
+
+
+
+# Useful packages
+
+## accelerate
+https://huggingface.co/docs/accelerate/index
+
+https://github.com/huggingface/accelerate
+
+```sh
+torchrun \ # python -m torch.distributed.run 
+    --nproc_per_node 2 \
+    --nnodes 2 \
+    --rdzv_id 2299 \ # A unique job id 
+    --rdzv_backend c10d \
+    --rdzv_endpoint master_node_ip_address:29500 \
+    ./nlp_example.py
+
+```
+
+
+```py
++ from accelerate import Accelerator
++ accelerator = Accelerator()
+
++ model, optimizer, training_dataloader, scheduler = accelerator.prepare(
++     model, optimizer, training_dataloader, scheduler
++ )
+
+  for batch in training_dataloader:
+      optimizer.zero_grad()
+      inputs, targets = batch
+      inputs = inputs.to(device)
+      targets = targets.to(device)
+      outputs = model(inputs)
+      loss = loss_function(outputs, targets)
++     accelerator.backward(loss)
+      optimizer.step()
+      scheduler.step()
+```
+
+## bitsandbytes
+The bitsandbytes library is a lightweight Python wrapper around CUDA custom functions, in particular 8-bit optimizers, matrix multiplication (LLM.int8()), and 8 & 4-bit quantization functions.
+
+The library includes quantization primitives for 8-bit & 4-bit operations, through bitsandbytes.nn.Linear8bitLt and bitsandbytes.nn.Linear4bit and 8-bit optimizers through bitsandbytes.optim module.
+
+https://huggingface.co/docs/bitsandbytes/main/en/index
+
+https://github.com/bitsandbytes-foundation/bitsandbytes
+
+
+## DeepSpeed
+https://github.com/microsoft/DeepSpeed
+
+DeepSpeed is a deep learning optimization library that makes distributed training easy, efficient, and effective. 10x Larger Models. 10x Faster Training.
+
+DeepSpeed uses Accelerate.
+
+
+# gradio
+https://www.gradio.app/
+
+Gradio is the fastest way to demo your machine learning model with a friendly web interface so that anyone can use it, anywhere!
+
+```py
+import gradio as gr
+
+def greet(name):
+    return "Hello " + name + "!"
+
+demo = gr.Interface(fn=greet, inputs="text", outputs="text")
+demo.launch()   
+```
 
 
 
