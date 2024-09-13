@@ -213,3 +213,7 @@ demo.launch()
 
 
 
+# groq
+Groq is Fast AI Inference
+
+https://console.groq.com/playground
