@@ -33,7 +33,8 @@ I have covered these topics. You can go to each topic and see examples there.
 
 
 ## [vLLM](vLLM/)
-- PagedAttention
+- Optimizing KV pairs
+- `PagedAttention` algorithm allows storing continuous KV pairs in non-contiguous memory space
 
 ## [Graph](graph/)
 - query from graph database, such as neo4j with cypher
@@ -102,22 +103,26 @@ https://github.com/HenryHZY/Awesome-Multimodal-LLM
 https://github.com/DefTruth/Awesome-LLM-Inference
 
 
-
+## companies
 https://www.crewai.com/
 
 https://autogen-studio.com/
+
+
+## TensorFlow-Examples
+https://github.com/aymericdamien/TensorFlow-Examples/tree/master
 
 
 
 # Standard Set of Metrics for Evaluating LLMs
 https://www.linkedin.com/pulse/evaluating-large-language-models-llms-standard-set-metrics-biswas-ecjlc/
 
-- Perplexity
+- Perplexity - perplexity = 2^(-log P(w1,w2,...,wn)/n), where P(w1,w2,...,wn) is the probability of the test set and n is the number of words in the test set.
 - Accuracy
 - F1-score
-- ROUGE score
-- BLEU score
-- METEOR score
+- ROUGE score - based on the concept of n-grams - [link](https://github.com/google-research/google-research/tree/master/rouge)
+- BLEU score - based on the n-gram overlap
+- METEOR score - It combines both precision and recall
 - Question Answering Metrics
 - Sentiment Analysis Metrics
 - Named Entity Recognition Metrics
@@ -217,3 +222,29 @@ demo.launch()
 Groq is Fast AI Inference
 
 https://console.groq.com/playground
+
+
+# multi GPU
+https://pytorch.org/docs/stable/distributed.html
+
+## torch
+```
+torch.distributed.launch
+```
+
+```
++ import torch.multiprocessing as mp
++ from torch.utils.data.distributed import DistributedSampler
++ from torch.nn.parallel import DistributedDataParallel as DDP
++ from torch.distributed import init_process_group, destroy_process_group
++ import os
+```
+
+
+## tensorflow
+https://github.com/aymericdamien/TensorFlow-Examples/blob/master/tensorflow_v2/notebooks/6_Hardware/multigpu_training.ipynb
+s
+
+```
+tf.device('/gpu:%i' % i):
+```
