@@ -10,6 +10,9 @@ https://huggingface.co/TheBloke/Mistral-7B-Claude-Chat-GGUF
 
 
 # facebook/opt-350m
+Open Pre-trained Transformer
+
+
 https://huggingface.co/facebook/opt-350m
 
 https://github.com/huggingface/

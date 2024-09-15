@@ -103,12 +103,6 @@ https://github.com/HenryHZY/Awesome-Multimodal-LLM
 https://github.com/DefTruth/Awesome-LLM-Inference
 
 
-## companies
-https://www.crewai.com/
-
-https://autogen-studio.com/
-
-
 ## TensorFlow-Examples
 https://github.com/aymericdamien/TensorFlow-Examples/tree/master
 
@@ -181,6 +175,7 @@ torchrun \ # python -m torch.distributed.run
       scheduler.step()
 ```
 
+
 ## bitsandbytes
 The bitsandbytes library is a lightweight Python wrapper around CUDA custom functions, in particular 8-bit optimizers, matrix multiplication (LLM.int8()), and 8 & 4-bit quantization functions.
 
@@ -200,8 +195,88 @@ DeepSpeed uses Accelerate.
 
 https://deepspeed.readthedocs.io/en/latest/zero3.html
 
+- [Transformers with DeepSpeed](https://huggingface.co/docs/transformers/main/main_classes/deepspeed)
+- [Accelerate with DeepSpeed](https://huggingface.co/docs/accelerate/usage_guides/deepspeed)
 
-# gradio
+DeepSpeed:
+1. Optimizer state partitioning (ZeRO stage 1)
+2. Gradient partitioning (ZeRO stage 2)
+3. Parameter partitioning (ZeRO stage 3)
+4. Custom mixed precision training handling
+5. A range of fast CUDA-extension-based optimizers
+6. ZeRO-Offload to CPU and Disk/NVMe
+7. Hierarchical partitioning of model parameters (ZeRO++)
+
+```
+accelerate launch my_script.py --args_to_my_script
+```
+
+
+
+
+# multi GPU
+https://pytorch.org/docs/stable/distributed.html
+
+
+
+## torch
+```py
+torch.distributed.launch
+```
+
+```py
++ import torch.multiprocessing as mp
++ from torch.utils.data.distributed import DistributedSampler
++ from torch.nn.parallel import DistributedDataParallel as DDP
++ from torch.distributed import init_process_group, destroy_process_group
++ import os
+```
+
+
+## tensorflow
+https://github.com/aymericdamien/TensorFlow-Examples/blob/master/tensorflow_v2/notebooks/6_Hardware/multigpu_training.ipynb
+s
+
+```py
+tf.device('/gpu:%i' % i):
+```
+
+
+
+## with accelerate
+https://huggingface.co/docs/trl/example_overview
+```sh
+accelerate launch --config_file=examples/accelerate_configs/multi_gpu.yaml --num_processes {NUM_GPUS} path_to_script.py --all_arguments_of_the_script
+```
+
+## with DeepSpeed
+https://huggingface.co/docs/trl/example_overview
+```sh
+accelerate launch --config_file=examples/accelerate_configs/deepspeed_zero{1,2,3}.yaml --num_processes {NUM_GPUS} path_to_script.py --all_arguments_of_the_script
+```
+
+
+
+
+# companies
+
+## crewai
+https://www.crewai.com/
+
+## autogen-studio
+AI Agents
+
+https://autogen-studio.com/
+
+
+## groq
+Groq is Fast AI Inference
+
+https://console.groq.com/playground
+
+
+
+## gradio
 https://www.gradio.app/
 
 Gradio is the fastest way to demo your machine learning model with a friendly web interface so that anyone can use it, anywhere!
@@ -218,33 +293,15 @@ demo.launch()
 
 
 
-# groq
-Groq is Fast AI Inference
+# train LLM from scartch time
+https://github.com/microsoft/DeepSpeedExamples/tree/master/applications/DeepSpeed-Chat
 
-https://console.groq.com/playground
+GPU SKUs	OPT-1.3B	OPT-6.7B	OPT-13.2B	OPT-30B	OPT-66B	OPT-175B
+1x V100 32G	1.8 days					
+1x A6000 48G	1.1 days	5.6 days				
+1x A100 40G	15.4 hrs	3.4 days				
+1x A100 80G	11.7 hrs	1.7 days	4.9 days			
+8x A100 40G	2 hrs	5.7 hrs	10.8 hrs	1.85 days		
+8x A100 80G	1.4 hrs($45)	4.1 hrs ($132)	9 hrs ($290)	18 hrs ($580)	2.1 days ($1620)	
+64x A100 80G	31 minutes	51 minutes	1.25 hrs ($320)	4 hrs ($1024)	7.5 hrs ($1920)	20 hrs ($5120)
 
-
-# multi GPU
-https://pytorch.org/docs/stable/distributed.html
-
-## torch
-```
-torch.distributed.launch
-```
-
-```
-+ import torch.multiprocessing as mp
-+ from torch.utils.data.distributed import DistributedSampler
-+ from torch.nn.parallel import DistributedDataParallel as DDP
-+ from torch.distributed import init_process_group, destroy_process_group
-+ import os
-```
-
-
-## tensorflow
-https://github.com/aymericdamien/TensorFlow-Examples/blob/master/tensorflow_v2/notebooks/6_Hardware/multigpu_training.ipynb
-s
-
-```
-tf.device('/gpu:%i' % i):
-```
