@@ -309,6 +309,9 @@ GPU SKUs	OPT-1.3B	OPT-6.7B	OPT-13.2B	OPT-30B	OPT-66B	OPT-175B
 # arcprize
 https://arcprize.org/arc
 
+ARC Prize is a $1,000,000+ public competition to beat and open source a solution to the ARC-AGI benchmark.
+
+
 Measuring task-specific skill is not a good proxy for intelligence.
 
 Skill is heavily influenced by prior knowledge and experience: unlimited priors or unlimited training data allows developers to "buy" levels of skill for a system. This masks a system's own generalization power.
