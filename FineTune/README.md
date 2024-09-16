@@ -341,12 +341,12 @@ https://github.com/axolotl-ai-cloud/axolotl
 
 
 ## finetune lora
-```
+```sh
 accelerate launch -m axolotl.cli.train examples/openllama-3b/lora.yml
 
 ```
 
-```
+```sh
 python -m axolotl.cli.preprocess your_config.yml
 accelerate launch -m axolotl.cli.train examples/llama-2/config.yml --deepspeed deepspeed_configs/zero1.json
 python -m axolotl.cli.inference examples/your_config.yml --lora_model_dir="./lora-output-dir"
@@ -372,7 +372,7 @@ https://www.youtube.com/watch?v=mrKuDK9dGlg&ab_channel=AIAnytime
 https://github.com/AIAnytime/Multi-GPU-Fine-Training-LLMs
 
 
-```
+```py
 accelerate
 deepspeed
 

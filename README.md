@@ -11,7 +11,7 @@ I have covered these topics. You can go to each topic and see examples there.
 ## [Fine Tune](FineTune/)
 - LoRA
 - QLoRA
-- [axolotl](https://github.com/axolotl-ai-cloud/axolotl)
+- [axolotl](FineTune)
 
 ## [RAG](RAG/)
 - langchain_chroma
@@ -304,4 +304,18 @@ GPU SKUs	OPT-1.3B	OPT-6.7B	OPT-13.2B	OPT-30B	OPT-66B	OPT-175B
 8x A100 40G	2 hrs	5.7 hrs	10.8 hrs	1.85 days		
 8x A100 80G	1.4 hrs($45)	4.1 hrs ($132)	9 hrs ($290)	18 hrs ($580)	2.1 days ($1620)	
 64x A100 80G	31 minutes	51 minutes	1.25 hrs ($320)	4 hrs ($1024)	7.5 hrs ($1920)	20 hrs ($5120)
+
+
+# arcprize
+https://arcprize.org/arc
+
+Measuring task-specific skill is not a good proxy for intelligence.
+
+Skill is heavily influenced by prior knowledge and experience: unlimited priors or unlimited training data allows developers to "buy" levels of skill for a system. This masks a system's own generalization power.
+
+Intelligence lies in broad or general-purpose abilities; it is marked by skill-acquisition and generalization, rather than skill itself.
+
+AGI is a system that can efficiently acquire new skills outside of its training data.
+
+
 
