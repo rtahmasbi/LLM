@@ -219,3 +219,11 @@ for document in response["context"]:
 https://github.com/explodinggradients/ragas/blob/main/src/ragas/metrics/_faithfulness.py
 
 Faithfulness and Answer Relevancy
+
+
+https://github.com/NirDiamant/RAG_Techniques/blob/main/evaluation/evaluation_deep_eval.ipynb
+
+
+
+# more info
+https://github.com/NirDiamant/RAG_Techniques

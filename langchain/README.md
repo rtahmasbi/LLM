@@ -26,3 +26,30 @@ from langchain_core.prompts import ChatPromptTemplate
 
 ```
 
+
+# faiss
+https://python.langchain.com/docs/integrations/vectorstores/faiss/
+
+```py
+from langchain_community.vectorstores import FAISS
+
+index = faiss.IndexFlatL2(len(embeddings.embed_query("hello world")))
+
+vector_store = FAISS(
+    embedding_function=embeddings,
+    index=index,
+    docstore=InMemoryDocstore(),
+    index_to_docstore_id={},
+)
+
+
+results = vector_store.similarity_search(
+    "LangChain provides abstractions to make working with LLMs easy",
+    k=2,
+    filter={"source": "tweet"},
+)
+
+retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
+retriever.invoke("Stealing from the bank is a crime", filter={"source": "news"})
+
+```

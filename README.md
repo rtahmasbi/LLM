@@ -1,3 +1,4 @@
+
 # LLM
 I have covered these topics. You can go to each topic and see examples there.
 
@@ -37,7 +38,7 @@ I have covered these topics. You can go to each topic and see examples there.
 - `PagedAttention` algorithm allows storing continuous KV pairs in non-contiguous memory space
 
 ## [Graph](graph/)
-- query from graph database, such as neo4j with cypher
+- query from graph database, such as `neo4j` with `cypher`
 - building the knowledge graphs with `LLMGraphTransformer`
 
 
@@ -125,6 +126,16 @@ https://www.linkedin.com/pulse/evaluating-large-language-models-llms-standard-se
 
 
 While BLEU and ROUGE assess text similarity by analyzing matching n-gram statistics between the generated text and the reference text, BERTScore assesses similarity in the embedding space by assigning a score that reflects how closely the generated text aligns with the reference text in that space.
+
+
+## great
+https://github.com/NirDiamant/RAG_Techniques/blob/main/evaluation/evaluation_deep_eval.ipynb
+
+```py
+from deepeval import evaluate
+from deepeval.metrics import GEval, FaithfulnessMetric, ContextualRelevancyMetric
+from deepeval.test_case import LLMTestCase, LLMTestCaseParams
+```
 
 
 # Judging LLM-as-a-Judge
@@ -295,7 +306,7 @@ demo.launch()
 
 # train LLM from scartch time
 https://github.com/microsoft/DeepSpeedExamples/tree/master/applications/DeepSpeed-Chat
-
+```
 GPU SKUs	OPT-1.3B	OPT-6.7B	OPT-13.2B	OPT-30B	OPT-66B	OPT-175B
 1x V100 32G	1.8 days					
 1x A6000 48G	1.1 days	5.6 days				
@@ -304,7 +315,7 @@ GPU SKUs	OPT-1.3B	OPT-6.7B	OPT-13.2B	OPT-30B	OPT-66B	OPT-175B
 8x A100 40G	2 hrs	5.7 hrs	10.8 hrs	1.85 days		
 8x A100 80G	1.4 hrs($45)	4.1 hrs ($132)	9 hrs ($290)	18 hrs ($580)	2.1 days ($1620)	
 64x A100 80G	31 minutes	51 minutes	1.25 hrs ($320)	4 hrs ($1024)	7.5 hrs ($1920)	20 hrs ($5120)
-
+```
 
 # arcprize
 https://arcprize.org/arc
