@@ -53,7 +53,7 @@ Iterative Retrieval
 
 Explainable Retrieval 
 
-Knowledge Graph Integration (Graph RAG) 🕸️
+Knowledge Graph Integration (Graph RAG)
 
 GraphRag (Microsoft)
 

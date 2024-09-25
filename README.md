@@ -334,3 +334,26 @@ AGI is a system that can efficiently acquire new skills outside of its training 
 
 # ray.io
 https://www.ray.io/
+
+Ray is an open-source unified framework for scaling AI and Python applications like machine learning.
+
+https://docs.ray.io/en/latest/ray-overview/use-cases.html
+
+
+for python AI/ML applications
+
+https://github.com/ray-project/ray
+https://docs.ray.io/en/latest/serve/production-guide/index.html
+https://www.ray.io/
+
+
+https://docs.ray.io/en/latest/train/examples/transformers/huggingface_text_classification.html
+
+https://docs.ray.io/en/latest/train/examples.html
+
+
+Ray provides a distributed compute framework for scaling these models, allowing developers to train and deploy models faster and more efficiently. With specialized libraries for data streaming, training, fine-tuning, hyperparameter tuning, and serving, Ray simplifies the process of developing and deploying large-scale AI models.
+
+https://docs.ray.io/en/latest/ray-overview/examples.html
+
+

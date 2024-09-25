@@ -380,3 +380,26 @@ trainer = SFTTrainer
 LoraConfig
 BitsAndBytesConfig
 ```
+
+
+# Adapters
+https://huggingface.co/docs/peft/en/conceptual_guides/adapter
+
+Adapter-based methods add extra trainable parameters after the attention and fully-connected layers of a frozen pretrained model to reduce memory-usage and speed up training.
+- Low-Rank Hadamard Product (LoHa)
+- Low-Rank Kronecker Product (LoKr)
+- Orthogonal Finetuning (OFT)
+- Orthogonal Butterfly (BOFT)
+- Adaptive Low-Rank Adaptation (AdaLoRA)
+- Llama-Adapter
+
+
+more on Orthogonal Finetuning (OFT and BOFT):
+
+https://huggingface.co/docs/peft/en/conceptual_guides/oft
+
+
+# IA3
+https://huggingface.co/docs/peft/en/task_guides/ia3
+
+IA3 multiplies the model’s activations (the keys and values in the self-attention and encoder-decoder attention blocks, and the intermediate activation of the position-wise feedforward network) by three learned vectors. This PEFT method introduces an even smaller number of trainable parameters than LoRA which introduces weight matrices instead of vectors. 
