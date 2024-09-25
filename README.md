@@ -475,3 +475,9 @@ https://www.vellum.ai/llm-leaderboard
 https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard
 
 https://huggingface.co/spaces/open-llm-leaderboard-old/open_llm_leaderboard
+
+https://klu.ai/llm-leaderboard
+
+
+## price, tioken size, latency
+https://artificialanalysis.ai/leaderboards/models
