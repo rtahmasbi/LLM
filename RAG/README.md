@@ -227,3 +227,96 @@ https://github.com/NirDiamant/RAG_Techniques/blob/main/evaluation/evaluation_dee
 
 # more info
 https://github.com/NirDiamant/RAG_Techniques
+
+
+# reranking strategy
+- CohereRerank
+- FlashrankRerank
+- CrossEncoderReranker
+- LLMListwiseRerank
+- Colbert
+- Jina
+
+# retrievers
+https://python.langchain.com/docs/integrations/retrievers/
+
+A retriever is an interface that returns documents given an unstructured query.
+
+
+## arxiv
+https://python.langchain.com/docs/integrations/retrievers/arxiv/
+
+
+pip install -qU langchain-community arxiv
+
+```py
+
+from langchain_community.retrievers import ArxivRetriever
+
+retriever = ArxivRetriever(
+    load_max_docs=2,
+    get_ful_documents=True,
+)
+
+docs = retriever.invoke("1605.08386")
+
+retriever.invoke("Rasool Tahmasbi")
+
+
+
+
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+
+prompt = ChatPromptTemplate.from_template(
+    """Answer the question based only on the context provided.
+
+Context: {context}
+
+Question: {question}"""
+)
+
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+chain.invoke("What is the ImageBind model?")
+
+
+chain.invoke("Rasool Tahmasbi")
+
+
+
+```
+
+
+## tavily - search engine
+https://python.langchain.com/docs/integrations/retrievers/tavily/
+
+
+## wikipedia
+https://python.langchain.com/docs/integrations/retrievers/wikipedia/
+
+
+https://www.mediawiki.org/wiki/Extension:TextExtracts#API
+
+https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
+
+
+https://github.com/goldsmith/Wikipedia?tab=readme-ov-file
+
+
+https://pypi.org/project/wikipedia/

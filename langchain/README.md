@@ -53,3 +53,8 @@ retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
 retriever.invoke("Stealing from the bank is a crime", filter={"source": "news"})
 
 ```
+
+
+# langchain_community LLMs
+https://github.com/langchain-ai/langchain/tree/master/libs/community/langchain_community/llms
+
