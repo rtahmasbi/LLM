@@ -437,3 +437,41 @@ megatron/model/module.py
 """Megatron Module"""
 
 ```
+
+
+
+# Language Model Evaluation Harness
+https://github.com/EleutherAI/lm-evaluation-harness
+
+pip install lm-eval==0.3.0
+
+
+https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/tasks
+
+
+```
+lm_eval --model hf \
+    --model_args pretrained=EleutherAI/gpt-j-6B \
+    --tasks hellaswag \
+    --device cuda:0 \
+    --batch_size 8
+```
+
+
+ run 8 data replicas over 8 GPUs
+```
+torchrun --nproc-per-node=8 --no-python lm_eval \
+    --model nemo_lm \
+    --model_args path=<path_to_nemo_model>,devices=8 \
+    --tasks hellaswag \
+    --batch_size 32
+```
+
+
+
+# LLM leaderboard
+https://www.vellum.ai/llm-leaderboard
+
+https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard
+
+https://huggingface.co/spaces/open-llm-leaderboard-old/open_llm_leaderboard

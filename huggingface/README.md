@@ -27,7 +27,6 @@ l /home/rt/.cache/huggingface/hub/
 
 
 
-################################################################################
 ## gguf
 GPT-Generated Unified Format
 
@@ -38,7 +37,6 @@ https://huggingface.co/docs/hub/en/gguf-llamacpp
 https://github.com/ggerganov/ggml/blob/master/docs/gguf.md
 
 
-################################################################################
 ## task_summary
 https://huggingface.co/docs/transformers/task_summary
 
@@ -65,6 +63,11 @@ fill_mask = pipeline(task="fill-mask")       # --> masked
 - Object detection
 - Image segmentation
 - Depth estimation
+
+### Audio
+- Audio classification
+- Automatic speech recognition
+
 
 
 ### Multimodal
