@@ -180,12 +180,12 @@ text_splitter = RecursiveCharacterTextSplitter(
 ## Level 3 : Document Based Chunking
 - Document with Markdown: Langchain provides `MarkdownTextSplitter`
 - Document with Python/JS: Langchain provides `PythonCodeTextSplitter`
-- Document with tables: <table> tags in HTML, CSV format separated by ';', etc.
+- Document with tables: `table` tags in HTML, CSV format separated by ';', etc.
 - Document with images (Multi- Modal): `Unstructured.io` provides partition_pdf method to extract images from pdf document.
 
 
 ## Level 4: Semantic Chunking
-Llamindex has SemanticSplitterNodeParse class
+`Llamindex` has `SemanticSplitterNodeParse class`
 
 The hypothesis here is we can use embeddings of individual sentences to make more meaningful chunks. Basic idea is as follows:
 
