@@ -45,9 +45,6 @@ I have covered these topics. You can go to each topic and see examples there.
 ## [huggingface](huggingface/)
 
 
-## Standard Set of Metrics for Evaluating LLMs
-
-## LLM-as-a-Judge
 
 
 
@@ -143,10 +140,6 @@ from deepeval.test_case import LLMTestCase, LLMTestCaseParams
 
 # Judging LLM-as-a-Judge
 https://arxiv.org/pdf/2306.05685
-
-
-# cloud GPU
-https://www.runpod.io/console/console/pods
 
 
 
@@ -273,6 +266,11 @@ accelerate launch --config_file=examples/accelerate_configs/deepspeed_zero{1,2,3
 
 
 # companies
+
+
+## cloud GPU
+https://www.runpod.io/console/console/pods
+
 
 ## crewai
 https://www.crewai.com/

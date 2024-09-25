@@ -6,6 +6,10 @@ LoRA: Low-Rank Adaptation of Large Language Models
 
 https://arxiv.org/abs/2106.09685
 
+- lora_alpha: is a scaling parameter: "We then scale $\Delta W x$ by $\alpha r$, where $\alpha$ is a constant in $r$.
+
+
+
 ## paper explaned
 https://athekunal.medium.com/lora-low-rank-adaptation-paper-in-depth-explanation-417f5fa40668
 
