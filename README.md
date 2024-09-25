@@ -42,6 +42,9 @@ I have covered these topics. You can go to each topic and see examples there.
 - building the knowledge graphs with `LLMGraphTransformer`
 
 
+## [huggingface](huggingface/)
+
+
 ## Standard Set of Metrics for Evaluating LLMs
 
 ## LLM-as-a-Judge
@@ -357,3 +360,80 @@ Ray provides a distributed compute framework for scaling these models, allowing 
 https://docs.ray.io/en/latest/ray-overview/examples.html
 
 
+# triton
+https://openai.com/research/triton
+
+Introducing Triton: Open-source GPU programming for neural networks
+with no CUDA experience to write highly efficient GPU code
+
+We train our models using the open source library GPTNeoX (Andonian et al., 2021) developed by EleutherAI.
+
+
+
+# Megatron-LM
+Training Multi-Billion Parameter Language Models
+
+################################################################################
+## main paper
+Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism (2020)
+Mohammad Shoeybi, ...
+https://arxiv.org/pdf/1909.08053.pdf
+
+we train an 8.3 billion parameter transformer language model similar to GPT-2 and a 3.9 billion parameter model similar to BERT. 
+
+
+(it seems that all the big LLM use this library)
+
+################################################################################
+## more info
+https://github.com/NVIDIA/Megatron-LM
+
+How to train a Language Model with Megatron-LM
+https://huggingface.co/blog/megatron-training
+(I have the pdf)
+
+Megatron-LM is a highly optimized and efficient library for training large language models. With Megatron model parallelism, language models can be trained with billions of weights and then used in NeMo for downstream tasks.
+
+In examples/pretrain_gpt3_175B.sh we have provided an example of how to configure Megatron to run GPT-3 with 175 billion parameters on 1024 GPUs. 
+
+
+
+https://github.com/NVIDIA/Megatron-LM/blob/main/examples/run_text_generation_server_345M.sh
+GPT Text Generation: We have included a simple REST server to use for text generation in tools/run_text_generation_server.py.
+
+
+https://github.com/NVIDIA/Megatron-LM/blob/main/tools/run_text_generation_server.py
+
+
+################################################################################
+## GPT-2 model created by NVIDIA
+https://github.com/NVIDIA/Megatron-LM/blob/main/megatron/model/gpt_model.py
+
+megatron/model/gpt2_model.py
+
+
+```py
+class GPTModel(MegatronModule):
+    """GPT-2 Language model."""
+```
+
+
+```py
+get_language_model
+   -> TransformerLanguageModel
+
+
+
+class TransformerLanguageModel(MegatronModule):
+    """Transformer language model.
+# Embeddings.
+# Rotary positional embeddings
+# Encoder (usually set to True, False if part of an encoder-decoder architecture and in encoder-only stage).
+# Decoder (usually set to False, True if part of an encoder-decoder architecture and in decoder-only stage).
+# Pooler.
+
+
+megatron/model/module.py
+"""Megatron Module"""
+
+```
