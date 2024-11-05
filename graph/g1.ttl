@@ -1,31 +1,13 @@
 @base <tifin://entity/> .
 @prefix entity: <tifin://entity/> .
-@prefix pos: <tifin://pos/> .
 @prefix pred: <tifin://predicator/> .
-@prefix wd: <http://www.wikidata.org/entity/> .
-@prefix s: <http://www.wikidata.org/entity/statement/> .
-@prefix wdt: <http://www.wikidata.org/prop/direct/> .
-@prefix p: <http://www.wikidata.org/prop/> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix wikibase: <http://wikiba.se/ontology#> .
-@prefix schema: <http://schema.org/> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix dc: <http://purl.org/dc/elements/1.1/> .
 
 
 # instance of (P31)
-<p1> a <portfolio> .
+<p1> a <tifin://entity/> .
 # P1552 has characteristic
 # name (P2561)
 <p1> pred:name "p1" .
 <p1> pred:list_stock "APPL", "GOOG", "TESLA" .
 
-
-<portfolio> a <tifin://entity/> ;
-	rdfs:label "portfolio"@en ;
-	skos:prefLabel "portfolio"@en ;
-	schema:name "portfolio"@en ;
-	schema:description "any portfolio"@en .
 

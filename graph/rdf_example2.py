@@ -71,7 +71,7 @@ chain = GraphSparqlQAChain.from_llm(
     ChatOpenAI(temperature=0), graph=graph, verbose=True, allow_dangerous_requests=True
 )
 
-chain.run("What is the list of stocks in portfolio p1?")
+chain.run("What is the list of stocks in p1?")
 
 
 query = """
