@@ -1,0 +1,17 @@
+@base <tifin://entity/> .
+@prefix entity: <tifin://entity/> .
+@prefix pos: <tifin://pos/> .
+@prefix pred: <tifin://predicator/> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix s: <http://www.wikidata.org/entity/statement/> .
+@prefix wdt: <http://www.wikidata.org/prop/direct/> .
+@prefix p: <http://www.wikidata.org/prop/> .
+
+
+# instance of (P31)
+<portfolio> wdt:P31 <Portfolio> .
+# P1552 has characteristic
+<portfolio> pred:stock "APPL" "GOOG" "TESLA" .
+# name (P2561)
+<portfolio> wdt:P2561 "p1" .
+
