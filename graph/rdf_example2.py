@@ -71,14 +71,15 @@ chain = GraphSparqlQAChain.from_llm(
     ChatOpenAI(temperature=0), graph=graph, verbose=True, allow_dangerous_requests=True
 )
 
-chain.run("What is the list of stocks in portfolio p1?")
+chain.run("What is the list of stocks in portfolio portfolio1?")
 
 
 query = """
-PREFIX tifin: <tifin://predicator/>
+PREFIX pred: <tifin://predicator/>
 SELECT ?stock
 WHERE {
-    tifin:p1 tifin:stock ?stock .
+    ?portfolio pred:list_stock ?stock .
+    ?portfolio pred:name "portfolio1" .
 }
 """
 graph.query(query)
