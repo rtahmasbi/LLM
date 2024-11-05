@@ -16,11 +16,18 @@
 
 
 # instance of (P31)
-<portfolio1> a <portfolio> .
+<portfolio1> wdt:P31 <portfolio> .
 # P1552 has characteristic
 <portfolio1> pred:list_stock "APPL", "GOOG", "TESLA" .
 # name (P2561)
 <portfolio1> wdt:P2561 "p1" .
+
+
+<portfolio> a <tifin://entity/> ;
+	rdfs:label "portfolio"@en ;
+	skos:prefLabel "portfolio"@en ;
+	schema:name "portfolio"@en ;
+	schema:description "any portfolio"@en .
 
 
 wd:P31 a wikibase:Property ;
@@ -28,3 +35,13 @@ wd:P31 a wikibase:Property ;
 	skos:prefLabel "instance of"@en ;
 	schema:name "instance of"@en ;
 	schema:description "that class of which this subject is a particular example and member; different from P279 (subclass of); for example: K2 is an instance of mountain; volcano is a subclass of mountain (and an instance of volcanic landform)"@en .
+
+wd:P2561 a wikibase:Property ;
+	rdfs:label "name"@en ;
+	skos:prefLabel "name"@en ;
+	schema:name "name"@en ;
+	schema:description "name the subject is known by. If a more specific property is available, use that"@en .
+
+
+wdt:P31 a owl:ObjectProperty .
+wdt:P2561 a owl:ObjectProperty .
