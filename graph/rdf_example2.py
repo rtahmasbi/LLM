@@ -30,7 +30,6 @@ chain = GraphSparqlQAChain.from_llm(
     ChatOpenAI(temperature=0), graph=graph, verbose=True, allow_dangerous_requests=True
 )
 
-
 chain.run("What is Tim Berners-Lee's work homepage?")
 
 
@@ -63,4 +62,30 @@ WHERE {
 """
 graph.query(query)
 
+
+
+
+
+
+chain = GraphSparqlQAChain.from_llm(
+    ChatOpenAI(temperature=0), graph=graph, verbose=True, allow_dangerous_requests=True
+)
+
+chain.run("What is the list of stocks in portfolio p1?")
+
+
+query = """
+PREFIX tifin: <tifin://predicator/>
+SELECT ?stock
+WHERE {
+    tifin:p1 tifin:stock ?stock .
+}
+"""
+graph.query(query)
+
+chain.run("Create a portfolio named p3.")
+
+
+
+chain.invoke({"query": "Create a portfolio named p3."})
 
