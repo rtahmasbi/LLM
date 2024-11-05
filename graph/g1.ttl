@@ -11,7 +11,7 @@
 # instance of (P31)
 <portfolio> wdt:P31 <Portfolio> .
 # P1552 has characteristic
-<portfolio> pred:stock "APPL" "GOOG" "TESLA" .
+<portfolio> pred:stock "APPL", "GOOG", "TESLA" .
 # name (P2561)
 <portfolio> wdt:P2561 "p1" .
 

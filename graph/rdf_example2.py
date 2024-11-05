@@ -16,7 +16,7 @@ from langchain_openai import ChatOpenAI
 
 
 graph = RdfGraph(
-    source_file="http://www.w3.org/People/Berners-Lee/card",
+    source_file="/home/rt/GITHUB/LLM/graph/g1.ttl",
     standard="rdf",
     local_copy="test.ttl",
 )
