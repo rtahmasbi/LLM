@@ -1,10 +1,10 @@
-@prefix p: <tifin://portfolio/> .
-@prefix tifin: <tifin://> .
+@prefix portfolio: <tifin://portfolio/> .
+@prefix property: <tifin://property/> .
 
 
 # instance of (P31)
-p:p1 a <tifin://portfolio/> .
-p:p1 tifin:name "p1" .
-p:p1 tifin:list_stock "APPL", "GOOG", "TESLA" .
+portfolio:p1 a <tifin://portfolio/> .
+portfolio:p1 property:name "p1" .
+portfolio:p1 property:list_stock "APPL", "GOOG", "TESLA" .
 
 
