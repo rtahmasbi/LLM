@@ -1,9 +1,10 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix glb: <tifin://> .
 @prefix portfolio: <tifin://portfolio/> .
 @prefix : <http://xmlns.com/foaf/0.1/> .
 
 
-portfolio:p1 a :portfolio .
+portfolio:p1 a glb:portfolio .
 portfolio:p1 :name "p1" .
 portfolio:p1 :list_stock "APPL", "GOOG", "TESLA" .
 

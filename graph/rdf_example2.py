@@ -101,6 +101,20 @@ WHERE {
 graph.query(query)
 
 
+
+query = """
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?stock
+WHERE {
+    ?p1 foaf:portfolio ?stock .
+    ?stock foaf:list_stock ?stock .
+}
+"""
+graph.query(query)
+
+
+
+
 graph.graph.all_nodes() 
 list(graph.graph.predicates())
 
