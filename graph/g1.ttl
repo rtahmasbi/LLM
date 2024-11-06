@@ -1,10 +1,10 @@
 @prefix portfolio: <tifin://portfolio/> .
-@prefix property: <tifin://property/> .
+@prefix : <http://xmlns.com/foaf/0.1/> .
 
 
 # instance of (P31)
-"p1" a <tifin://portfolio/> .
-portfolio:p1 property:name "p1" .
-portfolio:p1 property:list_stock "APPL", "GOOG", "TESLA" .
+portfolio:p1 a <tifin://portfolio/> .
+portfolio:p1 :name "p1" .
+portfolio:p1 :list_stock "APPL", "GOOG", "TESLA" .
 
 
