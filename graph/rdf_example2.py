@@ -71,7 +71,7 @@ chain = GraphSparqlQAChain.from_llm(
     ChatOpenAI(temperature=0), graph=graph, verbose=True, allow_dangerous_requests=True
 )
 
-chain.run("What is the list of stocks in p1?")
+chain.invoke({"query": "What is the list of stocks in p1?"})
 
 
 query = """
@@ -89,4 +89,21 @@ chain.run("Create a portfolio named p3.")
 
 
 chain.invoke({"query": "Create a portfolio named p3."})
+
+
+query = """
+PREFIX pred: <tifin://predicator/>
+SELECT ?stock
+WHERE {
+    ?portfolio pred:list_stock ?stock .
+}
+"""
+graph.query(query)
+
+
+graph.graph.all_nodes() 
+list(graph.graph.predicates())
+
+
+https://github.com/langchain-ai/langchain/blob/41b7a5169d3b6bdb0949a409397707eb69b3cd07/libs/community/langchain_community/chains/graph_qa/sparql.py#L25
 
