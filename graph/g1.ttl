@@ -3,8 +3,7 @@
 @prefix : <http://xmlns.com/foaf/0.1/> .
 
 
-# instance of (P31)
-portfolio:p1 rdf:type <tifin://portfolio/> .
+portfolio:p1 a <tifin://portfolio/> .
 portfolio:p1 :name "p1" .
 portfolio:p1 :list_stock "APPL", "GOOG", "TESLA" .
 

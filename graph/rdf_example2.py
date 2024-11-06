@@ -92,10 +92,10 @@ chain.invoke({"query": "Create a portfolio named p3."})
 
 
 query = """
-PREFIX pred: <tifin://predicator/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 SELECT ?stock
 WHERE {
-    ?portfolio pred:list_stock ?stock .
+    <tifin://portfolio/p1> foaf:list_stock ?stock .
 }
 """
 graph.query(query)
