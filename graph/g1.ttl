@@ -3,7 +3,7 @@
 
 
 # instance of (P31)
-portfolio:p1 a <tifin://portfolio/> .
+"p1" a <tifin://portfolio/> .
 portfolio:p1 property:name "p1" .
 portfolio:p1 property:list_stock "APPL", "GOOG", "TESLA" .
 
