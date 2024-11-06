@@ -1,10 +1,10 @@
 @prefix p: <tifin://portfolio/> .
-@prefix pa: <tifin://portfolio/p1/> .
+@prefix tifin: <tifin://> .
 
 
 # instance of (P31)
 portfolio:p1 a <tifin://portfolio/> .
-portfolio:p1 pa:name "p1" .
-portfolio:p1 pa:list_stock "APPL", "GOOG", "TESLA" .
+portfolio:p1 tifin:name "p1" .
+portfolio:p1 tifin:list_stock "APPL", "GOOG", "TESLA" .
 
 

@@ -17,7 +17,7 @@ from langchain_openai import ChatOpenAI
 
 graph = RdfGraph(
     source_file="/home/rt/GITHUB/LLM/graph/g1.ttl",
-    standard="rdf",
+    standard="rdfs",
     local_copy="test.ttl",
 )
 
