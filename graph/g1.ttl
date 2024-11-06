@@ -3,8 +3,8 @@
 
 
 # instance of (P31)
-portfolio:p1 a <tifin://portfolio/> .
-portfolio:p1 tifin:name "p1" .
-portfolio:p1 tifin:list_stock "APPL", "GOOG", "TESLA" .
+p:p1 a <tifin://portfolio/> .
+p:p1 tifin:name "p1" .
+p:p1 tifin:list_stock "APPL", "GOOG", "TESLA" .
 
 
