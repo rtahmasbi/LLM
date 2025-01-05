@@ -63,3 +63,18 @@ https://github.com/langchain-ai/langchain/tree/master/libs/community/langchain_c
 
 # a great exampel of prompts for graph_qa
 https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/chains/graph_qa/prompts.py
+
+
+Check these files as well:
+- https://github.com/rtahmasbi/LLM/blob/main/graph/rdf_example2.py
+- https://github.com/langchain-ai/langchain/blob/master/docs/docs/tutorials/graph.ipynb
+
+
+
+
+https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/chains/graph_qa/base.py
+
+https://github.com/langchain-ai/langchain/blob/41b7a5169d3b6bdb0949a409397707eb69b3cd07/libs/community/tests/integration_tests/chains/test_graph_database_sparql.py#L9
+
+
+https://github.com/langchain-ai/langchain/blob/41b7a5169d3b6bdb0949a409397707eb69b3cd07/libs/community/langchain_community/chains/graph_qa/sparql.py#L25
