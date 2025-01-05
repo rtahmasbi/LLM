@@ -58,3 +58,8 @@ retriever.invoke("Stealing from the bank is a crime", filter={"source": "news"})
 # langchain_community LLMs
 https://github.com/langchain-ai/langchain/tree/master/libs/community/langchain_community/llms
 
+
+
+
+# a great exampel of prompts for graph_qa
+https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/chains/graph_qa/prompts.py
