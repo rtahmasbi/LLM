@@ -1,4 +1,7 @@
 
+https://github.com/deepseek-ai/DeepSeek-R1
+
+
 # GPU System Requirements for Running DeepSeek-R1
 
 https://apxml.com/posts/gpu-requirements-deepseek-r1
