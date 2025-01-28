@@ -22,6 +22,8 @@ I have covered these topics. You can go to each topic and see examples there.
 
 ## [Llama](Llama/)
 
+## [Deepseek](Deepseek/)
+
 ## [Other LLM's](Other_LLMs/)
 - TinyLlama
 - Mistral
