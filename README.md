@@ -30,8 +30,8 @@ I have covered these topics. You can go to each topic and see examples there.
 - facebook/opt-350m
 
 
-## [Reinforcement Learning](RLHF/)
-- [Reinforcement Learning from Human Feedback (RLHF)](RLHF/)
+## [Reinforcement Learning](ReinforcementLearning/)
+- Reinforcement Learning from Human Feedback (RLHF)
 - Reinforcement learning from AI feedback (RLAIF)
 
 
@@ -152,17 +152,6 @@ https://huggingface.co/docs/accelerate/index
 
 https://github.com/huggingface/accelerate
 
-```sh
-torchrun \ # python -m torch.distributed.run 
-    --nproc_per_node 2 \
-    --nnodes 2 \
-    --rdzv_id 2299 \ # A unique job id 
-    --rdzv_backend c10d \
-    --rdzv_endpoint master_node_ip_address:29500 \
-    ./nlp_example.py
-
-```
-
 
 ```py
 + from accelerate import Accelerator
@@ -183,6 +172,20 @@ torchrun \ # python -m torch.distributed.run
       optimizer.step()
       scheduler.step()
 ```
+
+
+## torchrun
+```sh
+torchrun \ # python -m torch.distributed.run 
+    --nproc_per_node 2 \
+    --nnodes 2 \
+    --rdzv_id 2299 \ # A unique job id 
+    --rdzv_backend c10d \
+    --rdzv_endpoint master_node_ip_address:29500 \
+    ./nlp_example.py
+
+```
+
 
 
 ## bitsandbytes
