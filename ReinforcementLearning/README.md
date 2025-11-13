@@ -17,13 +17,14 @@ pip install trl
 
 # Trainers
 - `SFTTrainer` - Supervised fine-tuning, (input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
-- `DPOTrainer` - PPO (Proximal Policy Optimisation)
+- `DPOTrainer` - Direct Preference Optimization
 - `RewardTrainer` - Reward Modeling (input columsn: chosen, rejected) [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
 - `CPOTrainer`
 - `PPOTrainer` - PPO (Proximal Policy Optimisation)
 - `ORPOTrainer`
 - `KTOTrainer`
 - Binary Classifier Optimization (BCO)
+- Group Relative Policy Optimization
 
 
 
@@ -111,7 +112,21 @@ trainer.train()
 
 
 
-## DPOTrainer
+```py
+from trl import GRPOTrainer
+
+trainer = GRPOTrainer(
+    model="meta-llama/Llama-3-8b-instruct",
+    ref_model="meta-llama/Llama-3-8b-instruct",
+    dataset=dataset,
+    reward_model="OpenAssistant/reward-model-deberta-v3-large"
+)
+trainer.train()
+
+```
+
+
+## DPO - Direct Preference Optimization
 ```py
 from trl import DPOTrainer
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -133,3 +148,12 @@ trainer.train()
 
 
 ```
+
+# references
+https://github.com/norhum/reinforcement-learning-from-scratch/blob/main/README.md
+Reinforcement Learning From Scratch
+- Multi-Armed Bandits (MAB): (Epsilon-Greedy strategy, Upper Confidence Bound)
+- Value-Based Methods: (Q-Values, Q-Learning, SARSA)
+- Deep Reinforcement Learning: (Deep Q-Networks - DQN)
+- Policy Gradient Methods: (Monte Carlo policy gradients)
+- Actor-Critic Methods: (Advantage Actor-Critic (A2C) algorithm)
