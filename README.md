@@ -497,3 +497,10 @@ MemGPT: Towards LLMs as Operating Systems
 
 # [Diffusion models](Diffusion/)
 
+
+# nanochat
+https://github.com/karpathy/nanochat
+
+The fastest way to feel the magic is to run the speedrun script speedrun.sh, which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours.
+
+
