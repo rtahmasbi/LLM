@@ -277,15 +277,6 @@ accelerate launch --config_file=examples/accelerate_configs/deepspeed_zero{1,2,3
 https://www.runpod.io/console/console/pods
 
 
-## crewai
-https://www.crewai.com/
-
-## autogen-studio
-AI Agents
-
-https://autogen-studio.com/
-
-
 ## groq
 Groq is Fast AI Inference
 
@@ -503,4 +494,19 @@ https://github.com/karpathy/nanochat
 
 The fastest way to feel the magic is to run the speedrun script speedrun.sh, which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours.
 
+
+# Agentic campanies
+## crewai
+https://www.crewai.com/
+
+## autogen-studio
+AI Agents
+
+
+## zapier
+Automate AI Workflows, Agents, and Apps
+https://zapier.com/
+
+## n8n
+https://n8n.io/
 
