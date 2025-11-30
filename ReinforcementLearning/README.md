@@ -20,9 +20,8 @@ pip install trl
 (input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
 SFTTrainer uses the standard LM next-token cross-entropy loss:
 
-```math
-\mathcal{L} = -\sum_{t=1}^{T} \log \pi_\theta (y_t \mid y_{<t}).
-```
+$$\mathcal{L} = -\sum_{t=1}^{T} \log \pi_\theta (y_t \mid y_{<t}).$$
+
 
 ```json
 {
@@ -37,8 +36,8 @@ SFTTrainer uses the standard LM next-token cross-entropy loss:
 ```json
 {
     "prompt": "...",
-    "chosen": "...",   // preferred answer
-    "rejected": "..."  // dispreferred answer
+    "chosen": "...",   # preferred answer
+    "rejected": "..."  # dispreferred answer
 }
 ```
 DPO fine-tunes a model by increasing the likelihood of the chosen output relative to rejected output.
@@ -58,6 +57,28 @@ A_\theta(x, r) = \log \pi_\theta(r \mid x) - \log \pi_{\text{ref}}(r \mid x).
 
 ## `RewardTrainer` - Reward Modeling
 (input columsn: chosen, rejected) [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
+```json
+{
+    "prompt": "...",
+    "chosen": "...",      # preferred output
+    "rejected": "..."     # dispreferred output
+}
+```
+
+\[
+r_\theta(x, c) = \text{RM}_\theta(x, c),
+\qquad
+r_\theta(x, r) = \text{RM}_\theta(x, r).
+\]
+
+\[
+\mathcal{L}_{\text{RM}} = -
+\log \sigma\!\left(
+r_\theta(x, c) - r_\theta(x, r)
+\right),
+\]
+
+
 
 ## `CPOTrainer`
 ## `PPOTrainer` - PPO (Proximal Policy Optimisation)
