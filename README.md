@@ -1,23 +1,22 @@
 
-# LLM
-I have covered these topics. You can go to each topic and see examples there.
 
-## [langchain](langchain/)
+# [langchain](langchain/)
 - LangChain - [langchain](langchain/)
 - LangSmith - production-grade LLM applications
 - LangGraph - [LangGraph](graph/)
 - LangServe - server API
 
 
-## [Fine Tune](FineTune/)
+# [Fine Tune](FineTune/)
 - LoRA
 - QLoRA
 - [axolotl](FineTune)
 
-## [RAG](RAG/)
+# [RAG](RAG/)
 - langchain_chroma
 - vectorstore
 
+# LLM's
 ## [OpenAI](OpenAI/)
 
 ## [Llama](Llama/)
@@ -30,58 +29,35 @@ I have covered these topics. You can go to each topic and see examples there.
 - facebook/opt-350m
 
 
-## [Reinforcement Learning](ReinforcementLearning/)
+# [Reinforcement Learning](ReinforcementLearning/)
 - Reinforcement Learning from Human Feedback (RLHF)
 - Reinforcement learning from AI feedback (RLAIF)
 
+## Trainers
+- `SFTTrainer` - Supervised fine-tuning, (input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
+- `DPOTrainer` - Direct Preference Optimization
+- `RewardTrainer` - Reward Modeling (input columsn: chosen, rejected) [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
+- `CPOTrainer`
+- `PPOTrainer` - PPO (Proximal Policy Optimisation)
+- `ORPOTrainer`
+- `KTOTrainer`
+- Binary Classifier Optimization (BCO)
+- Group Relative Policy Optimization
 
-## [vLLM](vLLM/)
+
+
+# [vLLM](vLLM/)
 - Optimizing KV pairs
 - `PagedAttention` algorithm allows storing continuous KV pairs in non-contiguous memory space
 
-## [Graph](graph/)
+# [Graph](graph/)
 - query from graph database, such as `neo4j` with `cypher`
 - building the knowledge graphs with `LLMGraphTransformer`
 
 
-## [huggingface](huggingface/)
 
+# [MCP](MCP/)
 
-
-
-
-
-# datasets
-```py
-from datasets import list_datasets
-list_datasets()
->
-['acronym_identification',
- 'ade_corpus_v2',
- 'adversarial_qa',
- 'aeslc',
- 'afrikaans_ner_corpus',
- 'ag_news',
- ...
-]
-```
-
-
-## load local datasset
-```py
-from datasets import load_dataset
-ds = load_dataset('csv', data_files='path/to/local/my_dataset.csv')
-
-from datasets import load_dataset
-ds = load_dataset('json', data_files='path/to/local/my_dataset.json')
-
-from datasets import load_dataset
-ds = load_dataset('path/to/local/loading_script/loading_script.py', split='train')
-
-
-from datasets import load_from_disk
-ds = load_from_disk('path/to/dataset/directory')
-```
 
 
 

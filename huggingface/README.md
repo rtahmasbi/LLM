@@ -75,3 +75,38 @@ Multimodal tasks require a model to process multiple data modalities (text, imag
 
 Document question answering
 
+
+
+
+# datasets
+```py
+from datasets import list_datasets
+list_datasets()
+>
+['acronym_identification',
+ 'ade_corpus_v2',
+ 'adversarial_qa',
+ 'aeslc',
+ 'afrikaans_ner_corpus',
+ 'ag_news',
+ ...
+]
+```
+
+
+## load local datasset
+```py
+from datasets import load_dataset
+ds = load_dataset('csv', data_files='path/to/local/my_dataset.csv')
+
+from datasets import load_dataset
+ds = load_dataset('json', data_files='path/to/local/my_dataset.json')
+
+from datasets import load_dataset
+ds = load_dataset('path/to/local/loading_script/loading_script.py', split='train')
+
+
+from datasets import load_from_disk
+ds = load_from_disk('path/to/dataset/directory')
+```
+
