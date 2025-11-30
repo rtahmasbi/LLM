@@ -20,7 +20,7 @@ pip install trl
 (input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
 SFTTrainer uses the standard LM next-token cross-entropy loss:
 ```math
-L=−\sum_t \​log P_\thta​(y_t​|y<t​)
+\mathcal{L} = -\sum_{t=1}^{T} \log \pi_\theta(y_t \mid y_{<t}).
 ```
 
 ```json
@@ -42,9 +42,8 @@ L=−\sum_t \​log P_\thta​(y_t​|y<t​)
 ```
 DPO fine-tunes a model by increasing the likelihood of the chosen output relative to rejected output.
 ```math
-A_\theta(x, c) = \log \pi_\theta(c \mid x) - \log \pi_{\text{ref}}(c \mid x),
-A_\theta(x, r) = \log \pi_\theta(r \mid x) - \log \pi_{\text{ref}}(r \mid x).
-
+A_\theta(x, c) = \log \pi_\theta(c \mid x) - \log \pi_{\text{ref}}(c \mid x),\\
+A_\theta(x, r) = \log \pi_\theta(r \mid x) - \log \pi_{\text{ref}}(r \mid x).\\
 \mathcal{L}_{\text{DPO}} = - \log \sigma\!\left( \beta \left[ A_\theta(x, c) - A_\theta(x, r) \right] \right)
 ```
 
