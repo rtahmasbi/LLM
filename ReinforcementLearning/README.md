@@ -17,9 +17,10 @@ pip install trl
 
 # Trainers
 ## `SFTTrainer` Supervised fine-tuning
-(input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
+[data example](https://huggingface.co/datasets/stanfordnlp/imdb)
 
 SFTTrainer uses the standard LM next-token cross-entropy loss:
+
 $$\mathcal{L} = -\sum_{t=1}^{T} \log \pi_\theta (y_t \mid y_{<t})$$
 
 
@@ -56,7 +57,7 @@ A_\theta(x, r) = \log \pi_\theta(r \mid x) - \log \pi_{\text{ref}}(r \mid x).
 
 
 ## `RewardTrainer` - Reward Modeling
-(input columsn: chosen, rejected) [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
+[data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
 ```json
 {
     "prompt": "...",
@@ -65,23 +66,40 @@ A_\theta(x, r) = \log \pi_\theta(r \mid x) - \log \pi_{\text{ref}}(r \mid x).
 }
 ```
 
+`RewardTrainer` trains a reward model used for RLHF or DPO.
+The input is pairwise preference data, similar to DPO but the model outputs a scalar reward, not a token distribution.
+
 $$
 r_\theta(x, c) = \text{RM}_\theta(x, c),
-\qquad
+$$
+
+$$
 r_\theta(x, r) = \text{RM}_\theta(x, r).
 $$
 
 $$
 \mathcal{L}_{\text{RM}} = -
-\log \sigma\!\left(
-r_\theta(x, c) - r_\theta(x, r)
-\right),
+\log \sigma \left(r_\theta(x, c) - r_\theta(x, r)\right),
 $$
 
 
 
 ## `CPOTrainer`
 ## `PPOTrainer` - PPO (Proximal Policy Optimisation)
+PPO uses a clipped policy gradient objective + KL reward shaping.
+
+Policy ratio:
+$$
+r_t(\theta) = 
+\frac{
+\pi_\theta(a_t \mid s_t)
+}{
+\pi_{\theta_{\text{old}}}(a_t \mid s_t)
+}.
+$$
+
+
+
 ## `ORPOTrainer`
 ## `KTOTrainer`
 ## Binary Classifier Optimization (BCO)
