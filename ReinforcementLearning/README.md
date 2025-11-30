@@ -16,11 +16,12 @@ pip install trl
 
 
 # Trainers
-- `SFTTrainer` - Supervised fine-tuning, (input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
+## `SFTTrainer` Supervised fine-tuning
+(input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
 SFTTrainer uses the standard LM next-token cross-entropy loss:
-$$
+```math
 L=−\sum_t \​log P_\thta​(y_t​|y<t​)
-$$
+```
 
 ```json
 {
@@ -31,7 +32,7 @@ $$
 
 
 
-- `DPOTrainer` - Direct Preference Optimization
+## `DPOTrainer` - Direct Preference Optimization
 ```json
 {
     "prompt": "...",
@@ -40,22 +41,24 @@ $$
 }
 ```
 DPO fine-tunes a model by increasing the likelihood of the chosen output relative to rejected output.
-$$
+```math
 A_\theta(x, c) = \log \pi_\theta(c \mid x) - \log \pi_{\text{ref}}(c \mid x),
 A_\theta(x, r) = \log \pi_\theta(r \mid x) - \log \pi_{\text{ref}}(r \mid x).
 
 \mathcal{L}_{\text{DPO}} = - \log \sigma\!\left( \beta \left[ A_\theta(x, c) - A_\theta(x, r) \right] \right)
-$$
+```
 
 
 
-- `RewardTrainer` - Reward Modeling (input columsn: chosen, rejected) [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
-- `CPOTrainer`
-- `PPOTrainer` - PPO (Proximal Policy Optimisation)
-- `ORPOTrainer`
-- `KTOTrainer`
-- Binary Classifier Optimization (BCO)
-- Group Relative Policy Optimization
+## `RewardTrainer` - Reward Modeling
+(input columsn: chosen, rejected) [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
+
+## `CPOTrainer`
+## `PPOTrainer` - PPO (Proximal Policy Optimisation)
+## `ORPOTrainer`
+## `KTOTrainer`
+## Binary Classifier Optimization (BCO)
+## Group Relative Policy Optimization
 
 
 
