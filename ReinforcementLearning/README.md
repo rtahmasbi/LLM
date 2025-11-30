@@ -88,51 +88,34 @@ $$
 PPO uses a clipped policy gradient objective + KL reward shaping.
 
 Policy ratio:
+
 $$r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}.$$
 
 Clipped PPO Objective:
+
 $$\mathcal{L}_{\text{PPO}} = \mathbb{E}_t [\min( r_t(\theta) A_t, \text{clip}(r_t(\theta), 1 - \epsilon, 1 + \epsilon) A_t )].$$
 
 
 KL Penalty (used in RLHF):
-$$
-r_t^{\text{RLHF}}
-=
-r_t^{\text{RM}}
--
-\beta \, 
-D_{\mathrm{KL}}
-\left(
+
+$$r_t^{\text{RLHF}} = r_t^{\text{RM}} - \beta \, D_{\mathrm{KL}}
+(
 \pi_\theta(\cdot \mid s_t)
 \;\|\;
-\pi_{\text{ref}}(\cdot \mid s_t)
-\right).
+\pi_{\text{ref}}(\cdot \mid s_t) ).
 $$
 
 
 Generalized Advantage Estimation (GAE):
-$$
-A_t
-=
-\sum_{l=0}^{\infty}
-(\gamma \lambda)^l
-\left(
-\delta_{t+l}
-\right),
-\qquad
+
+$$A_t = \sum_{l=0}^{\infty} (\gamma \lambda)^l (\delta_{t+l}), \qquad
 \delta_t = r_t + \gamma V(s_{t+1}) - V(s_t).
 $$
 
 
 Full PPO Loss (Policy + Value + Entropy):
-$$
-\mathcal{L}
-=
-\mathcal{L}_{\text{PPO}}
-+
-c_v \, (V_\theta(s_t) - R_t)^2
--
-c_e \, H(\pi_\theta(\cdot \mid s_t)).
+
+$$\mathcal{L} = \mathcal{L}_{\text{PPO}} + c_v \, (V_\theta(s_t) - R_t)^2 - c_e \, H(\pi_\theta(\cdot \mid s_t)).
 $$
 
 
