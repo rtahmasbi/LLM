@@ -19,7 +19,7 @@ pip install trl
 ## `SFTTrainer` Supervised fine-tuning
 [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
 
-SFTTrainer uses the standard LM next-token cross-entropy loss:
+SFTTrainer uses the standard LM next-token cross-entropy loss
 
 $$\mathcal{L} = -\sum_{t=1}^{T} \log \pi_\theta (y_t \mid y_{<t})$$
 
@@ -88,14 +88,10 @@ $$
 ## `PPOTrainer` - PPO (Proximal Policy Optimisation)
 PPO uses a clipped policy gradient objective + KL reward shaping.
 
-Policy ratio:
+Policy ratio
+
 $$
-r_t(\theta) = 
-\frac{
-\pi_\theta(a_t \mid s_t)
-}{
-\pi_{\theta_{\text{old}}}(a_t \mid s_t)
-}.
+r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}.
 $$
 
 
