@@ -88,17 +88,11 @@ $$
 PPO uses a clipped policy gradient objective + KL reward shaping.
 
 Policy ratio:
-
-$$
-r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}.
-$$
+$$r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}.$$
 
 Clipped PPO Objective:
-
 $$
-\mathcal{L}_{\text{PPO}}
-=
-\mathbb{E}_t \left[
+\mathcal{L}_{\text{PPO}} = \mathbb{E}_t \left[
 \min\Big(
 r_t(\theta) A_t,\;
 \text{clip}(r_t(\theta), 1 - \epsilon, 1 + \epsilon) A_t
@@ -115,7 +109,7 @@ r_t^{\text{RM}}
 -
 \beta \, 
 D_{\mathrm{KL}}
-\!\left(
+\left(
 \pi_\theta(\cdot \mid s_t)
 \;\|\;
 \pi_{\text{ref}}(\cdot \mid s_t)
