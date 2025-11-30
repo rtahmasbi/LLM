@@ -91,14 +91,7 @@ Policy ratio:
 $$r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}.$$
 
 Clipped PPO Objective:
-$$
-\mathcal{L}_{\text{PPO}} = \mathbb{E}_t \left[
-\min\Big(
-r_t(\theta) A_t,\;
-\text{clip}(r_t(\theta), 1 - \epsilon, 1 + \epsilon) A_t
-\Big)
-\right].
-$$
+$$\mathcal{L}_{\text{PPO}} = \mathbb{E}_t [\min( r_t(\theta) A_t, \text{clip}(r_t(\theta), 1 - \epsilon, 1 + \epsilon) A_t )].$$
 
 
 KL Penalty (used in RLHF):
