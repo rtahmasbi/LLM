@@ -19,9 +19,8 @@ pip install trl
 ## `SFTTrainer` Supervised fine-tuning
 [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
 
-SFTTrainer uses the standard LM next-token cross-entropy loss
-
-$$\mathcal{L} = -\sum_{t=1}^{T} \log \pi_\theta (y_t \mid y_{<t})$$
+SFTTrainer uses the standard LM next-token cross-entropy loss:
+$\mathcal{L} = -\sum_{t=1}^{T} \log \pi_\theta (y_t \mid y_{<t})$
 
 
 ```json
@@ -88,11 +87,68 @@ $$
 ## `PPOTrainer` - PPO (Proximal Policy Optimisation)
 PPO uses a clipped policy gradient objective + KL reward shaping.
 
-Policy ratio
+Policy ratio:
 
 $$
 r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}.
 $$
+
+Clipped PPO Objective:
+
+$$
+\mathcal{L}_{\text{PPO}}
+=
+\mathbb{E}_t \left[
+\min\Big(
+r_t(\theta) A_t,\;
+\text{clip}(r_t(\theta), 1 - \epsilon, 1 + \epsilon) A_t
+\Big)
+\right].
+$$
+
+
+KL Penalty (used in RLHF):
+$$
+r_t^{\text{RLHF}}
+=
+r_t^{\text{RM}}
+-
+\beta \, 
+D_{\mathrm{KL}}
+\!\left(
+\pi_\theta(\cdot \mid s_t)
+\;\|\;
+\pi_{\text{ref}}(\cdot \mid s_t)
+\right).
+$$
+
+
+Generalized Advantage Estimation (GAE):
+$$
+A_t
+=
+\sum_{l=0}^{\infty}
+(\gamma \lambda)^l
+\left(
+\delta_{t+l}
+\right),
+\qquad
+\delta_t = r_t + \gamma V(s_{t+1}) - V(s_t).
+$$
+
+
+Full PPO Loss (Policy + Value + Entropy):
+$$
+\mathcal{L}
+=
+\mathcal{L}_{\text{PPO}}
++
+c_v \, (V_\theta(s_t) - R_t)^2
+-
+c_e \, H(\pi_\theta(\cdot \mid s_t)).
+$$
+
+
 
 
 
