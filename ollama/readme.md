@@ -13,6 +13,7 @@ brew install ollama
 
 # Run a model
 ```sh
+# text
 ollama run qwen2.5
 ollama run llama3
 ollama run mistral
@@ -29,6 +30,10 @@ ollama run phi4-reasoning:14b
 # thinking, cloud
 ollama run kimi-k2.5:cloud
 ollama run qwen3-vl:235b-cloud
+
+# coding
+ollama run qwen3-coder
+ollama run codellama
 
 ```
 
@@ -54,7 +59,7 @@ ollama launch openclaw --model kimi-k2.5:cloud
 ollama signin
 ```
 
-# Listing models
+# List models
 ```sh
 curl https://ollama.com/api/tags | jq
 

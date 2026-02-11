@@ -18,4 +18,47 @@ pip install vllm
 python -m vllm.entrypoints.openai.api_server --model meta-llama/Meta-Llama-3-8B-Instruct
 ```
 
+```sh
+vllm serve Qwen/Qwen2.5-1.5B-Instruct
+vllm serve Qwen/Qwen2.5-1.5B-Instruct --attention-backend FLASH_ATTN
 
+curl http://localhost:8000/v1/models
+
+
+curl http://localhost:8000/v1/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "Qwen/Qwen2.5-1.5B-Instruct",
+        "prompt": "San Francisco is a",
+        "max_tokens": 7,
+        "temperature": 0
+    }'
+
+
+curl http://localhost:8000/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "Qwen/Qwen2.5-1.5B-Instruct",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Who won the world series in 2020?"}
+        ]
+    }'
+```
+
+
+
+## run locally
+```py
+from vllm import LLM
+
+llm = LLM(model=..., revision=..., runner=..., trust_remote_code=True)
+
+# For generative models (runner=generate) only
+output = llm.generate("Hello, my name is")
+print(output)
+
+# For pooling models (runner=pooling) only
+output = llm.encode("Hello, my name is")
+print(output)
+```
