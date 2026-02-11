@@ -50,6 +50,10 @@
 - Optimizing KV pairs
 - `PagedAttention` algorithm allows storing continuous KV pairs in non-contiguous memory space
 
+# [ollama](ollama/)
+Run an open source quickly. It also support lots of applications such as claude, openx, openclaw/
+
+
 # [Graph](graph/)
 - query from graph database, such as `neo4j` with `cypher`
 - building the knowledge graphs with `LLMGraphTransformer`
