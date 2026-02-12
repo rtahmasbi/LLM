@@ -219,6 +219,7 @@ trainer.train()
 ```
 
 
+Or define another model as reward_model:
 
 ```py
 from trl import GRPOTrainer

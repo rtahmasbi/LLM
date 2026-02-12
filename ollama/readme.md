@@ -80,3 +80,8 @@ On Linux:
 ```
 
 
+# vision
+```sh
+ollama run qwen3-vl:8b ./xx.jpg whats in this image?
+```
+
