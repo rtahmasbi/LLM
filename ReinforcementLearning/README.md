@@ -16,7 +16,7 @@ pip install trl
 
 
 # Trainers
-## `SFTTrainer` Supervised fine-tuning
+## `SFTTrainer` - Supervised fine-tuning
 [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
 
 SFTTrainer uses the standard LM next-token cross-entropy loss:
@@ -84,8 +84,12 @@ $$
 
 
 ## `CPOTrainer`
-## `PPOTrainer` - PPO (Proximal Policy Optimisation)
+
+## `PPOTrainer` - Proximal Policy Optimisation
 PPO uses a clipped policy gradient objective + KL reward shaping.
+
+The clip function is defined as: $$clip(x,a,b)$$ is $$a$$ if $$x<a$$, is $$b$$ if $$x>b$$ else, $$x$$.
+
 
 Policy ratio:
 
@@ -121,11 +125,14 @@ $$
 
 
 
-
+## `GRPOTrainer`
 ## `ORPOTrainer`
 ## `KTOTrainer`
 ## Binary Classifier Optimization (BCO)
 ## Group Relative Policy Optimization
+## `RLOOTrainer` - Reinforce Leave One Out
+
+
 
 
 # Codes
@@ -250,6 +257,9 @@ trainer.train()
 
 ```
 
+
+
+
 # references
 https://github.com/norhum/reinforcement-learning-from-scratch/blob/main/README.md
 Reinforcement Learning From Scratch
@@ -258,3 +268,18 @@ Reinforcement Learning From Scratch
 - Deep Reinforcement Learning: (Deep Q-Networks - DQN)
 - Policy Gradient Methods: (Monte Carlo policy gradients)
 - Actor-Critic Methods: (Advantage Actor-Critic (A2C) algorithm)
+
+
+# Papers
+## Group Relative Policy Optimization (GRPO) - 2025
+https://www.nature.com/articles/s41586-025-09422-z.pdf
+
+
+## Reinforcement Learning with Verifiable Rewards (RLVR) - 2025
+https://arxiv.org/pdf/2506.14245
+
+
+## Decoupled Clip and Dynamic sAmpling Policy Optimization (DAPO) - 2025
+https://arxiv.org/pdf/2503.14476
+
+
