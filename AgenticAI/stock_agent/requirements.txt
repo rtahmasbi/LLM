@@ -1,0 +1,13 @@
+# Core LangChain and LangGraph
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+langchain-ollama>=0.2.0
+
+# Stock market data
+yfinance>=0.2.40
+
+# Utilities
+python-dotenv>=1.0.0
+pandas>=2.0.0
