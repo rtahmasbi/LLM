@@ -10,6 +10,11 @@ PagedAttention is an attention algorithm inspired by the concept of paging in op
 
 ## Install
 ```
+# vllm needs python 3.10-3.12
+conda create -n vllm_env python=3.10
+conda activate vllm_env
+
+
 pip install vllm
 ```
 
@@ -50,9 +55,17 @@ curl http://localhost:8000/v1/chat/completions \
 
 ## run locally
 ```py
+
+import torch
+print(torch.cuda.is_available())
+print(torch.version.cuda)
+
 from vllm import LLM
 
-llm = LLM(model=..., revision=..., runner=..., trust_remote_code=True)
+#llm = LLM(model=..., revision=..., runner=..., trust_remote_code=True)
+llm = LLM("meta-llama/Meta-Llama-3-8B-Instruct", device="cuda") # or "cpu"
+llm = LLM("Qwen/Qwen2.5-1.5B-Instruct", device="cuda") # or "cpu"
+
 
 # For generative models (runner=generate) only
 output = llm.generate("Hello, my name is")
@@ -61,4 +74,5 @@ print(output)
 # For pooling models (runner=pooling) only
 output = llm.encode("Hello, my name is")
 print(output)
+
 ```
