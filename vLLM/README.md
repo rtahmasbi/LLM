@@ -1,5 +1,8 @@
 https://www.hopsworks.ai/dictionary/vllm
 
+vLLM is a high-throughput, open-source library designed for fast, efficient Large Language Model (LLM) inference and serving. It achieves superior performance, often 10x-24x higher throughput than Hugging Face Transformers, by using PagedAttention to manage KV cache memory and continuous batching of requests.
+
+
 The attention mechanism allows LLMs to focus on relevant parts of the input sequence while generating output/response. Inside the attention mechanism, the attention scores for all input tokens need to be calculated. Existing systems store KV pairs in contiguous memory spaces, limiting memory sharing and leading to inefficient memory management.
 
 
