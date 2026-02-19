@@ -55,6 +55,28 @@ A_\theta(x, r) = \log \pi_\theta(r \mid x) - \log \pi_{\text{ref}}(r \mid x).
 
 
 
+**Loss functions**
+Given the preference data, we can fit a binary classifier according to the Bradley-Terry model and in fact the DPO authors propose the sigmoid loss on the normalized likelihood via the logsigmoid to fit a logistic regression.
+- The RSO authors propose to use a hinge loss on the normalized likelihood
+- The IPO authors provide a deeper theoretical understanding of the DPO algorithms and identify an issue with overfitting and propose an alternative loss which can be used via the loss_type="ipo" argument to the trainer.
+
+- sigmoid
+- robust
+- exo_pair
+- hinge
+- ipo
+- bco_pair
+- sppo_hard
+- nca_pair
+- aot_unpaired
+- aot
+- apo_zero
+- apo_down
+- discopop
+- sft
+
+
+
 ## `RewardTrainer` - Reward Modeling
 [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
 ```json
@@ -135,142 +157,6 @@ $$
 
 
 
-# Codes
-## PPO
-```py
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from trl import PPOTrainer, PPOConfig, AutoModelForCausalLMWithValueHead
-
-# Load base model
-model_name = "meta-llama/Llama-3-8b-instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLMWithValueHead.from_pretrained(model_name)
-
-# PPO config
-config = PPOConfig(
-    learning_rate=1.41e-5,
-    log_with="tensorboard",
-    batch_size=16,
-)
-
-# Define dataset
-from datasets import load_dataset
-dataset = load_dataset("Anthropic/hh-rlhf", split="train")
-
-# Reward model (can be trained separately)
-from transformers import AutoModelForSequenceClassification
-reward_model = AutoModelForSequenceClassification.from_pretrained("OpenAssistant/reward-model-deberta-v3-large")
-
-# PPO Trainer
-ppo_trainer = PPOTrainer(
-    model=model,
-    tokenizer=tokenizer,
-    config=config,
-    dataset=dataset,
-    reward_model=reward_model,
-)
-
-ppo_trainer.train()
-
-```
-
-
-
-## GRPO
-```py
-from datasets import load_dataset
-from trl import GRPOConfig, GRPOTrainer
-
-# Load dataset
-dataset = load_dataset("trl-lib/tldr", split="train")
-
-# Define the reward function
-def reward_len(completions, **kwargs):
-    return [-abs(20 - len(completion)) for completion in completions]
-
-# Define training arguments
-training_args = GRPOConfig(
-    output_dir="Qwen2-0.5B-GRPO",
-    logging_steps=1,
-    use_vllm=True,
-    vllm_mode="colocate",
-    vllm_tensor_parallel_size=1,
-    vllm_gpu_memory_utilization=0.3,
-    max_prompt_length=512,
-    max_completion_length=1024,
-    max_steps=2,
-    num_generations=4,
-    num_train_epochs=1,
-    per_device_train_batch_size=4,
-    push_to_hub=False,
-    report_to=None
-)
-
-# Create and run the trainer
-trainer = GRPOTrainer(
-    model="Qwen/Qwen2-0.5B-Instruct",
-    reward_funcs=reward_len,
-    args=training_args,
-    train_dataset=dataset,
-)
-
-trainer.train()
-
-```
-
-
-Or define another model as reward_model:
-
-```py
-from trl import GRPOTrainer
-
-trainer = GRPOTrainer(
-    model="meta-llama/Llama-3-8b-instruct",
-    ref_model="meta-llama/Llama-3-8b-instruct",
-    dataset=dataset,
-    reward_model="OpenAssistant/reward-model-deberta-v3-large"
-)
-trainer.train()
-
-```
-
-
-## DPO - Direct Preference Optimization
-```py
-from trl import DPOTrainer
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-model_name = "meta-llama/Llama-3-8b"
-model = AutoModelForCausalLM.from_pretrained(model_name)
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-# Dataset: prompt, chosen, rejected
-dataset = load_dataset("Anthropic/hh-rlhf")
-
-trainer = DPOTrainer(
-    model=model,
-    tokenizer=tokenizer,
-    beta=0.1,  # RL temperature
-    train_dataset=dataset["train"],
-)
-trainer.train()
-
-
-```
-
-
-
-
-# references
-https://github.com/norhum/reinforcement-learning-from-scratch/blob/main/README.md
-Reinforcement Learning From Scratch
-- Multi-Armed Bandits (MAB): (Epsilon-Greedy strategy, Upper Confidence Bound)
-- Value-Based Methods: (Q-Values, Q-Learning, SARSA)
-- Deep Reinforcement Learning: (Deep Q-Networks - DQN)
-- Policy Gradient Methods: (Monte Carlo policy gradients)
-- Actor-Critic Methods: (Advantage Actor-Critic (A2C) algorithm)
-
-
 # Papers
 ## Group Relative Policy Optimization (GRPO) - 2025
 https://www.nature.com/articles/s41586-025-09422-z.pdf
@@ -284,3 +170,20 @@ https://arxiv.org/pdf/2506.14245
 https://arxiv.org/pdf/2503.14476
 
 
+## Identity Preference Optimisation (IPO)
+https://arxiv.org/pdf/2502.16182v1
+
+## Kahneman-Tversky Optimisation (KTO)
+https://arxiv.org/pdf/2402.01306
+
+
+
+
+# references
+https://github.com/norhum/reinforcement-learning-from-scratch/blob/main/README.md
+Reinforcement Learning From Scratch
+- Multi-Armed Bandits (MAB): (Epsilon-Greedy strategy, Upper Confidence Bound)
+- Value-Based Methods: (Q-Values, Q-Learning, SARSA)
+- Deep Reinforcement Learning: (Deep Q-Networks - DQN)
+- Policy Gradient Methods: (Monte Carlo policy gradients)
+- Actor-Critic Methods: (Advantage Actor-Critic (A2C) algorithm)

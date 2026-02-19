@@ -10,6 +10,13 @@ PagedAttention is an attention algorithm inspired by the concept of paging in op
 
 ## Install
 ```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv venv --python 3.12 --seed
+source .venv/bin/activate
+uv pip install vllm --extra-index-url https://wheels.vllm.ai/rocm/
+
+
+
 # vllm needs python 3.10-3.12
 conda create -n vllm_env python=3.10
 conda activate vllm_env
@@ -76,3 +83,5 @@ output = llm.encode("Hello, my name is")
 print(output)
 
 ```
+
+
