@@ -8,12 +8,14 @@ import time
 
 client = OpenAI()
 model_name = "gpt-4.1-mini"
+max_output_tokens = 2048
+
 
 
 prompt_llm = """
 You are given some user information and your task is to fill the values of each element in the given json object.
 - Check the `label` carefully and make your answer based on it
-- For each element, make a new item `value` and fill it with the right answer
+- For each element, fill the `value` with the right answer
 - For each `value`, make sure to follow the `placeholder` or `data_format` format.
 - If you dont have any information about the element, just fill it with blank.
 - For the phone number, convert it to the `placeholder` formast.
@@ -36,10 +38,10 @@ Position of interest: data science jobs
 
 """
 
-json_schema = {
+json_schema =  text={
     "format": {
       "type": "json_schema",
-      "name": "form_element_list",
+      "name": "form_list",
       "strict": True,
       "schema": {
         "type": "object",
@@ -51,52 +53,78 @@ json_schema = {
               "properties": {
                 "form_index": {
                   "type": "integer",
-                  "description": "The index of the form, starting from 1."
+                  "description": "Index of the form; 1-based position."
                 },
-                "elements": {
+                "fields": {
                   "type": "array",
-                  "description": "A list of form elements (fields) in this form.",
+                  "description": "List of fields for the form.",
                   "items": {
                     "type": "object",
                     "properties": {
                       "label": {
                         "type": "string",
-                        "description": "Label shown for the form element."
+                        "description": "Field label (can be empty)."
                       },
-                      "field_type": {
+                      "type": {
                         "type": "string",
-                        "description": "Type of field (e.g. text, email, tel, file).",
-                        "enum": [
-                          "text",
-                          "email",
-                          "tel",
-                          "file"
-                        ]
+                        "description": "Type of the form field (text, email, tel, file, etc.)."
                       },
                       "placeholder": {
                         "type": "string",
-                        "description": "Placeholder text for the field."
+                        "description": "Placeholder text for input (can be empty)."
                       },
-                      "data_format": {
+                      "id": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Field identifier; can be null when missing."
+                      },
+                      "name": {
                         "type": "string",
-                        "description": "Special data format constraints (if any); empty string if not set."
+                        "description": "Name attribute for the field (can be empty)."
+                      },
+                      "data-format": {
+                        "type": "string",
+                        "description": "Field format value (can be empty)."
+                      },
+                      "data-seperator": {
+                        "type": "string",
+                        "description": "Separator value (can be empty)."
+                      },
+                      "data-maxlength": {
+                        "type": "string",
+                        "description": "Maximum length for input (as string, can be empty)."
+                      },
+                      "validate": {
+                        "type": "string",
+                        "description": "Validate class or rule string."
                       },
                       "is_visible": {
                         "type": "boolean",
-                        "description": "Whether the form element is currently visible."
+                        "description": "Is the field visible on the form."
                       },
                       "value": {
                         "type": "string",
-                        "description": "Current value of the form element (empty string if not set)."
+                        "description": "The value for the Field."
                       }
                     },
                     "required": [
                       "label",
-                      "field_type",
+                      "type",
                       "placeholder",
-                      "data_format",
+                      "id",
+                      "name",
+                      "data-format",
+                      "data-seperator",
+                      "data-maxlength",
+                      "validate",
                       "is_visible",
-                      "value"
+                      "value",
                     ],
                     "additionalProperties": False
                   }
@@ -104,7 +132,7 @@ json_schema = {
               },
               "required": [
                 "form_index",
-                "elements"
+                "fields"
               ],
               "additionalProperties": False
             }
@@ -129,6 +157,7 @@ def call_llm(prompt, json_schema):
         reasoning={},
         tools=[],
         text=json_schema,
+        max_output_tokens=max_output_tokens,
     )
     try:
         return json.loads(response.output_text)
@@ -154,7 +183,7 @@ async def get_forms(page, skip_hidden=True):
                 "type":           await inp.get_attribute("type") or "text",
                 "placeholder":    await inp.get_attribute("placeholder") or "",
                 "required":       await inp.get_attribute("required") is not None,
-                "field_id":       await inp.get_attribute("id"),
+                "id":             await inp.get_attribute("id"),
                 "name":           await inp.get_attribute("name") or "",
                 "data-format":    await inp.get_attribute("data-format") or "",
                 "data-seperator": await inp.get_attribute("data-seperator") or "",
@@ -163,9 +192,9 @@ async def get_forms(page, skip_hidden=True):
                 "is_visible":     await inp.is_visible(),
             }
             # Try to get label if exists
-            field_id = await inp.get_attribute("id")
-            if field_id:
-                label = await page.query_selector(f'label[for="{field_id}"]')
+            id = await inp.get_attribute("id")
+            if id:
+                label = await page.query_selector(f'label[for="{id}"]')
                 if label:
                     field_info["label"] = await label.inner_text()
             fields.append(field_info)
@@ -188,7 +217,7 @@ async def form_get_elements(url, headless=True):
         return forms
 
 
-async def agentic_form_interaction(url, headless=False):
+async def agentic_form_interaction(ret_llm, url, headless=True):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=headless)  # set True for headless
         page = await browser.new_page()
@@ -199,10 +228,8 @@ async def agentic_form_interaction(url, headless=False):
             print("No forms found on this page.")
             await browser.close()
             return
-        for form in forms:
-            print(f"\n{'='*100}")
-            print(f"  FORM {form['form_index']}")
-            print(f"{'='*100}")
+        for idx_form, form in enumerate(forms):
+            print(f"\n{'='*100}", f"FORM {form['form_index']}")
             fields = form["fields"]
             if not fields:
                 print("No input fields found in this form.")
@@ -210,21 +237,14 @@ async def agentic_form_interaction(url, headless=False):
             for field in fields:
                 if field["type"] == "hidden":
                     continue  # Skip hidden fields
-                # Build a human-readable prompt for the field
-                label       = field["label"] or field["name"] or field["placeholder"] or field["type"]
-                field_type  = field["type"].lower()
-                placeholder = field.get("placeholder", "")
-                data_format = field.get("data-format", "")
-                required_marker = "required" if field["required"] else "optional"
                 # Locate the field on the page by name or placeholder
                 selector = None
-                if field["name"]:
-                    selector = f'[name="{field["name"]}"]'
-                elif field["placeholder"]:
-                    selector = f'[placeholder="{field["placeholder"]}"]'
+                id = field["id"]
+                if id:
+                    selector = f'[id="{id}"]'
                 if not selector:
                     print("*"*30)
-                    print(f"Could not locate field '{label}' on page, skipping.")
+                    print(f"Could not locate field id '{id}' on page, skipping.")
                     print(str(field))
                     continue
                 # Skip non-visible elements (honeypots, hidden inputs)
@@ -234,16 +254,15 @@ async def agentic_form_interaction(url, headless=False):
                         continue
                 # Pretty-print field metadata
                 print("-"*50)
-                print(f"Field      : {label}")
-                print(f"required   : {required_marker}")
-                print(f"Type       : {field_type}")
-                print(f"placeholder: {placeholder}")
-                print(f"data_format: {data_format}")
-                prompt = f"Enter > "
-                user_input = input(prompt)
+                print(f"id   : {id}")
+                print(f"label: {field['label']}")
+                #prompt = f"Enter > "
+                #user_input = input(prompt)
+                user_input = get_filed_value(ret_llm, idx_form, id)
+                print(f"value: {user_input}")
                 element = await page.query_selector(selector)
                 if not element:
-                    print(f"  Element '{label}' not found on page, skipping.")
+                    print(f"  Element with id '{id}' not found on page, skipping.")
                     continue
                 field_type = field["type"].lower()
                 if field_type == "checkbox":
@@ -259,7 +278,7 @@ async def agentic_form_interaction(url, headless=False):
                     if user_input.strip():
                         await element.set_input_files(user_input.strip())
                     else:
-                        print(f"  Skipping file upload for '{label}' (no path provided).")
+                        print(f"  Skipping file upload for id '{id}' (no path provided).")
                 else:
                     await element.fill(user_input)
             # After filling all fields, ask whether to submit
@@ -282,6 +301,13 @@ async def agentic_form_interaction(url, headless=False):
 
 
 
+def get_filed_value(ret_llm, idx_form, id):
+    form_fields = ret_llm["items"][idx_form]["fields"]
+    for f in form_fields:
+        if f["id"] == id:
+            return f["value"]
+    return ""
+    
 
 
 if __name__ == "__main__":
@@ -293,6 +319,8 @@ if __name__ == "__main__":
     prompt = prompt_llm.format(json_elements=all_elements, user_info=user_info)
     ret_llm = call_llm(prompt, json_schema)
     print(json.dumps(ret_llm, indent=4))
+    print("-"*80, "agentic_form_interaction:")
+    all_elements = asyncio.run(agentic_form_interaction(ret_llm, url))
 
 
 
