@@ -3,7 +3,7 @@ import json
 import asyncio
 from playwright.async_api import async_playwright
 
-async def get_forms(page):
+async def get_forms(page, skip_hidden=True):
     """Extract all forms and their input fields on the current page."""
     forms = await page.query_selector_all("form")
     form_data = []
@@ -12,19 +12,22 @@ async def get_forms(page):
         fields = []
         for inp in inputs:
             # Skip honeypot / invisible fields
-            is_visible = await inp.is_visible()
-            if not is_visible:
-                continue
+            if skip_hidden:
+                is_visible = await inp.is_visible()
+                if not is_visible:
+                    continue
             field_info = {
-                "name":           await inp.get_attribute("name") or "",
+                "label":          "", # we will fill it if id exists
                 "type":           await inp.get_attribute("type") or "text",
                 "placeholder":    await inp.get_attribute("placeholder") or "",
                 "required":       await inp.get_attribute("required") is not None,
-                "label":          "",
+                "field_id":       await inp.get_attribute("id"),
+                "name":           await inp.get_attribute("name") or "",
                 "data-format":    await inp.get_attribute("data-format") or "",
                 "data-seperator": await inp.get_attribute("data-seperator") or "",
                 "data-maxlength": await inp.get_attribute("data-maxlength") or "",
                 "validate":       await inp.get_attribute("class") or "",
+                "is_visible":     await inp.is_visible(),
             }
             # Try to get label if exists
             field_id = await inp.get_attribute("id")

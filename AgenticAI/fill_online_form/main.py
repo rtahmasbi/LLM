@@ -7,8 +7,136 @@ import time
 
 
 client = OpenAI()
+model_name = "gpt-4.1-mini"
 
-async def get_forms(page):
+
+prompt_llm = """
+You are given some user information and your task is to fill the values of each element in the given json object.
+- Check the `label` carefully and make your answer based on it
+- For each element, make a new item `value` and fill it with the right answer
+- For each `value`, make sure to follow the `placeholder` or `data_format` format.
+- If you dont have any information about the element, just fill it with blank.
+- For the phone number, convert it to the `placeholder` formast.
+- Make sure the retun json object is valid.
+
+json elements:
+{json_elements}
+
+user info:
+{user_info}
+"""
+
+
+user_info = """
+name: James
+family name: Abdi
+phone number: +1222 333 4444
+email: james.a@gmail.com
+Position of interest: data science jobs
+
+"""
+
+json_schema = {
+    "format": {
+      "type": "json_schema",
+      "name": "form_element_list",
+      "strict": True,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "form_index": {
+                  "type": "integer",
+                  "description": "The index of the form, starting from 1."
+                },
+                "elements": {
+                  "type": "array",
+                  "description": "A list of form elements (fields) in this form.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "description": "Label shown for the form element."
+                      },
+                      "field_type": {
+                        "type": "string",
+                        "description": "Type of field (e.g. text, email, tel, file).",
+                        "enum": [
+                          "text",
+                          "email",
+                          "tel",
+                          "file"
+                        ]
+                      },
+                      "placeholder": {
+                        "type": "string",
+                        "description": "Placeholder text for the field."
+                      },
+                      "data_format": {
+                        "type": "string",
+                        "description": "Special data format constraints (if any); empty string if not set."
+                      },
+                      "is_visible": {
+                        "type": "boolean",
+                        "description": "Whether the form element is currently visible."
+                      },
+                      "value": {
+                        "type": "string",
+                        "description": "Current value of the form element (empty string if not set)."
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "field_type",
+                      "placeholder",
+                      "data_format",
+                      "is_visible",
+                      "value"
+                    ],
+                    "additionalProperties": False
+                  }
+                }
+              },
+              "required": [
+                "form_index",
+                "elements"
+              ],
+              "additionalProperties": False
+            }
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": False
+      }
+    }
+  }
+
+
+
+
+def call_llm(prompt, json_schema):
+    response = client.responses.create(
+        model=model_name,
+        input=prompt,
+        temperature=0,
+        reasoning={},
+        tools=[],
+        text=json_schema,
+    )
+    try:
+        return json.loads(response.output_text)
+    except Exception:
+        return {}
+
+
+async def get_forms(page, skip_hidden=True):
     """Extract all forms and their input fields on the current page."""
     forms = await page.query_selector_all("form")
     form_data = []
@@ -17,19 +145,22 @@ async def get_forms(page):
         fields = []
         for inp in inputs:
             # Skip honeypot / invisible fields
-            is_visible = await inp.is_visible()
-            if not is_visible:
-                continue
+            if skip_hidden:
+                is_visible = await inp.is_visible()
+                if not is_visible:
+                    continue
             field_info = {
-                "name":           await inp.get_attribute("name") or "",
+                "label":          "", # we will fill it if id exists
                 "type":           await inp.get_attribute("type") or "text",
                 "placeholder":    await inp.get_attribute("placeholder") or "",
                 "required":       await inp.get_attribute("required") is not None,
-                "label":          "",
+                "field_id":       await inp.get_attribute("id"),
+                "name":           await inp.get_attribute("name") or "",
                 "data-format":    await inp.get_attribute("data-format") or "",
                 "data-seperator": await inp.get_attribute("data-seperator") or "",
                 "data-maxlength": await inp.get_attribute("data-maxlength") or "",
                 "validate":       await inp.get_attribute("class") or "",
+                "is_visible":     await inp.is_visible(),
             }
             # Try to get label if exists
             field_id = await inp.get_attribute("id")
@@ -42,76 +173,24 @@ async def get_forms(page):
     return form_data
 
 
-def llm_decide_next_action(form_data, task_description="Extract all inputs"):
-    """
-    Use LLM to suggest next action:
-    - which form to fill
-    - what values to enter
-    - whether to submit
-    """
-    prompt = f"""
-You are an agent tasked to interact with a website form.
-
-Current form data:
-{form_data}
-
-Task: {task_description}
-
-Return a JSON with:
-- action: "fill_form" / "submit_form" / "next_step" / "stop"
-- form_index: which form to act on
-- field_values: mapping from field names to values (only if action is fill_form)
-"""
-    
-    response = client.responses.create(
-        model="gpt-4.1-mini",
-        input=prompt,
-        temperature=0,
-    )
-    try:
-        return json.loads(response.output_text)
-    except Exception:
-        return {"action": "stop"}
-
-
-def get_format_hint(field_type: str, field_meta: dict = None) -> str:
-    """Return a human-readable format hint based on input type and field metadata."""
-    # --- Detect JotForm lite date picker by placeholder or data-format attribute ---
-    if field_meta:
-        placeholder = field_meta.get("placeholder", "")
-        data_format = field_meta.get("data-format", "")
-        if placeholder in ("MM-DD-YYYY", "MM/DD/YYYY") or data_format == "mmddyyyy":
-            return (
-                "Format: MM-DD-YYYY            |  Example: 03-15-2024\n"
-                "  Note   : Future dates only   |  Past dates are not allowed"
-            )
-    hints = {
-        "text":           "Format: Any text string        |  Example: John Doe",
-        "email":          "Format: user@example.com",
-        "password":       "Format: Min 8 chars, mix of letters/numbers recommended",
-        "number":         "Format: Numeric value          |  Example: 42",
-        "tel":            "Format: Phone number           |  Example: +1-800-555-0199",
-        "url":            "Format: Full URL               |  Example: https://example.com",
-        "date":           "Format: YYYY-MM-DD             |  Example: 2024-03-15",
-        "time":           "Format: HH:MM                  |  Example: 14:30",
-        "datetime-local": "Format: YYYY-MM-DDTHH:MM       |  Example: 2024-03-15T14:30",
-        "month":          "Format: YYYY-MM                |  Example: 2024-03",
-        "week":           "Format: YYYY-WNN               |  Example: 2024-W10",
-        "color":          "Format: Hex color code         |  Example: #ff5733",
-        "range":          "Format: Numeric value within slider range",
-        "checkbox":       "Format: y/yes/true/1 to check, anything else to uncheck",
-        "radio":          "Format: Press Enter to select this option",
-        "select":         "Format: Type the exact label of the option to select",
-        "textarea":       "Format: Multi-line text (press Enter twice when done in terminal)",
-        "file":           "Format: Absolute file path     |  Example: /home/user/file.pdf",
-        "search":         "Format: Search query string",
-    }
-    return hints.get(field_type.lower(), "Format: Text input")
-
-
-async def agentic_form_interaction(url):
+async def form_get_elements(url, headless=True):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)  # set True for headless
+        browser = await p.chromium.launch(headless=headless)  # set True for headless
+        page = await browser.new_page()
+        await page.goto(url, wait_until="networkidle")
+        #
+        forms = await get_forms(page)
+        if not forms:
+            print("No forms found on this page.")
+            await browser.close()
+            return
+        #
+        return forms
+
+
+async def agentic_form_interaction(url, headless=False):
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=headless)  # set True for headless
         page = await browser.new_page()
         await page.goto(url, wait_until="networkidle")
         #
@@ -137,7 +216,6 @@ async def agentic_form_interaction(url):
                 placeholder = field.get("placeholder", "")
                 data_format = field.get("data-format", "")
                 required_marker = "required" if field["required"] else "optional"
-                fmt_hint    = get_format_hint(field_type, field_meta=field)
                 # Locate the field on the page by name or placeholder
                 selector = None
                 if field["name"]:
@@ -161,7 +239,6 @@ async def agentic_form_interaction(url):
                 print(f"Type       : {field_type}")
                 print(f"placeholder: {placeholder}")
                 print(f"data_format: {data_format}")
-                print(f"{fmt_hint}")
                 prompt = f"Enter > "
                 user_input = input(prompt)
                 element = await page.query_selector(selector)
@@ -204,12 +281,53 @@ async def agentic_form_interaction(url):
         await browser.close()
 
 
+
+
+
 if __name__ == "__main__":
-    test_url = "https://form.jotform.com/260497189942169"
-    asyncio.run(agentic_form_interaction(test_url))
+    url = "https://form.jotform.com/260497189942169"
+    all_elements = asyncio.run(form_get_elements(url))
+    print("-"*80, "all_elements:")
+    print(json.dumps(all_elements, indent=4))
+    print("-"*80, "ret_llm:")
+    prompt = prompt_llm.format(json_elements=all_elements, user_info=user_info)
+    ret_llm = call_llm(prompt, json_schema)
+    print(json.dumps(ret_llm, indent=4))
+
+
+
 
 
 """
-python AgenticAI/fill_online_form/test_playwright2.py
+python AgenticAI/fill_online_form/main.py
+
+
+
+
+
+url = "https://form.jotform.com/260497189942169"
+all_elements = asyncio.run(form_get_elements(url))
+print("-"*80, "all_elements:")
+print(json.dumps(all_elements, indent=4))
+
+print("-"*80, "ret_llm:")
+prompt = prompt_llm.format(json_elements=all_elements, user_info=user_info)
+ret_llm = call_llm(prompt, json_schema)
+print(json.dumps(ret_llm, indent=4))
+
+
+prompt = prompt_llm.format(json_elements=all_elements, user_info=user_info)
+response = client.responses.create(
+    model=model_name,
+    input=prompt,
+    temperature=0,
+    reasoning={},
+    tools=[],
+    text=json_schema,
+)
+
+
+
+
 
 """
