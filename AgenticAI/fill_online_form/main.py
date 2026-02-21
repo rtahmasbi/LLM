@@ -161,8 +161,11 @@ async def form_submit(url: str, values: dict[str, str], config: RunnableConfig) 
         values: Same flat id→value mapping used in form_fill_fields.
     """
     session: BrowserSession = config["configurable"]["browser_session"]
-    await session.goto(url)
-    await _fill_page_flat(session.page, values)
+   # Only navigate if we're not already on the page
+    current = session.page.url
+    if not current.startswith(url.rstrip("/")):
+        await session.goto(url)
+        await _fill_page_flat(session.page, values)
 
     submit_btn = await session.page.query_selector(
         'form button[type="submit"], form input[type="submit"]'
@@ -173,6 +176,9 @@ async def form_submit(url: str, values: dict[str, str], config: RunnableConfig) 
         await session.page.keyboard.press("Enter")
 
     await session.page.wait_for_load_state("networkidle")
+    screenshot_path = "/tmp/final_state.png"
+    await session.page.screenshot(path=screenshot_path, full_page=True)
+    print(f"Final page screenshot saved to {screenshot_path}")
     return f"Form submitted successfully. Final URL: {session.page.url}"
 
 
