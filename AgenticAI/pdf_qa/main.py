@@ -33,7 +33,7 @@ _llm = None
 
 ######################################################################
 
-prompt_cover_letter = f"""You are an expert career coach and professional writer.
+prompt_cover_letter = """You are an expert career coach and professional writer.
 
 Below is extracted content from a candidate's resume:
 ---
@@ -106,7 +106,7 @@ def write_a_cover_letter(job_role: str, job_desc: str) -> str:
     resume_docs = _retriever.invoke(job_role + " " + job_desc)
     resume_context = "\n\n".join(doc.page_content for doc in resume_docs)
 
-    response = _llm.invoke(prompt_cover_letter)
+    response = _llm.invoke(prompt_cover_letter.format(resume_context=resume_context, job_role=job_role, job_desc=job_desc))
     return response.content
 
 
