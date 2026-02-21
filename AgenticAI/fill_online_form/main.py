@@ -482,9 +482,9 @@ async def run_tools_submit(state: MessagesState):
 builder = StateGraph(MessagesState)
 
 builder.add_node("agent", call_agent)
-builder.add_node("tools_fill", tool_node)          # fills without submitting
-builder.add_node("human_approval", human_approval_node)  # pause for review
-builder.add_node("tools_submit", tool_node)         # actual submission
+builder.add_node("tools_fill", run_tools_fill)          # fills without submitting
+builder.add_node("human_approval", human_approval_node) # pause for review
+builder.add_node("tools_submit", run_tools_submit)      # actual submission
 
 builder.add_edge(START, "agent")
 builder.add_conditional_edges(
