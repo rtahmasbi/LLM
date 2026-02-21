@@ -1,5 +1,5 @@
 """
-LangChain PDF QA Agent
+LangChain PDF QA Agent + cover letter
 Reads a PDF file and answers user questions using RAG (Retrieval-Augmented Generation).
 
 Requirements:
@@ -121,7 +121,7 @@ def build_agent(vectorstore):
 
     # Create a retriever tool from the vector store
     retriever_tool = create_retriever_tool(
-        retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
+        retriever=_retriever,
         name="PDFSearch",
         description=(
             "Use this tool to search and answer questions about the content of the PDF document. "

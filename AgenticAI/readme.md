@@ -1,4 +1,7 @@
 
+**There are many good examples in this directory.**
+
+
 # LangGraph
 https://github.com/langchain-ai/langgraph
 
@@ -69,8 +72,63 @@ for chunk in graph.stream(
 ```
 
 
-# claude-agent-sdk-python
+## deepagent langchain
+https://docs.langchain.com/oss/python/deepagents/overview
+
+
+
+## middleware langchain
+```py
+from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
+```
+Middleware provides a way to more tightly control what happens inside the agent. Middleware is useful for the following:
+- Tracking agent behavior with **logging**, analytics, and debugging.
+- Transforming prompts, tool selection, and output formatting.
+- Adding retries, fallbacks, and early termination logic.
+- Applying rate limits, guardrails, and **PII detection**.
+
+
+```py
+from langchain.agents import create_agent
+from langchain.agents.middleware import SummarizationMiddleware, HumanInTheLoopMiddleware
+
+agent = create_agent(
+    model="gpt-4.1",
+    tools=[...],
+    middleware=[
+        SummarizationMiddleware(...),
+        HumanInTheLoopMiddleware(...)
+    ],
+)
+````
+
+
+| Middleware           | Description                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| Summarization        | Automatically summarize conversation history when approaching token limits. |
+| Human-in-the-loop    | Pause execution for human approval of tool calls.                           |
+| Model call limit     | Limit the number of model calls to prevent excessive costs.                 |
+| Tool call limit      | Control tool execution by limiting call counts.                             |
+| Model fallback       | Automatically fallback to alternative models when primary fails.            |
+| PII detection        | Detect and handle Personally Identifiable Information (PII).                |
+| To-do list           | Equip agents with task planning and tracking capabilities.                  |
+| LLM tool selector    | Use an LLM to select relevant tools before calling main model.              |
+| Tool retry           | Automatically retry failed tool calls with exponential backoff.             |
+| Model retry          | Automatically retry failed model calls with exponential backoff.            |
+| LLM tool emulator    | Emulate tool execution using an LLM for testing purposes.                   |
+| Context editing      | Manage conversation context by trimming or clearing tool uses.              |
+| Shell tool           | Expose a persistent shell session to agents for command execution.          |
+| File search          | Provide Glob and Grep search tools over filesystem files.                   |
+| Filesystem           | Provide agents with a filesystem for storing context and long-term memories.|
+| Subagent             | Add the ability to spawn subagents.                                         |
+|----------------------|-----------------------------------------------------------------------------|
+
+
+
+# claude
+## claude-agent-sdk-python
 https://code.claude.com/docs/en/settings#tools-available-to-claude
+
 ```
 Tool	Description	Permission Required
 AskUserQuestion	Asks multiple-choice questions to gather requirements or clarify ambiguity	No
@@ -97,12 +155,3 @@ LSP	Code intelligence via language servers. Reports type errors and warnings aut
 ```
 
 
-# deepagent langchain
-https://docs.langchain.com/oss/python/deepagents/overview
-
-
-
-# middleware
-```
-from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
-```
