@@ -12,15 +12,8 @@ from langgraph.graph import StateGraph, MessagesState, END, START
 from langgraph.prebuilt import ToolNode
 
 from typing import Optional
+import argparser
 
-
-user_info = """
-name: James
-family name: Abdi
-phone number: +1222 333 4444
-email: james.a@gmail.com
-Position of interest: data science jobs
-"""
 
 
 # ── Shared browser session ────────────────────────────────────────────────────
@@ -305,8 +298,8 @@ print(graph.get_graph().draw_ascii())
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-async def main():
-    target_url    = "https://form.jotform.com/260497189942169"
+async def main(target_url, user_info):
+    target_url    = ""
     session       = BrowserSession()
     thread_config = {
         "configurable": {
@@ -371,12 +364,28 @@ async def main():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Form filler agent")
+    parser.add_argument(
+        "--url",
+        type=str,
+        required=True,
+        help="Target form URL"
+    )
+    parser.add_argument(
+        "--user_info",
+        type=str,
+        required=True,
+        help="Path to user info file"
+    )
+    url = args.url
+    user_info = open(args.user_info, "r", encoding="utf-8").read()
+    args = parser.parse_args(url, user_info)
     asyncio.run(main())
 
 
 
 
 """
-python AgenticAI/fill_online_form/main.py
+python AgenticAI/fill_online_form/main.py --url https://form.jotform.com/260497189942169 --user_info /home/ras/user_info.txt
 
 """
