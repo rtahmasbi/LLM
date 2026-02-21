@@ -425,6 +425,10 @@ extraction_tools = [form_get_elements]
 tool_node_fill   = ToolNode([form_fill_fields])
 tool_node_submit = ToolNode([form_submit])
 
+# Tools for the fill-forms agent
+fill_tools = [form_fill_fields, form_submit]
+
+
 # MemorySaver enables graph checkpointing required for interrupt/resume
 memory = MemorySaver()
 
