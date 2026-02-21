@@ -96,3 +96,13 @@ Write	Creates or overwrites files	Yes
 LSP	Code intelligence via language servers. Reports type errors and warnings automatically after file edits. Also supports navigation operations: jump to definitions, find references, get type info, list symbols, find implementations, trace call hierarchies. Requires a code intelligence plugin and its language server binary	No
 ```
 
+
+# deepagent langchain
+https://docs.langchain.com/oss/python/deepagents/overview
+
+
+
+# middleware
+```
+from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
+```
