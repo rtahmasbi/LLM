@@ -40,12 +40,14 @@ agent = create_agent(
 )
 
 
-agent.invoke(
+a_response = agent.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
 )
+a_response
 
 
 
+##########################################
 content=[
     {
         "type": "text",

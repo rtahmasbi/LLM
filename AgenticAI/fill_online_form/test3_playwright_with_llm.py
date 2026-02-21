@@ -38,7 +38,7 @@ Position of interest: data science jobs
 
 """
 
-json_schema =  text={
+json_schema = {
     "format": {
       "type": "json_schema",
       "name": "form_list",
