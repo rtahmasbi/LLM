@@ -16,6 +16,7 @@ Usage:
 
 import os
 import argparse
+from langchain_core.tools import tool
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
@@ -23,8 +24,40 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.tools.retriever import create_retriever_tool
 from langchain_core.messages import HumanMessage, AIMessage
 from langgraph.prebuilt import create_react_agent
-#from langchain.agents import create_react_agent
+#from langchain.agents import create_react_agent # for the new versions
 
+######################################################################
+# Module-level references set during build_agent()
+_retriever = None
+_llm = None
+
+######################################################################
+
+prompt_cover_letter = f"""You are an expert career coach and professional writer.
+
+Below is extracted content from a candidate's resume:
+---
+{resume_context}
+---
+
+Job Role: {job_role}
+
+Job Description:
+{job_desc}
+
+Write a compelling, personalised cover letter for this candidate applying to the above role.
+The letter should:
+- Open with a strong hook that mentions the role by name
+- Highlight 2-3 specific experiences or achievements from the resume that match the job requirements
+- Show enthusiasm for the company/role
+- Close with a confident call to action
+- Be concise (3-4 paragraphs), professional, and human in tone
+- NOT invent any facts not present in the resume
+
+Return only the cover letter text, ready to send."""
+
+
+######################################################################
 
 def load_and_index_pdf(pdf_path: str):
     """Load PDF with PyPDF and index it into a FAISS vector store."""
@@ -51,9 +84,40 @@ def load_and_index_pdf(pdf_path: str):
     return vectorstore
 
 
+@tool
+def write_a_cover_letter(job_role: str, job_desc: str) -> str:
+    """
+    Generate a professional cover letter tailored to a specific job.
+
+    Uses the resume content from the indexed PDF to extract relevant experience,
+    skills, and achievements, then writes a compelling cover letter.
+
+    Args:
+        job_role: The title of the job being applied for (e.g. 'Senior Data Scientist').
+        job_desc: The full job description or a summary of requirements and responsibilities.
+
+    Returns:
+        A professionally written cover letter as a string.
+    """
+    if _retriever is None or _llm is None:
+        raise RuntimeError("Agent not initialised — call build_agent() first.")
+
+    # Retrieve the most relevant resume chunks for the target role
+    resume_docs = _retriever.invoke(job_role + " " + job_desc)
+    resume_context = "\n\n".join(doc.page_content for doc in resume_docs)
+
+    response = _llm.invoke(prompt_cover_letter)
+    return response.content
+
+
+
+
 def build_agent(vectorstore):
     """Build a LangGraph ReAct agent with a PDF retrieval tool."""
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    global _retriever, _llm
+ 
+    _llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    _retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
 
     # Create a retriever tool from the vector store
     retriever_tool = create_retriever_tool(
@@ -64,18 +128,20 @@ def build_agent(vectorstore):
             "Input should be a clear, concise question or keyword."
         ),
     )
-
+    
     system_prompt = (
-        "You are a helpful assistant that answers questions based on a PDF document. "
-        "Always use the PDFSearch tool to find relevant content before answering."
+        "You are a helpful career assistant. The user has uploaded their resume as a PDF. "
+        "Use PDFSearch to answer questions about the resume. "
+        "Use write_a_cover_letter when the user asks to generate a cover letter — "
+        "always ask for the job role and job description first if not provided."
     )
 
-    # create_react_agent from langgraph handles tool-calling natively
     agent = create_react_agent(
-        model=llm,
-        tools=[retriever_tool],
+        model=_llm,
+        tools=[retriever_tool, write_a_cover_letter],
         prompt=system_prompt,
     )
+
     return agent
 
 
@@ -143,5 +209,18 @@ if __name__ == "__main__":
 
 python AgenticAI/pdf_qa/main.py --pdf /home/ras/functionalsample.pdf
 
+
+
+# for multiple pdf loads
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders import PyPDFLoader
+
+loader = DirectoryLoader(
+    "path/to/pdf_folder",
+    glob="*.pdf",
+    loader_cls=PyPDFLoader
+)
+
+documents = loader.load()
 
 """
