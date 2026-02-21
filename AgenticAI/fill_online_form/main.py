@@ -299,7 +299,6 @@ print(graph.get_graph().draw_ascii())
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 async def main(target_url, user_info):
-    target_url    = ""
     session       = BrowserSession()
     thread_config = {
         "configurable": {
@@ -377,10 +376,10 @@ if __name__ == "__main__":
         required=True,
         help="Path to user info file"
     )
+    args = parser.parse_args()
     url = args.url
     user_info = open(args.user_info, "r", encoding="utf-8").read()
-    args = parser.parse_args(url, user_info)
-    asyncio.run(main())
+    asyncio.run(main(url, user_info))
 
 
 
