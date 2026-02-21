@@ -13,7 +13,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.tools.retriever import create_retriever_tool
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import interrupt, Command
@@ -533,7 +533,7 @@ async def main():
     target_url = "https://form.jotform.com/260497189942169"
     thread_config = {"configurable": {"thread_id": "form-session-1"}}
 
-    # ── Step 1: Extract form elements ──────────────────────────────────────────
+    # Extract form elements ──────────────────────────────────────────
     print("-"*80, "Step 1: Extracting form elements...")
     response = await agent_page_elements.ainvoke(
         {"messages": [{"role": "user", "content": f"extract the form elements from {target_url}"}]}
@@ -545,8 +545,8 @@ async def main():
             break
     print(json.dumps(jsn_elements, indent=4))
 
-    # ── Step 2: LLM fills in the values ───────────────────────────────────────
-    print("\nStep 2: Filling field values with LLM...")
+    # LLM fills in the values ───────────────────────────────────────
+    print("-"*80, "Filling field values with LLM...")
     content = (
         f"Here is the JSON elements:\n{json.dumps(jsn_elements, indent=2)}\n\n"
         f"user_info:\n{user_info}"
