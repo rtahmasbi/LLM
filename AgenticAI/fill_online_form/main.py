@@ -446,9 +446,6 @@ Never call `form_submit` before `form_fill_fields` has been reviewed by a human.
 # a custom node into the compiled graph.
 
 
-tool_node = ToolNode(fill_tools)
-
-
 def should_continue(state: MessagesState):
     """Route: after the agent responds, decide what to do next."""
     last = state["messages"][-1]
