@@ -372,7 +372,7 @@ async def form_submit(url: str, filled_form: str, headless: bool = True) -> str:
 
 
 ################################################################ middleware
-def human_approval_node(state: dict) -> Command:
+async def human_approval_node(state: dict) -> Command:
     """
     Middleware node that pauses graph execution and asks the human whether to
     proceed with form submission.  Uses LangGraph's `interrupt()` primitive so
@@ -388,6 +388,7 @@ def human_approval_node(state: dict) -> Command:
         if isinstance(msg, ToolMessage) and "form_fill_fields" in (msg.name or ""):
             fill_summary = msg.content
             break
+    
     # `interrupt()` pauses the graph and returns a value when resumed.
     human_decision = interrupt(
         {
@@ -399,16 +400,39 @@ def human_approval_node(state: dict) -> Command:
             )
         }
     )
-    # Route based on human response
+    
+    # Grab the original tool-call arguments so the agent knows what to submit
+    fill_args: dict = {}
+    for msg in reversed(state["messages"]):
+        if hasattr(msg, "tool_calls"):
+            for tc in msg.tool_calls:
+                if tc["name"] == "form_fill_fields":
+                    fill_args = tc["args"]
+                    break
+        if fill_args:
+            break
+    
     if str(human_decision).strip().lower() in ("yes", "y"):
-        return Command(goto="agent")  # resume agent so it can call form_submit
+        # Inject an explicit instruction so the agent calls form_submit, not form_fill_fields
+        url_val = fill_args.get("url", "")
+        filled_val = fill_args.get("filled_form", "")
+        submit_instruction = HumanMessage(
+            content=(
+                "Human approved the filled form. "
+                f"Now call `form_submit` with url=\"{url_val}\" "
+                f"and filled_form=\"{filled_val}\" to complete the submission."
+            )
+        )
+        return Command(
+            goto="agent",
+            update={"messages": state["messages"] + [submit_instruction]},
+        )
     else:
-        # Inject a message telling the agent the user declined submission
         return Command(
             goto="__end__",
             update={
                 "messages": state["messages"]
-                + [HumanMessage(content="User declined form submission. Task cancelled.")]
+                + [HumanMessage(content="User declined form submission. Task cancelled.")],
             },
         )
 
@@ -534,7 +558,7 @@ async def main():
     thread_config = {"configurable": {"thread_id": "form-session-1"}}
 
     # Extract form elements ──────────────────────────────────────────
-    print("-"*80, "Step 1: Extracting form elements...")
+    print("-"*80, "Extracting form elements...")
     response = await agent_page_elements.ainvoke(
         {"messages": [{"role": "user", "content": f"extract the form elements from {target_url}"}]}
     )
@@ -556,8 +580,8 @@ async def main():
     filled_json_str = filled.model_dump_json(by_alias=True)
     print(filled.model_dump_json(indent=2))
 
-    # ── Step 3: Run the fill-forms agent (will pause for approval) ────────────
-    print("\nStep 3: Running fill-forms agent (will pause for human approval)...")
+    # Run the fill-forms agent (will pause for approval) ────────────
+    print("-"*80, "Running fill-forms agent (will pause for human approval)...")
     user_message = (
         f"Please fill the form at {target_url} using this pre-filled JSON:\n{filled_json_str}"
     )
@@ -582,7 +606,7 @@ async def main():
         print("\nGraph finished without requiring human approval.")
         return
 
-    # ── Step 4: Human reviews and decides ─────────────────────────────────────
+    # Human reviews and decides ─────────────────────────────────────
     # Retrieve the interrupt payload surfaced by human_approval_node
     interrupt_payload = None
     for task in interrupted_state.tasks:
@@ -600,14 +624,14 @@ async def main():
     else:
         decision = "no"
 
-    # ── Step 5: Resume the graph with the human decision ──────────────────────
-    print(f"\nStep 5: Resuming graph with decision='{decision}'...")
+    # Resume the graph with the human decision ──────────────────────
+    print("-"*80, f"Resuming graph with decision='{decision}'...")
     resume_events = fill_forms_graph.astream(
         Command(resume=decision),
         config=thread_config,
         stream_mode="values",
     )
-    for event in resume_events:
+    async for event in resume_events:
         last_msg = event["messages"][-1]
         if hasattr(last_msg, "content") and last_msg.content:
             print(f"\n[Agent]: {last_msg.content}")
