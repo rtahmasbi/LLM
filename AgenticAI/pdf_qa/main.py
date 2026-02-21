@@ -6,19 +6,21 @@ Requirements:
     pip install langchain langchain-community langchain-openai pypdf faiss-cpu openai
     
 Usage:
-    Set OPENAI_API_KEY environment variable, then run:
-    python pdf_agent.py --pdf path/to/your/file.pdf
+    Set OPENAI_API_KEY environment variable, then run:    
+    python main.py --pdf path/to/your/file.pdf
+
 """
+
 
 import os
 import argparse
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain.chains import RetrievalQA
-from langchain.agents import Tool, initialize_agent, AgentType
-from langchain.memory import ConversationBufferMemory
+from langchain_core.tools.retriever import create_retriever_tool
+from langchain_core.messages import HumanMessage, AIMessage
+from langgraph.prebuilt import create_react_agent
 
 
 def load_and_index_pdf(pdf_path: str):
@@ -47,48 +49,40 @@ def load_and_index_pdf(pdf_path: str):
 
 
 def build_agent(vectorstore):
-    """Build a LangChain agent with a PDF retrieval tool."""
+    """Build a LangGraph ReAct agent with a PDF retrieval tool."""
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-    # RetrievalQA chain wraps the vector store for question answering
-    retrieval_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
+    # Create a retriever tool from the vector store
+    retriever_tool = create_retriever_tool(
         retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
-        return_source_documents=False,
-    )
-
-    # Expose the chain as a Tool so the agent can decide when to use it
-    pdf_tool = Tool(
         name="PDFSearch",
-        func=retrieval_chain.run,
         description=(
-            "Use this tool to answer questions about the content of the PDF document. "
-            "Input should be a clear, concise question."
+            "Use this tool to search and answer questions about the content of the PDF document. "
+            "Input should be a clear, concise question or keyword."
         ),
     )
 
-    memory = ConversationBufferMemory(
-        memory_key="chat_history",
-        return_messages=True,
+    system_prompt = (
+        "You are a helpful assistant that answers questions based on a PDF document. "
+        "Always use the PDFSearch tool to find relevant content before answering."
     )
 
-    agent = initialize_agent(
-        tools=[pdf_tool],
-        llm=llm,
-        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
-        memory=memory,
-        verbose=True,
-        handle_parsing_errors=True,
+    # create_react_agent from langgraph handles tool-calling natively
+    agent = create_react_agent(
+        model=llm,
+        tools=[retriever_tool],
+        prompt=system_prompt,
     )
     return agent
 
 
 def interactive_loop(agent):
-    """Run an interactive Q&A loop."""
+    """Run an interactive Q&A loop with conversation history."""
     print("=" * 60)
     print("PDF Q&A Agent ready. Type 'exit' or 'quit' to stop.")
     print("=" * 60)
+
+    chat_history = []
 
     while True:
         try:
@@ -103,7 +97,12 @@ def interactive_loop(agent):
             print("Goodbye!")
             break
 
-        response = agent.run(question)
+        chat_history.append(HumanMessage(content=question))
+
+        result = agent.invoke({"messages": chat_history})
+        response = result["messages"][-1].content
+
+        chat_history.append(AIMessage(content=response))
         print(f"\n🤖 Agent: {response}")
 
 
@@ -138,7 +137,8 @@ if __name__ == "__main__":
 
 
 """
-python main.py --pdf /home/ras/functionalsample.pdf
+
+python AgenticAI/pdf_qa/main.py --pdf /home/ras/functionalsample.pdf
 
 
 """
