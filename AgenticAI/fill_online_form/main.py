@@ -322,7 +322,8 @@ async def main(target_url, user_info):
         ):
             last_msg = event["messages"][-1]
             if hasattr(last_msg, "content") and last_msg.content:
-                print(f"\n[Agent]: {last_msg.content}")
+                print("\n[Agent]:")
+                print(last_msg.content)
             snapshot = await graph.aget_state(thread_config)
             if snapshot.next and "human_approval" in snapshot.next:
                 interrupted_state = snapshot
@@ -354,7 +355,8 @@ async def main(target_url, user_info):
         ):
             last_msg = event["messages"][-1]
             if hasattr(last_msg, "content") and last_msg.content:
-                print(f"\n[Agent]: {last_msg.content}")
+                print("\n[Agent]:")
+                print(last_msg.content)
 
         print("\nDone.")
 
