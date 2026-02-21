@@ -121,7 +121,6 @@ agent = create_agent(
 | File search          | Provide Glob and Grep search tools over filesystem files.                   |
 | Filesystem           | Provide agents with a filesystem for storing context and long-term memories.|
 | Subagent             | Add the ability to spawn subagents.                                         |
-|----------------------|-----------------------------------------------------------------------------|
 
 
 
@@ -129,29 +128,27 @@ agent = create_agent(
 ## claude-agent-sdk-python
 https://code.claude.com/docs/en/settings#tools-available-to-claude
 
-```
-Tool	Description	Permission Required
-AskUserQuestion	Asks multiple-choice questions to gather requirements or clarify ambiguity	No
-Bash	Executes shell commands in your environment (see Bash tool behavior below)	Yes
-TaskOutput	Retrieves output from a background task (bash shell or subagent)	No
-Edit	Makes targeted edits to specific files	Yes
-ExitPlanMode	Prompts the user to exit plan mode and start coding	Yes
-Glob	Finds files based on pattern matching	No
-Grep	Searches for patterns in file contents	No
-KillShell	Kills a running background bash shell by its ID	No
-MCPSearch	Searches for and loads MCP tools when tool search is enabled	No
-NotebookEdit	Modifies Jupyter notebook cells	Yes
-Read	Reads the contents of files	No
-Skill	Executes a skill within the main conversation	Yes
-Task	Runs a sub-agent to handle complex, multi-step tasks	No
-TaskCreate	Creates a new task in the task list	No
-TaskGet	Retrieves full details for a specific task	No
-TaskList	Lists all tasks with their current status	No
-TaskUpdate	Updates task status, dependencies, details, or deletes tasks	No
-WebFetch	Fetches content from a specified URL	Yes
-WebSearch	Performs web searches with domain filtering	Yes
-Write	Creates or overwrites files	Yes
-LSP	Code intelligence via language servers. Reports type errors and warnings automatically after file edits. Also supports navigation operations: jump to definitions, find references, get type info, list symbols, find implementations, trace call hierarchies. Requires a code intelligence plugin and its language server binary	No
-```
-
+| Tool            | Description | Permission Required |
+|-----------------|------------|---------------------|
+| AskUserQuestion | Asks multiple-choice questions to gather requirements or clarify ambiguity | No |
+| Bash | Executes shell commands in your environment (see Bash tool behavior below) | Yes |
+| TaskOutput | Retrieves output from a background task (bash shell or subagent) | No |
+| Edit | Makes targeted edits to specific files | Yes |
+| ExitPlanMode | Prompts the user to exit plan mode and start coding | Yes |
+| Glob | Finds files based on pattern matching | No |
+| Grep | Searches for patterns in file contents | No |
+| KillShell | Kills a running background bash shell by its ID | No |
+| MCPSearch | Searches for and loads MCP tools when tool search is enabled | No |
+| NotebookEdit | Modifies Jupyter notebook cells | Yes |
+| Read | Reads the contents of files | No |
+| Skill | Executes a skill within the main conversation | Yes |
+| Task | Runs a sub-agent to handle complex, multi-step tasks | No |
+| TaskCreate | Creates a new task in the task list | No |
+| TaskGet | Retrieves full details for a specific task | No |
+| TaskList | Lists all tasks with their current status | No |
+| TaskUpdate | Updates task status, dependencies, details, or deletes tasks | No |
+| WebFetch | Fetches content from a specified URL | Yes |
+| WebSearch | Performs web searches with domain filtering | Yes |
+| Write | Creates or overwrites files | Yes |
+| LSP | Code intelligence via language servers. Reports type errors and warnings automatically after file edits. Also supports navigation operations: jump to definitions, find references, get type info, list symbols, find implementations, trace call hierarchies. Requires a code intelligence plugin and its language server binary | No |
 
