@@ -22,7 +22,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.tools.retriever import create_retriever_tool
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain.agents import create_react_agent
+from langgraph.prebuilt import create_react_agent
+#from langchain.agents import create_react_agent
 
 
 def load_and_index_pdf(pdf_path: str):
