@@ -3,11 +3,13 @@ LangChain PDF QA Agent
 Reads a PDF file and answers user questions using RAG (Retrieval-Augmented Generation).
 
 Requirements:
-    pip install langchain langchain-community langchain-openai pypdf faiss-cpu openai
-    
+    pip install langchain langchain-community langchain-openai langchain-text-splitters langgraph pypdf faiss-cpu openai
+
 Usage:
     Set OPENAI_API_KEY environment variable, then run:    
-    python main.py --pdf path/to/your/file.pdf
+    wget https://writing.colostate.edu/guides/documents/resume/functionalsample.pdf
+    python main.py --pdf functionalsample.pdf
+
 
 """
 
@@ -20,7 +22,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.tools.retriever import create_retriever_tool
 from langchain_core.messages import HumanMessage, AIMessage
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_react_agent
 
 
 def load_and_index_pdf(pdf_path: str):
