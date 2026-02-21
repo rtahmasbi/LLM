@@ -422,7 +422,8 @@ structured_llm = llm.with_structured_output(FormElements)
 extraction_tools = [form_get_elements]
 
 # Tools for the fill-forms agent
-fill_tools = [form_fill_fields, form_submit]
+tool_node_fill   = ToolNode([form_fill_fields])
+tool_node_submit = ToolNode([form_submit])
 
 # MemorySaver enables graph checkpointing required for interrupt/resume
 memory = MemorySaver()
@@ -461,12 +462,23 @@ def should_continue(state: MessagesState):
     return "tools_submit"
 
 
-def call_agent(state: MessagesState):
+async def call_agent(state: MessagesState):
+    """Async agent node — avoids sync/async mismatch with Playwright tools."""
     bound_llm = llm.bind_tools(fill_tools)
-    response = bound_llm.invoke(
+    response = await bound_llm.ainvoke(
         [{"role": "system", "content": FILL_FORMS_SYSTEM_PROMPT}] + state["messages"]
     )
     return {"messages": [response]}
+
+async def run_tools_fill(state: MessagesState):
+    """Async wrapper around the fill ToolNode."""
+    return await tool_node_fill.ainvoke(state)
+
+
+async def run_tools_submit(state: MessagesState):
+    """Async wrapper around the submit ToolNode."""
+    return await tool_node_submit.ainvoke(state)
+
 
 
 # Build the graph
@@ -538,7 +550,8 @@ async def main():
         f"Here is the JSON elements:\n{json.dumps(jsn_elements, indent=2)}\n\n"
         f"user_info:\n{user_info}"
     )
-    filled: FormElements = structured_llm.invoke(content)
+    # ainvoke keeps us fully in async context (no sync blocking)
+    filled: FormElements = await structured_llm.ainvoke(content)
     filled_json_str = filled.model_dump_json(by_alias=True)
     print(filled.model_dump_json(indent=2))
 
@@ -548,23 +561,22 @@ async def main():
         f"Please fill the form at {target_url} using this pre-filled JSON:\n{filled_json_str}"
     )
 
-    # First invocation — agent fills fields then graph pauses at human_approval
-    events = fill_forms_graph.stream(
+    # Use astream so Playwright's async event loop is never blocked by sync calls.
+    interrupted_state = None
+    async for event in fill_forms_graph.astream(
         {"messages": [HumanMessage(content=user_message)]},
         config=thread_config,
         stream_mode="values",
-    )
-    interrupted_state = None
-    for event in events:
+    ):
         last_msg = event["messages"][-1]
-        if hasattr(last_msg, "content"):
+        if hasattr(last_msg, "content") and last_msg.content:
             print(f"\n[Agent]: {last_msg.content}")
-        # Check if we are interrupted
-        snapshot = fill_forms_graph.get_state(thread_config)
+        # Check whether the graph has paused inside human_approval
+        snapshot = await fill_forms_graph.aget_state(thread_config)
         if snapshot.next and "human_approval" in snapshot.next:
             interrupted_state = snapshot
             break
-
+    
     if interrupted_state is None:
         print("\nGraph finished without requiring human approval.")
         return
@@ -589,7 +601,7 @@ async def main():
 
     # ── Step 5: Resume the graph with the human decision ──────────────────────
     print(f"\nStep 5: Resuming graph with decision='{decision}'...")
-    resume_events = fill_forms_graph.stream(
+    resume_events = fill_forms_graph.astream(
         Command(resume=decision),
         config=thread_config,
         stream_mode="values",
