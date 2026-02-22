@@ -2,7 +2,7 @@
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from trl import PPOTrainer, AutoModelForCausalLMWithValueHead
-from trl.experimental.ppo import PPOConfig
+from trl.experimental.ppo import PPOConfig # it is in the experimental now
 
 # Load base model
 model_name = "meta-llama/Llama-3.1-8B-Instruct"
