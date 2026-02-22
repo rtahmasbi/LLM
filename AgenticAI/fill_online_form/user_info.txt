@@ -1,0 +1,6 @@
+name: james
+fname: Ebadi
+date of Birth: Jan 10, 1990
+job intersted: DS
+email: j.ebadi@gmail.com
+phone: 1122334444
