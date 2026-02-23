@@ -1,6 +1,14 @@
 We can use https://www.agentql.com/, but it is a paid platform.
 My goal is to create a simple version using `playwright`.
 
+# examples
+https://github.com/ajitsingh98/Auto-Job-Form-Filler-Agent
+They fill Google Form
+
+
+https://github.com/mohammed97ashraf/ApplyWizard
+They use AgentQL. AgentQL is not free and all the LLM page extractions are there.
+
 
 
 

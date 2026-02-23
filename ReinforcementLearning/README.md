@@ -145,6 +145,10 @@ $$\mathcal{L} = \mathcal{L}_{\text{PPO}} + c_v \, (V_\theta(s_t) - R_t)^2 - c_e 
 $$
 
 
+https://medium.com/@chnwsw01/rlhf-with-trl-ppotrainer-6567f3e073a5
+https://medium.com/@gupta.aman/learning-ppo-by-writing-your-own-training-loop-6907e23162d9
+https://github.com/amangup/summary-length-ppo
+
 
 
 ## `GRPOTrainer`
@@ -187,3 +191,8 @@ Reinforcement Learning From Scratch
 - Deep Reinforcement Learning: (Deep Q-Networks - DQN)
 - Policy Gradient Methods: (Monte Carlo policy gradients)
 - Actor-Critic Methods: (Advantage Actor-Critic (A2C) algorithm)
+
+
+# Gymnasium
+https://github.com/Farama-Foundation/Gymnasium
+Gymnasium is an open source Python library for developing and comparing reinforcement learning algorithms 
