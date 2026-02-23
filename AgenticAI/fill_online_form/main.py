@@ -10,8 +10,10 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import interrupt, Command
 from langgraph.graph import StateGraph, MessagesState, END, START
 from langgraph.prebuilt import ToolNode
+from pydantic import BaseModel
 
-from typing import Optional
+
+from typing import Optional, List
 import argparse
 
 
@@ -47,6 +49,13 @@ class BrowserSession:
         print("[BrowserSession] Browser closed.")
 
 
+class Element(BaseModel):
+    field_id: str = ""
+    value: str = ""
+    is_required: bool = True
+
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 async def get_forms(page: Page, skip_hidden: bool = True):
@@ -59,6 +68,13 @@ async def get_forms(page: Page, skip_hidden: bool = True):
         for inp in inputs:
             if skip_hidden and not await inp.is_visible():
                 continue
+            ####
+            is_required = await inp.evaluate("el => el.required")
+            if not is_required:
+                class_attr = await inp.get_attribute("class") or ""
+                if "required" in class_attr.lower():
+                    is_required = True
+            ####
             field_info = {
                 "label":          "",
                 "type":           await inp.get_attribute("type") or "text",
@@ -69,6 +85,7 @@ async def get_forms(page: Page, skip_hidden: bool = True):
                 "data-seperator": await inp.get_attribute("data-seperator") or "",
                 "data-maxlength": await inp.get_attribute("data-maxlength") or "",
                 "is_visible":     await inp.is_visible(),
+                "is_required":    is_required,
             }
             field_id = await inp.get_attribute("id")
             if field_id:
@@ -80,10 +97,13 @@ async def get_forms(page: Page, skip_hidden: bool = True):
     return form_data
 
 
-async def _fill_page_flat(page: Page, values: dict[str, str]) -> str:
+async def _fill_page_flat(page: Page, values: List[Element]) -> str:
     """Fill fields from a flat {id: value} dict and return a summary."""
     summary_lines = []
-    for id_, user_input in values.items():
+    for v in values:
+        id_ = v.field_id
+        user_input = v.value
+        is_required = v.is_required
         element = await page.query_selector(f'[id="{id_}"]')
         if not element or not await element.is_visible():
             summary_lines.append(f"  [SKIP] id='{id_}' not visible or not found")
@@ -110,7 +130,7 @@ async def _fill_page_flat(page: Page, values: dict[str, str]) -> str:
                         await element.select_option(label=user_input)
                     else:
                         await element.fill(user_input)
-            summary_lines.append(f"  [OK]   id='{id_}' | value='{user_input}'")
+            summary_lines.append(f"  [OK]   id='{id_}' | value='{user_input}' | is_required={is_required}")
         except Exception as e:
             summary_lines.append(f"  [ERR]  id='{id_}' — {e}")
     return "\n".join(summary_lines)
@@ -132,7 +152,20 @@ async def form_get_elements(url: str, config: RunnableConfig) -> list:
 
 
 @tool
-async def form_fill_fields(url: str, values: dict[str, str], config: RunnableConfig) -> str:
+def form_validate_elements(url: str, values: List[Element], config: RunnableConfig) -> str:
+    """
+    Checks and validates if the fields are correct and all the required items are filled. 
+    Always call this first before filling any form.
+    """
+    for v in values:
+        if v.is_required and len(v.value)==0:
+            return "False"
+    return "True"
+
+
+
+@tool
+async def form_fill_fields(url: str, values: List[Element], config: RunnableConfig) -> str:
     """
     Fill form fields on a webpage. Does NOT submit — returns a summary for human review.
 
@@ -151,7 +184,7 @@ async def form_fill_fields(url: str, values: dict[str, str], config: RunnableCon
 
 
 @tool
-async def form_submit(url: str, values: dict[str, str], config: RunnableConfig) -> str:
+async def form_submit(url: str, values: List[Element], config: RunnableConfig) -> str:
     """
     Re-fill form fields and SUBMIT the form.
     Call this ONLY after the human has approved submission.
@@ -212,7 +245,7 @@ async def human_approval_node(state: MessagesState) -> Command:
             goto="agent",
             update={"messages": state["messages"] + [HumanMessage(
                 content=(
-                    "Human approved. Now call `form_submit` with "
+                    "Human approved.\nNow call `form_submit` with "
                     f"url=\"{fill_args.get('url', '')}\" and "
                     f"values={json.dumps(fill_args.get('values', {}))}."
                 )
@@ -231,55 +264,75 @@ async def human_approval_node(state: MessagesState) -> Command:
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-all_tools        = [form_get_elements, form_fill_fields, form_submit]
-tool_node_extract = ToolNode([form_get_elements])
-tool_node_fill    = ToolNode([form_fill_fields])
-tool_node_submit  = ToolNode([form_submit])
 
 SYSTEM_PROMPT = """
 You are a form-filling assistant. Your workflow is strictly:
 
 1. Call `form_get_elements` to extract all visible fields from the URL.
-2. Using the extracted field ids and the user info provided, build a flat
-   {field_id: value} mapping and call `form_fill_fields`.
-3. WAIT — a human approval step will pause execution here.
-4. If approved, call `form_submit` with the SAME url and values.
-5. Report the final outcome.
+2. Using the extracted field ids and the user info provided, build a list with
+   values=[{"field_id":field_id, "is_required":is_required, "value":value}] and call `form_validate_elements`. The list should contain all the is_required=True even if the user has not provided any value for them.
+3. If `form_validate_elements` returns "True", call `form_fill_fields` with the SAME values and url.
+   If `form_validate_elements` returns "False", STOP immediately and inform the user which required fields are missing. Do NOT call form_fill_fields.
+4. WAIT — a human approval step will pause execution here.
+5. If approved, call `form_submit` with the SAME url and values.
+6. Report the final outcome.
 
-Never skip step 1. Never call `form_submit` before human approval.
+- Never skip step 1.
+- Never call `form_submit` before human approval.
+- Never call `form_fill_fields` if validation failed.
 """
 
+
+
+async def call_agent(state: MessagesState):
+    all_tools = [form_get_elements, form_validate_elements, form_fill_fields, form_submit]
+    response = await llm.bind_tools(all_tools).ainvoke(
+        [{"role": "system", "content": SYSTEM_PROMPT}] + state["messages"]
+    )
+    return {"messages": [response]}
 
 def should_continue(state: MessagesState):
     last = state["messages"][-1]
     if not hasattr(last, "tool_calls") or not last.tool_calls:
         return END
     match last.tool_calls[0]["name"]:
-        case "form_get_elements": return "tools_extract"
-        case "form_fill_fields":  return "tools_fill"
-        case _:                   return "tools_submit"
+        case "form_get_elements":       return "tools_extract"
+        case "form_validate_elements":  return "tools_validate"
+        case "form_fill_fields":        return "tools_fill"
+        case _:                         return "tools_submit"
 
-
-async def call_agent(state: MessagesState):
-    response = await llm.bind_tools(all_tools).ainvoke(
-        [{"role": "system", "content": SYSTEM_PROMPT}] + state["messages"]
+def should_continue_after_validate(state: MessagesState):
+    """After validation, only proceed to agent if form is valid."""
+    last_tool_msg = next(
+        (m for m in reversed(state["messages"])
+         if isinstance(m, ToolMessage) and m.name == "form_validate_elements"),
+        None,
     )
-    return {"messages": [response]}
-
+    if last_tool_msg and "not valid" in last_tool_msg.content.lower():
+        return END
+    return "agent"
 
 async def run_tools_extract(state: MessagesState, config: RunnableConfig):
+    tool_node_extract = ToolNode([form_get_elements])
     return await tool_node_extract.ainvoke(state, config)
 
+async def run_tools_validate(state: MessagesState, config: RunnableConfig):
+    tool_node_validate = ToolNode([form_validate_elements])
+    return await tool_node_validate.ainvoke(state, config)
+
 async def run_tools_fill(state: MessagesState, config: RunnableConfig):
+    tool_node_fill = ToolNode([form_fill_fields])
     return await tool_node_fill.ainvoke(state, config)
 
 async def run_tools_submit(state: MessagesState, config: RunnableConfig):
+    tool_node_submit  = ToolNode([form_submit])
     return await tool_node_submit.ainvoke(state, config)
 
 
 builder = StateGraph(MessagesState)
 builder.add_node("agent",          call_agent)
 builder.add_node("tools_extract",  run_tools_extract)
+builder.add_node("tools_validate", run_tools_validate)
 builder.add_node("tools_fill",     run_tools_fill)
 builder.add_node("human_approval", human_approval_node)
 builder.add_node("tools_submit",   run_tools_submit)
@@ -288,19 +341,28 @@ builder.add_edge(START,           "agent")
 builder.add_conditional_edges(
     "agent", should_continue,
     {
-        "tools_extract": "tools_extract",
-        "tools_fill":    "tools_fill",
-        "tools_submit":  "tools_submit",
-        END:             END,
+        "tools_extract":  "tools_extract",
+        "tools_validate": "tools_validate",
+        "tools_fill":     "tools_fill",
+        "tools_submit":   "tools_submit",
+        END:              END,
     },
 )
 builder.add_edge("tools_extract",  "agent")
+builder.add_conditional_edges(
+    "tools_validate",
+    should_continue_after_validate,
+    {
+        "agent": "agent",
+        END: END,
+    },
+)
 builder.add_edge("tools_fill",     "human_approval")
 builder.add_edge("tools_submit",   "agent")
 
 graph = builder.compile(checkpointer=MemorySaver())
 print(graph.get_graph().draw_ascii())
-
+graph.get_graph().draw_png("/tmp/graph.png")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
@@ -389,5 +451,7 @@ Usage:
 cd AgenticAI/fill_online_form
 python main.py --url https://form.jotform.com/260497189942169 --user_info user_info.txt
 python main.py --url https://form.jotform.com/260497189942169 --user_info user_info.txt --headless false
+python main.py --url https://form.jotform.com/260497189942169 --user_info user_info2.txt
+python main.py --url https://form.jotform.com/260497189942169 --user_info user_info3.txt
 
 """
