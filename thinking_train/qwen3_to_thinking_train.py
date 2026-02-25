@@ -614,7 +614,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_eval_samples",  type=int, default=200,     help="Cap eval set size")
     parser.add_argument("--epochs",            type=int,   default=3,     help="Number of epochs")
     parser.add_argument("--lr",                type=float, default=1e-6,  help="Learning rate")
-    parser.add_argument("--group_size",        type=int,   default=8,     help="G: samples per prompt")
+    parser.add_argument("--group_size",        type=int,   default=4,     help="G: samples per prompt")
     parser.add_argument("--batch_size",        type=int,   default=2,     help="Prompts per update")
     parser.add_argument("--kl",                type=float, default=0.04,  help="KL penalty coefficient")
     parser.add_argument("--max_new_tokens",    type=int,   default=512,   help="Max tokens to generate")
