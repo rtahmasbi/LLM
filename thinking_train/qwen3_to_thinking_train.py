@@ -615,7 +615,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs",            type=int,   default=3,     help="Number of epochs")
     parser.add_argument("--lr",                type=float, default=1e-6,  help="Learning rate")
     parser.add_argument("--group_size",        type=int,   default=4,     help="G: samples per prompt")
-    parser.add_argument("--batch_size",        type=int,   default=2,     help="Prompts per update")
+    parser.add_argument("--batch_size",        type=int,   default=1,     help="Prompts per update")
     parser.add_argument("--kl",                type=float, default=0.04,  help="KL penalty coefficient")
     parser.add_argument("--max_new_tokens",    type=int,   default=512,   help="Max tokens to generate")
     parser.add_argument("--no_4bit",           action="store_true",       help="Disable 4-bit quant")
