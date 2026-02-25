@@ -1,5 +1,5 @@
 """
-RL Training for Qwen3:8b Thinking Model — with GSM8K Support
+RL Training for Qwen3:xb Thinking Model — with GSM8K Support
 =============================================================
 Uses GRPO (Group Relative Policy Optimization) — the same RL algorithm
 used to train DeepSeek-R1 and Qwen3 thinking models.
@@ -16,6 +16,11 @@ Dependencies:
     pip install torch transformers datasets tqdm accelerate bitsandbytes
 
 For 8B model, recommended: GPU with ≥24GB VRAM (or use 4-bit quant).
+
+# important
+- We have a policy model (the model that we are going to train) and the ref_model, which we dont train.
+- Samples are taken from the policy model.
+
 """
 
 import os
@@ -48,7 +53,7 @@ class GRPOConfig:
     model_name: str = "Qwen/Qwen3-8B"          # HuggingFace model ID
     load_in_4bit: bool = True                    # Use 4-bit quantization (saves VRAM)
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
-
+    
     # Training
     learning_rate: float = 1e-6
     num_epochs: int = 3
@@ -56,21 +61,21 @@ class GRPOConfig:
     group_size: int = 8                          # G: responses sampled per prompt
     max_new_tokens: int = 512
     max_prompt_len: int = 512
-
+    
     # GRPO
     kl_coeff: float = 0.04                       # β: KL penalty weight
     clip_eps: float = 0.2                        # PPO-style clipping epsilon
     temperature: float = 0.8                     # sampling temperature
     top_p: float = 0.95
-
+    
     # Logging
     log_every: int = 1
     save_every: int = 50
     output_dir: str = "./qwen_rl_checkpoints"
-
+    
     # Thinking mode
     enable_thinking: bool = True                 # Qwen3 /think mode
-
+    
     # Dataset
     dataset_source: str = "gsm8k"               # "gsm8k" | "json" | "builtin"
     dataset_path: Optional[str] = None          # path for "json" source
@@ -85,16 +90,16 @@ class GRPOConfig:
 # ──────────────────────────────────────────────────────────────────────────────
 
 BUILTIN_DATASET = [
-    {"prompt": "What is 17 × 43?",                                                   "answer": "731"},
-    {"prompt": "What is the square root of 144?",                                    "answer": "12"},
+    {"prompt": "What is 17 x 43?",                                                  "answer": "731"},
+    {"prompt": "What is the square root of 144?",                                   "answer": "12"},
     {"prompt": "Solve: 2x + 5 = 13. What is x?",                                    "answer": "4"},
-    {"prompt": "What is 15% of 200?",                                                "answer": "30"},
-    {"prompt": "If a train travels 60 mph for 2.5 hours, how far does it go?",       "answer": "150"},
-    {"prompt": "What is the capital of France?",                                     "answer": "Paris"},
-    {"prompt": "How many days are in a leap year?",                                  "answer": "366"},
-    {"prompt": "What is 7 factorial (7!)?",                                          "answer": "5040"},
+    {"prompt": "What is 15% of 200?",                                               "answer": "30"},
+    {"prompt": "If a train travels 60 mph for 2.5 hours, how far does it go?",      "answer": "150"},
+    {"prompt": "What is the capital of France?",                                    "answer": "Paris"},
+    {"prompt": "How many days are in a leap year?",                                 "answer": "366"},
+    {"prompt": "What is 7 factorial (7!)?",                                         "answer": "5040"},
     {"prompt": "Solve: x² = 81. What is x (positive)?",                             "answer": "9"},
-    {"prompt": "What is 3^5?",                                                       "answer": "243"},
+    {"prompt": "What is 3^5?",                                                      "answer": "243"},
 ]
 
 
@@ -118,10 +123,8 @@ def load_gsm8k(split: str = "train", max_samples: Optional[int] = None) -> list[
     """
     print(f"📥 Loading GSM8K ({split} split)...")
     ds = hf_load_dataset("openai/gsm8k", "main", split=split)
-
     if max_samples:
         ds = ds.select(range(min(max_samples, len(ds))))
-
     formatted = [
         {
             "prompt": item["question"],
@@ -142,14 +145,12 @@ def load_dataset_for_config(config: GRPOConfig) -> tuple[list[dict], list[dict]]
         train_data = load_gsm8k(config.gsm8k_train_split, config.max_train_samples)
         eval_data  = load_gsm8k(config.gsm8k_test_split,  config.max_eval_samples)
         return train_data, eval_data
-
     elif config.dataset_source == "json":
         assert config.dataset_path, "dataset_path must be set when dataset_source='json'"
         with open(config.dataset_path) as f:
             data = json.load(f)
         split = int(0.9 * len(data))
         return data[:split], data[split:]
-
     else:  # builtin
         return BUILTIN_DATASET, BUILTIN_DATASET
 
@@ -186,7 +187,7 @@ def reward_gsm8k(response: str, ground_truth: str) -> float:
 def reward_format_quality(response: str) -> float:
     """
     Format reward: bonus for having a proper <think> block followed by an answer.
-    Returns 0.0–1.0.
+    Returns 0.0-1.0.
     """
     has_think  = bool(re.search(r"<think>.+?</think>", response, re.DOTALL))
     has_answer = (
@@ -212,9 +213,9 @@ def combined_reward_gsm8k(
 ) -> float:
     """
     Weighted reward tailored for GSM8K:
-      0.7 × numeric correctness
-      0.2 × thinking format quality
-      0.1 × response length
+      0.7 x numeric correctness
+      0.2 x thinking format quality
+      0.1 x response length
     """
     r_correct = reward_gsm8k(response, ground_truth)
     r_format  = reward_format_quality(response)
@@ -227,17 +228,15 @@ def combined_reward_gsm8k(
 # ──────────────────────────────────────────────────────────────────────────────
 
 def load_model_and_tokenizer(config: GRPOConfig):
-    """Load Qwen3-8B with optional 4-bit quantization."""
+    """Load model with optional 4-bit quantization."""
     print(f"Loading model: {config.model_name}")
     print(f"Device: {config.device} | 4-bit quant: {config.load_in_4bit}")
-
     tokenizer = AutoTokenizer.from_pretrained(
         config.model_name, trust_remote_code=True
     )
     tokenizer.padding_side = "left"
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-
     bnb_config = None
     if config.load_in_4bit and config.device == "cuda":
         bnb_config = BitsAndBytesConfig(
@@ -246,7 +245,6 @@ def load_model_and_tokenizer(config: GRPOConfig):
             bnb_4bit_compute_dtype=torch.bfloat16,
             bnb_4bit_use_double_quant=True,
         )
-
     model = AutoModelForCausalLM.from_pretrained(
         config.model_name,
         quantization_config=bnb_config,
@@ -254,14 +252,13 @@ def load_model_and_tokenizer(config: GRPOConfig):
         device_map="auto" if config.device == "cuda" else None,
         trust_remote_code=True,
     )
-
     if config.device == "cpu":
         model = model.to(config.device)
-
     model.train()
     return model, tokenizer
 
 
+# Rasool: I did not see any diff in the model_predict using enable_thinking
 def build_prompt(question: str, enable_thinking: bool = True) -> str:
     """Format prompt with Qwen3 chat template + optional thinking mode."""
     think_tag = "/think" if enable_thinking else "/no_think"
@@ -289,11 +286,10 @@ def generate_group(
         max_length=config.max_prompt_len,
         truncation=True,
     ).to(model.device)
-
     prompt_len = inputs["input_ids"].shape[1]
     responses  = []
-
-    for _ in range(config.group_size):
+    for idx in range(config.group_size):
+        print("idx:", idx)
         output = model.generate(
             **inputs,
             max_new_tokens=config.max_new_tokens,
@@ -305,7 +301,7 @@ def generate_group(
         gen_ids  = output[0, prompt_len:]
         gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
         responses.append(gen_text)
-
+    #
     return responses
 
 
@@ -327,15 +323,15 @@ def compute_log_probs(
         max_length=config.max_prompt_len + config.max_new_tokens,
         truncation=True,
     ).to(model.device)
-
+    
     prompt_len = tokenizer(
         prompt, return_tensors="pt"
     ).input_ids.shape[1]
-
+    
     outputs   = model(**inputs)
     logits    = outputs.logits[0, prompt_len - 1:-1]   # [T, vocab], shifted
     targets   = inputs["input_ids"][0, prompt_len:]    # [T]
-
+    
     log_probs = F.log_softmax(logits, dim=-1)
     token_lps = log_probs[range(len(targets)), targets]
     return token_lps.sum()
@@ -363,20 +359,20 @@ def grpo_loss(
     mean_r     = rewards.mean()
     std_r      = rewards.std() + 1e-8
     advantages = (rewards - mean_r) / std_r                          # [G]
-
+    
     # Probability ratio π / π_ref
     log_ratios = policy_log_probs - ref_log_probs.detach()           # [G]
     ratios     = log_ratios.exp()
-
+    
     # Clipped surrogate
     surr1       = ratios * advantages
     surr2       = ratios.clamp(1 - config.clip_eps, 1 + config.clip_eps) * advantages
     policy_loss = -torch.min(surr1, surr2).mean()
-
+    
     # KL penalty
     kl   = (ratios - 1 - log_ratios).mean()
     loss = policy_loss + config.kl_coeff * kl
-
+    
     return loss, {
         "policy_loss": policy_loss.item(),
         "kl":          kl.item(),
@@ -497,7 +493,7 @@ class GRPOTrainer:
 
     def train(self):
         print("=" * 60)
-        print("  GRPO RL Training — Qwen3-8B Thinking Model + GSM8K")
+        print(f"  GRPO RL Training — {self.config.model_name} Thinking Model + GSM8K")
         print("=" * 60)
 
         for epoch in range(1, self.config.num_epochs + 1):
@@ -608,9 +604,9 @@ class GRPOTrainer:
 # ──────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="GRPO RL Training for Qwen3-8B with GSM8K")
+    parser = argparse.ArgumentParser(description="GRPO RL Training with GSM8K")
 
-    parser.add_argument("--model",             default="Qwen/Qwen3-8B",  help="HuggingFace model ID")
+    parser.add_argument("--model",             default="Qwen/Qwen3-0.6B",  help="HuggingFace model ID")
     parser.add_argument("--dataset_source",    default="gsm8k",
                         choices=["gsm8k", "json", "builtin"],             help="Dataset to use")
     parser.add_argument("--dataset_path",      default=None,              help="Path to JSON dataset (if source=json)")
@@ -655,6 +651,11 @@ if __name__ == "__main__":
 
 
 """
-python thinking_training_training/qwen3_to_thinking_train.py
+python qwen3_to_thinking_train.py
+python qwen3_to_thinking_train.py --model Qwen/Qwen3-4B
+python qwen3_to_thinking_train.py --model Qwen/Qwen3-0.6B
+
+
+huggingface-cli upload rtahmasbi/qwen3-0.6B-gsm8k-grpo ./qwen_rl_checkpoints/final
 
 """
