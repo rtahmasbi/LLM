@@ -406,6 +406,7 @@ class GRPOTrainer:
 
         # Load policy model
         self.model, self.tokenizer = load_model_and_tokenizer(config)
+        self.model.config.use_cache = False # for memory
 
         # Frozen reference model
         print("Creating frozen reference model copy...")
