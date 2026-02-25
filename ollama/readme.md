@@ -85,3 +85,58 @@ On Linux:
 ollama run qwen3-vl:8b ./xx.jpg whats in this image?
 ```
 
+
+# more paramaters
+```sh
+ollama run qwen3 --think=false
+ollama run qwen3 --format json
+ollama run qwen3 --experimental-websearch
+ollama run qwen3 --hidethinking
+ollama show qwen3 --modelfile
+
+think: true/false or high/medium/low for supported models (gpt-oss)
+
+
+# during the run
+/set parameter temperature 0.2
+/show parameters
+top_k, top_p, and num_ctx
+
+/? set
+Available Commands:
+  /set parameter ...     Set a parameter
+  /set system <string>   Set system message
+  /set history           Enable history
+  /set nohistory         Disable history
+  /set wordwrap          Enable wordwrap
+  /set nowordwrap        Disable wordwrap
+  /set format json       Enable JSON mode
+  /set noformat          Disable formatting
+  /set verbose           Show LLM stats
+  /set quiet             Disable LLM stats
+  /set think             Enable thinking
+  /set nothink           Disable thinking
+
+
+ /? show
+Available Commands:
+  /show info         Show details for this model
+  /show license      Show model license
+  /show modelfile    Show Modelfile for this model
+  /show parameters   Show parameters for this model
+  /show system       Show system message
+  /show template     Show prompt template
+
+
+
+ollama show qwen3
+
+/show modelfile
+
+```
+
+
+GPT models have `message.thinking` and `message.content`, DeepSeek and Qwen thinkg models have `<think>xx<\think>` tags.
+
+`ollama show qwen3 --modelfile`
+

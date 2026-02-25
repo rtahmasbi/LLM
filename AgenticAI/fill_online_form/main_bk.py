@@ -36,9 +36,7 @@ class BrowserSession:
     async def goto(self, url: str):
         """Navigate only if not already on that URL."""
         if self.page.url != url:
-            # Use domcontentloaded (faster) then wait for JS frameworks to render
-            await self.page.goto(url, wait_until="domcontentloaded")
-            await self.page.wait_for_timeout(2500)
+            await self.page.goto(url, wait_until="networkidle")
             print(f"[BrowserSession] Navigated to {url}")
         else:
             print(f"[BrowserSession] Already on {url}, skipping navigation.")
@@ -57,244 +55,84 @@ class Element(BaseModel):
     is_required: bool = True
 
 
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-async def _extract_fields_from_context(page: Page, context, skip_hidden: bool = True):
-    """
-    Extract fields from a form element or the full page.
-    Handles:
-      - Duplicate IDs (appends _dup1, _dup2, ...)
-      - Signature divs (skipped — not real inputs)
-      - Checkbox siblings (flagged for mutual-exclusion handling)
-    """
-    inputs = await context.query_selector_all("input, select, textarea")
-    fields = []
-    seen_ids: dict[str, int] = {}  # original_id -> count seen so far
-
-    for inp in inputs:
-        if skip_hidden and not await inp.is_visible():
-            continue
-
-        field_id = await inp.get_attribute("id")
-
-        # Deduplicate IDs
-        if field_id:
-            if field_id in seen_ids:
-                seen_ids[field_id] += 1
-                effective_id = f"{field_id}_dup{seen_ids[field_id]}"
-            else:
-                seen_ids[field_id] = 0
-                effective_id = field_id
-        else:
-            effective_id = None
-
-        is_required = await inp.evaluate("el => el.required")
-        if not is_required:
-            class_attr = await inp.get_attribute("class") or ""
-            if "required" in class_attr.lower():
-                is_required = True
-
-        field_type = await inp.get_attribute("type") or "text"
-        field_name  = await inp.get_attribute("name") or ""
-
-        field_info = {
-            "label":          "",
-            "type":           field_type,
-            "placeholder":    await inp.get_attribute("placeholder") or "",
-            "id":             effective_id,
-            "original_id":    field_id,
-            "name":           field_name,
-            "data-format":    await inp.get_attribute("data-format") or "",
-            "data-seperator": await inp.get_attribute("data-seperator") or "",
-            "data-maxlength": await inp.get_attribute("data-maxlength") or "",
-            "is_visible":     await inp.is_visible(),
-            "is_required":    is_required,
-            # Flag checkbox groups that share the same name (radio-like behaviour)
-            "exclusive_group": field_name if field_type == "checkbox" else "",
-        }
-
-        # Resolve label via for= attribute (use original_id)
-        if field_id:
-            label_el = await page.query_selector(f'label[for="{field_id}"]')
-            if label_el:
-                field_info["label"] = await label_el.inner_text()
-
-        fields.append(field_info)
-
-    return fields
-
-
 async def get_forms(page: Page, skip_hidden: bool = True):
-    """
-    Extract all forms and their input fields on the current page.
-    Falls back to scanning the whole page when no <form> tags are present
-    (covers JS-rendered and iframe-less single-page apps).
-    Also checks iframes if no forms/inputs are found on the main frame.
-    """
+    """Extract all forms and their input fields on the current page."""
     forms = await page.query_selector_all("form")
-
-    # ── Iframe fallback ──────────────────────────────────────────────────────
-    if not forms:
-        for frame in page.frames:
-            if frame == page.main_frame:
-                continue
-            try:
-                iframe_forms = await frame.query_selector_all("form")
-                if iframe_forms:
-                    form_data = []
-                    for idx, form in enumerate(iframe_forms, 1):
-                        fields = await _extract_fields_from_context(frame, form, skip_hidden)
-                        form_data.append({"form_index": idx, "fields": fields, "source": "iframe"})
-                    return form_data
-            except Exception:
-                continue
-
-    # ── No <form> tags at all: scan whole page for inputs ───────────────────
-    if not forms:
-        fields = await _extract_fields_from_context(page, page, skip_hidden)
-        if fields:
-            return [{"form_index": 1, "fields": fields, "source": "page_scan"}]
-        return [{"error": "No form or input elements found on page after waiting."}]
-
-    # ── Normal path ──────────────────────────────────────────────────────────
     form_data = []
     for idx, form in enumerate(forms, 1):
-        fields = await _extract_fields_from_context(page, form, skip_hidden)
-        form_data.append({"form_index": idx, "fields": fields, "source": "form"})
+        inputs = await form.query_selector_all("input, select, textarea")
+        fields = []
+        for inp in inputs:
+            if skip_hidden and not await inp.is_visible():
+                continue
+            ####
+            is_required = await inp.evaluate("el => el.required")
+            if not is_required:
+                class_attr = await inp.get_attribute("class") or ""
+                if "required" in class_attr.lower():
+                    is_required = True
+            ####
+            field_info = {
+                "label":          "",
+                "type":           await inp.get_attribute("type") or "text",
+                "placeholder":    await inp.get_attribute("placeholder") or "",
+                "id":             await inp.get_attribute("id"),
+                "name":           await inp.get_attribute("name") or "",
+                "data-format":    await inp.get_attribute("data-format") or "",
+                "data-seperator": await inp.get_attribute("data-seperator") or "",
+                "data-maxlength": await inp.get_attribute("data-maxlength") or "",
+                "is_visible":     await inp.is_visible(),
+                "is_required":    is_required,
+            }
+            field_id = await inp.get_attribute("id")
+            if field_id:
+                label = await page.query_selector(f'label[for="{field_id}"]')
+                if label:
+                    field_info["label"] = await label.inner_text()
+            fields.append(field_info)
+        form_data.append({"form_index": idx, "fields": fields})
     return form_data
 
 
-async def _select_best_option(element, user_input: str) -> None:
-    """
-    Try to select a <select> option using multiple strategies in order:
-      1. Exact label match   (e.g. "California")
-      2. Exact value match   (e.g. "CA")
-      3. Case-insensitive label match
-      4. Partial label match (first option whose text contains the input)
-    Raises ValueError if nothing matches.
-    """
-    raw = user_input.strip()
-
-    # Collect all options as (value, label) pairs
-    options: list[tuple[str, str]] = await element.evaluate("""
-        el => Array.from(el.options).map(o => [o.value, o.text.trim()])
-    """)
-
-    # 1. Exact label
-    for val, label in options:
-        if label == raw:
-            await element.select_option(value=val)
-            return
-
-    # 2. Exact value
-    for val, label in options:
-        if val == raw:
-            await element.select_option(value=val)
-            return
-
-    # 3. Case-insensitive label
-    raw_lower = raw.lower()
-    for val, label in options:
-        if label.lower() == raw_lower:
-            await element.select_option(value=val)
-            return
-
-    # 4. Partial label (first match)
-    for val, label in options:
-        if raw_lower in label.lower():
-            await element.select_option(value=val)
-            return
-
-    raise ValueError(
-        f"No option matching '{raw}'. "
-        f"Available: {[label for _, label in options]}"
-    )
-
-
 async def _fill_page_flat(page: Page, values: List[Element]) -> str:
-    """
-    Fill fields from a list of Element objects and return a summary.
-
-    Handles:
-      - Duplicate IDs via _dup<N> suffix (queries all matching elements and
-        picks the right occurrence).
-      - Checkbox-as-radio groups: unchecks all siblings sharing the same
-        `name` attribute before checking the target.
-      - Signature <div> placeholders: skipped gracefully.
-    """
+    """Fill fields from a flat {id: value} dict and return a summary."""
     summary_lines = []
-
     for v in values:
         id_ = v.field_id
         user_input = v.value
         is_required = v.is_required
-
-        # ── Resolve original id and occurrence index ─────────────────────
-        if "_dup" in id_:
-            original_id, dup_str = id_.rsplit("_dup", 1)
-            try:
-                dup_index = int(dup_str)
-            except ValueError:
-                dup_index = 0
-        else:
-            original_id = id_
-            dup_index = 0
-
-        all_matching = await page.query_selector_all(f'[id="{original_id}"]')
-        if not all_matching or dup_index >= len(all_matching):
-            summary_lines.append(f"  [SKIP] id='{id_}' — not found (occurrence {dup_index})")
+        element = await page.query_selector(f'[id="{id_}"]')
+        if not element or not await element.is_visible():
+            summary_lines.append(f"  [SKIP] id='{id_}' not visible or not found")
             continue
-
-        element = all_matching[dup_index]
-
-        if not await element.is_visible():
-            summary_lines.append(f"  [SKIP] id='{id_}' — not visible")
-            continue
-
-        field_type = (await element.get_attribute("type") or "text").lower()
-        tag = await element.evaluate("el => el.tagName.toLowerCase()")
-
+        field_type = await element.get_attribute("type") or "text"
         try:
-            match field_type:
+            match field_type.lower():
                 case "checkbox":
-                    want_checked = user_input.strip().lower() in ("y", "yes", "true", "1")
-
-                    # Uncheck all siblings in the same name-group first
-                    # (handles checkbox-used-as-radio pattern)
-                    field_name = await element.get_attribute("name") or ""
-                    if field_name:
-                        siblings = await page.query_selector_all(
-                            f'input[type="checkbox"][name="{field_name}"]'
-                        )
-                        for sibling in siblings:
-                            await sibling.uncheck()
-
-                    if want_checked:
+                    if user_input.strip().lower() in ("y", "yes", "true", "1"):
                         await element.check()
-
+                    else:
+                        await element.uncheck()
                 case "radio":
                     await element.check()
-
                 case "file":
                     if user_input.strip():
                         await element.set_input_files(user_input.strip())
                     else:
-                        summary_lines.append(f"  [SKIP] file upload for id='{id_}' — no path given")
+                        summary_lines.append(f"  [SKIP] file upload for id='{id_}'")
                         continue
-
                 case _:
+                    tag = await element.evaluate("el => el.tagName.toLowerCase()")
                     if tag == "select":
-                        await _select_best_option(element, user_input)
+                        await element.select_option(label=user_input)
                     else:
                         await element.fill(user_input)
-
-            summary_lines.append(
-                f"  [OK]   id='{id_}' | value='{user_input}' | is_required={is_required}"
-            )
-
+            summary_lines.append(f"  [OK]   id='{id_}' | value='{user_input}' | is_required={is_required}")
         except Exception as e:
             summary_lines.append(f"  [ERR]  id='{id_}' — {e}")
-
     return "\n".join(summary_lines)
 
 
@@ -304,55 +142,38 @@ async def _fill_page_flat(page: Page, values: List[Element]) -> str:
 async def form_get_elements(url: str, config: RunnableConfig) -> list:
     """
     Extract all visible form fields from a webpage.
-    Returns a list of forms, each containing field metadata
-    (id, original_id, label, type, placeholder, is_required, exclusive_group).
+    Returns a list of forms, each containing field metadata (id, label, type, placeholder).
     Always call this first before filling any form.
-
-    Notes:
-      - Duplicate IDs are renamed with a _dup<N> suffix so every field has a
-        unique addressable id.
-      - Fields with no <input>/<select>/<textarea> (e.g. signature divs) are
-        not returned.
-      - Checkboxes sharing the same `name` are flagged with exclusive_group;
-        the agent should treat them as mutually exclusive (radio-like).
     """
     session: BrowserSession = config["configurable"]["browser_session"]
     await session.goto(url)
-
-    # Wait for either a <form> or at least an <input> — whichever appears first.
-    try:
-        await session.page.wait_for_selector("form, input, select, textarea", timeout=15000)
-    except Exception as e:
-        return [{"error": f"No form elements detected after 15 s: {e}"}]
-
+    await session.page.wait_for_selector("form", timeout=10000)
     return await get_forms(session.page)
 
 
 @tool
 def form_validate_elements(url: str, values: List[Element], config: RunnableConfig) -> str:
     """
-    Checks that all required fields have a non-empty value.
-    Returns "True" when valid, or a descriptive error string listing the
-    missing required field IDs.
-    Always call this before form_fill_fields.
+    Checks and validates if the fields are correct and all the required items are filled. 
+    Always call this first before filling any form.
     """
-    missing = [v.field_id for v in values if v.is_required and not v.value.strip()]
-    if missing:
-        return f"False — missing required fields: {', '.join(missing)}"
+    for v in values:
+        if v.is_required and len(v.value)==0:
+            return "False"
     return "True"
+
 
 
 @tool
 async def form_fill_fields(url: str, values: List[Element], config: RunnableConfig) -> str:
     """
-    Fill form fields on a webpage. Does NOT submit — returns a summary for
-    human review and saves a screenshot to /tmp/form_preview.png.
+    Fill form fields on a webpage. Does NOT submit — returns a summary for human review.
 
     Args:
         url: The page URL.
-        values: List of Element(field_id, value, is_required).
-                Use the field ids returned by form_get_elements (including
-                _dup<N> suffixes for duplicate ids).
+        values: Flat mapping of field id → value,
+                e.g. {"first_11": "James", "input_12": "james@email.com"}.
+                Use the field ids returned by form_get_elements.
     """
     session: BrowserSession = config["configurable"]["browser_session"]
     await session.goto(url)
@@ -370,9 +191,10 @@ async def form_submit(url: str, values: List[Element], config: RunnableConfig) -
 
     Args:
         url: The page URL.
-        values: Same list of Element objects used in form_fill_fields.
+        values: Same flat id→value mapping used in form_fill_fields.
     """
     session: BrowserSession = config["configurable"]["browser_session"]
+   # Only navigate if we're not already on the page
     current = session.page.url
     if not current.startswith(url.rstrip("/")):
         await session.goto(url)
@@ -448,25 +270,18 @@ You are a form-filling assistant. Your workflow is strictly:
 
 1. Call `form_get_elements` to extract all visible fields from the URL.
 2. Using the extracted field ids and the user info provided, build a list with
-   values=[{"field_id":field_id, "is_required":is_required, "value":value}] and call `form_validate_elements`.
-   - Include ALL fields returned, even optional ones, setting value="" if no data was provided.
-   - For fields with duplicate IDs (suffixed _dup1, _dup2 ...), treat each as a separate field.
-   - For checkbox groups sharing the same exclusive_group name, only set value="yes" for the
-     intended option and leave the rest as value="no".
-   - Skip any field whose id is None (non-input elements).
+   values=[{"field_id":field_id, "is_required":is_required, "value":value}] and call `form_validate_elements`. The list should contain all the is_required=True even if the user has not provided any value for them.
 3. If `form_validate_elements` returns "True", call `form_fill_fields` with the SAME values and url.
-   If `form_validate_elements` returns "False", STOP immediately and inform the user which
-   required fields are missing. Do NOT call form_fill_fields.
+   If `form_validate_elements` returns "False", STOP immediately and inform the user which required fields are missing. Do NOT call form_fill_fields.
 4. WAIT — a human approval step will pause execution here.
 5. If approved, call `form_submit` with the SAME url and values.
 6. Report the final outcome.
 
-Rules:
 - Never skip step 1.
 - Never call `form_submit` before human approval.
 - Never call `form_fill_fields` if validation failed.
-- Signature fields (type=div / no id) are not fillable — do not include them.
 """
+
 
 
 async def call_agent(state: MessagesState):
@@ -493,8 +308,7 @@ def should_continue_after_validate(state: MessagesState):
          if isinstance(m, ToolMessage) and m.name == "form_validate_elements"),
         None,
     )
-    # Validation returns "True" on success; anything else is a failure
-    if last_tool_msg and last_tool_msg.content.strip() != "True":
+    if last_tool_msg and "not valid" in last_tool_msg.content.lower():
         return END
     return "agent"
 
@@ -600,7 +414,7 @@ async def main(target_url, user_info, headless=True):
         print(interrupt_payload.get("question", "") if interrupt_payload else "")
         print("=" * 80)
         decision = input("\nYour decision (yes/no): ").strip()
-
+        
         # Resume the graph with the human decision
         async for event in graph.astream(
             Command(resume=decision),
@@ -630,6 +444,8 @@ if __name__ == "__main__":
     asyncio.run(main(args.url, user_info, args.headless))
 
 
+
+
 """
 Usage:
 cd AgenticAI/fill_online_form
@@ -638,6 +454,8 @@ python main.py --url https://form.jotform.com/260497189942169 --user_info user_i
 python main.py --url https://form.jotform.com/260497189942169 --user_info user_info2.txt
 python main.py --url https://form.jotform.com/260497189942169 --user_info user_info3.txt
 
-python main.py --url https://mendrika-alma.github.io/form-submission/ --user_info user_info4.txt  --headless false
+
+python main.py --url https://mendrika-alma.github.io/form-submission/ --user_info user_info4.json  --headless false
+
 
 """

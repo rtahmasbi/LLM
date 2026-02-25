@@ -3,6 +3,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model, TaskType
+from transformers import DataCollatorForLanguageModeling
 
 # -------------------------------
 # 1. Load LLaMA 3.1 Instruct
@@ -15,6 +16,10 @@ model = AutoModelForCausalLM.from_pretrained(
     dtype=torch.float16,
     low_cpu_mem_usage=True
 )
+
+# FIX: LLaMA has no pad token by default
+tokenizer.pad_token = tokenizer.eos_token
+model.config.pad_token_id = tokenizer.eos_token_id
 
 # -------------------------------
 # 2. LoRA Configuration
@@ -33,6 +38,7 @@ model = get_peft_model(model, lora_config)
 # 3. Load GSM8K dataset
 # -------------------------------
 dataset = load_dataset("gsm8k", "main")
+
 
 # Format dataset: combine question + step-by-step answer
 def format_gsm8k(example):
@@ -59,21 +65,30 @@ training_args = TrainingArguments(
     gradient_accumulation_steps=8,
     learning_rate=2e-4,
     fp16=True,
-    num_train_epochs=3,
+    num_train_epochs=2,
     save_strategy="epoch",
     logging_steps=50,
-    evaluation_strategy="epoch",
+    eval_strategy="epoch",
     save_total_limit=2,
+    push_to_hub=True,
+    hub_model_id="rtahmasbi/lora-llama3-gsm8k",
+    hub_strategy="end", # upload only final model
 )
 
 # -------------------------------
 # 5. Trainer
 # -------------------------------
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer=tokenizer,
+    mlm=False
+)
+
 trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=tokenized["train"],
     eval_dataset=tokenized["test"],
+    data_collator=data_collator,
 )
 
 # -------------------------------
@@ -87,13 +102,24 @@ trainer.train()
 model.save_pretrained("./lora-llama3-gsm8k")
 tokenizer.save_pretrained("./lora-llama3-gsm8k")
 
+trainer.push_to_hub()
 
 
 """
+huggingface-cli upload ./lora-llama3-gsm8k rtahmasbi/lora-llama3-gsm8k
+
+
+nohup python llama_to_thinking_train.py &
+
+
 
 On 1 x A100 40GB or 80GB:
 - Tokenization + preprocessing: negligible (<5 min)
 - Per epoch training: ~20-30 minutes
 - 3 epochs total: ~1-1.5 hours
+
+{'train_runtime': '3457', 'train_samples_per_second': '6.486', 'train_steps_per_second': '0.203', 'train_loss': '0.8319', 'epoch': '3'}
+100%|██████████| 702/702 [57:36<00:00,  4.92s/it]
+
 
 """

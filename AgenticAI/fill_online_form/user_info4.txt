@@ -1,0 +1,145 @@
+```json
+{
+  "Form": "G-28",
+  "Version": "09/17/18",
+  "Pages": 4,
+  "Part 1": {
+    "Information About Attorney or Accredited Representative": {
+      "USCIS Online Account Number": null,
+      "Name": {
+        "Family Name": "Smith",
+        "Given Name": "Barbara",
+        "Middle Name": null
+      },
+      "Contact Information": {
+        "Daytime Telephone Number": null,
+        "Email Address": "immigration@tryalma.ai",
+        "Fax Number": "1650123456",
+        "Mobile Telephone Number": null
+      },
+      "Address": {
+        "Street Number and Name": "545 Bryant Street",
+        "Apt Ste Flr": "N/A",
+        "City or Town": "Palo Alto",
+        "State": "CA",
+        "ZIP Code": "94301",
+        "Province": "N/A",
+        "Postal Code": "N/A",
+        "Country": "United States of America"
+      },
+      "Bar Number": "12083456",
+      "Licensing Authority": "State Bar of California",
+      "Name of Law Firm or Organization": "Alma Legal Services PC",
+      "Recognized Organization": {
+        "Name": "N/A",
+        "Date of Accreditation": "N/A"
+      },
+      "Order Restriction": "am not"
+    }
+  },
+  "Part 2": {
+    "Eligibility Information for Attorney or Accredited Representative": {
+      "Attorney Eligibility": "Y",
+      "Associated with Attorney or Accredited Representative": null,
+      "Law Student or Law Graduate": {
+        "Name": "N/A"
+      }
+    }
+  },
+  "Part 3": {
+    "Notice of Appearance as Attorney or Accredited Representative": {
+      "Appearance Relates to": {
+        "USCIS": "Y",
+        "ICE": null,
+        "CBP": "Y"
+      },
+      "Specific Matter": {
+        "USCIS": "N/A",
+        "ICE": "N/A",
+        "CBP": "I-129 E-3 Application"
+      },
+      "Client Information": {
+        "Name": {
+          "Family Name": "Jonas",
+          "Given Name": "Joe",
+          "Middle Name": "N/A"
+        },
+        "Entity": {
+          "Name": "N/A",
+          "Title of Authorized Signatory": "N/A"
+        },
+        "Contact Information": {
+          "Daytime Telephone Number": "+61 45453434",
+          "Email Address": "b.smith_00@test.ai",
+          "Mobile Telephone Number": "N/A"
+        },
+        "Mailing Address": {
+          "Street Number and Name": "16 Anytown Street",
+          "Apt Ste Flr": null,
+          "City or Town": "Perth",
+          "State": "WA",
+          "ZIP Code": "N/A",
+          "Province": "WA",
+          "Postal Code": "6000",
+          "Country": "Australia"
+        },
+        "Alien Registration Number": "N/A",
+        "USCIS Online Account Number": "N/A",
+        "Receipt Number": "N/A"
+      }
+    }
+  },
+  "Part 4": {
+    "Client's Consent to Representation and Signature": {
+      "Consent to Representation": "Y"
+    }
+  },
+  "Part 5": {
+    "Signature of Attorney or Accredited Representative": {
+      "Signature": null,
+      "Date of Signature": null,
+      "Law Student or Law Graduate Signature": null,
+      "Law Student or Law Graduate Date of Signature": null,
+      "Options Regarding Receipt of USCIS Notices and Documents": {
+        "Send Notices to Attorney": null,
+        "Send Secure Identity Documents to Attorney": null,
+        "Send Form I-94 to Client": null
+      }
+    }
+  },
+  "Part 6": {
+    "Additional Information": {
+      "Family Name": "Smith",
+      "Given Name": "Barbara",
+      "Middle Name": null,
+      "Page Number": null,
+      "Part Number": null,
+      "Item Number": null
+    }
+  }
+}
+```
+
+
+```json
+{
+  "passport": {
+    "type": "P",
+    "country_code": "USA",
+    "passport_number": "E00009349",
+    "surname": "TRAVELER",
+    "given_names": "HAPPY",
+    "nationality": "UNITED STATES OF AMERICA",
+    "date_of_birth": "05 FEB 1965",
+    "sex": "M",
+    "place_of_birth": "WASHINGTON, D.C., U.S.A.",
+    "date_of_issue": "10 JUL 2020",
+    "date_of_expiration": "09 JUL 2030",
+    "authority": "UNITED STATES DEPARTMENT OF STATE"
+  },
+  "machine_readable_zone": {
+    "line1": "P<USATRAVELER<<HAPPY<<<<<<<<<<<<<<<<<<<<<<<<<",
+    "line2": "E000093499USA6502056M300709934006673<085950"
+  }
+}
+```
