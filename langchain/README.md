@@ -78,3 +78,36 @@ https://github.com/langchain-ai/langchain/blob/41b7a5169d3b6bdb0949a409397707eb6
 
 
 https://github.com/langchain-ai/langchain/blob/41b7a5169d3b6bdb0949a409397707eb69b3cd07/libs/community/langchain_community/chains/graph_qa/sparql.py#L25
+
+
+
+# langchain and Ollama
+
+```py
+from langchain_ollama import ChatOllama
+
+llm = ChatOllama(
+    model="llama3.1",
+    temperature=0,
+    # other params...
+)
+print(llm("What is the capital of France?"))
+
+```
+
+# langchain and vllm
+```py
+from langchain_community.llms import VLLM
+
+llm = VLLM(
+    model="mosaicml/mpt-7b",
+    trust_remote_code=True,  # mandatory for some Hugging Face models
+    max_new_tokens=128,
+    top_k=10,
+    temperature=0.8,
+    # tensor_parallel_size=... for distributed inference
+)
+
+print(llm("What is the capital of France?"))
+```
+

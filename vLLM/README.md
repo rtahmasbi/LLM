@@ -12,7 +12,7 @@ PagedAttention is an attention algorithm inspired by the concept of paging in op
 
 
 ## Install
-```
+```sh
 curl -LsSf https://astral.sh/uv/install.sh | sh
 uv venv --python 3.12 --seed
 source .venv/bin/activate
@@ -26,6 +26,8 @@ conda activate vllm_env
 
 
 pip install vllm
+python -m pip install --user vllm
+
 ```
 
 ## Run server
@@ -36,6 +38,8 @@ python -m vllm.entrypoints.openai.api_server --model meta-llama/Meta-Llama-3-8B-
 ```sh
 vllm serve Qwen/Qwen2.5-1.5B-Instruct
 vllm serve Qwen/Qwen2.5-1.5B-Instruct --attention-backend FLASH_ATTN
+vllm serve Qwen/Qwen3-8B --quantization awq --gpu-memory-utilization 0.9
+
 
 curl http://localhost:8000/v1/models
 
@@ -88,3 +92,4 @@ print(output)
 ```
 
 
+# vllm can not run on `GTX 1050 Ti` GPU

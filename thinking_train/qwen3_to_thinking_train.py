@@ -289,7 +289,7 @@ def generate_group(
     prompt_len = inputs["input_ids"].shape[1]
     responses  = []
     for idx in range(config.group_size):
-        print("idx:", idx)
+        #print("idx:", idx)
         output = model.generate(
             **inputs,
             max_new_tokens=config.max_new_tokens,
@@ -606,7 +606,7 @@ class GRPOTrainer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GRPO RL Training with GSM8K")
-
+    
     parser.add_argument("--model",             default="Qwen/Qwen3-0.6B",  help="HuggingFace model ID")
     parser.add_argument("--dataset_source",    default="gsm8k",
                         choices=["gsm8k", "json", "builtin"],             help="Dataset to use")
@@ -616,7 +616,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs",            type=int,   default=3,     help="Number of epochs")
     parser.add_argument("--lr",                type=float, default=1e-6,  help="Learning rate")
     parser.add_argument("--group_size",        type=int,   default=4,     help="G: samples per prompt")
-    parser.add_argument("--batch_size",        type=int,   default=1,     help="Prompts per update")
+    parser.add_argument("--batch_size",        type=int,   default=2,     help="Prompts per update")
     parser.add_argument("--kl",                type=float, default=0.04,  help="KL penalty coefficient")
     parser.add_argument("--max_new_tokens",    type=int,   default=512,   help="Max tokens to generate")
     parser.add_argument("--no_4bit",           action="store_true",       help="Disable 4-bit quant")
@@ -624,7 +624,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir",        default="./qwen_rl_checkpoints")
     parser.add_argument("--eval_only",         action="store_true",       help="Skip training, just eval")
     args = parser.parse_args()
-
+    
     config = GRPOConfig(
         model_name         = args.model,
         num_epochs         = args.epochs,
@@ -641,9 +641,9 @@ if __name__ == "__main__":
         max_train_samples  = args.max_train_samples,
         max_eval_samples   = args.max_eval_samples,
     )
-
+    
     trainer = GRPOTrainer(config=config)
-
+    
     if args.eval_only:
         trainer.evaluate()
     else:
@@ -656,7 +656,15 @@ python qwen3_to_thinking_train.py
 python qwen3_to_thinking_train.py --model Qwen/Qwen3-4B
 python qwen3_to_thinking_train.py --model Qwen/Qwen3-0.6B
 
+# if memory error (for small GPU's)
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+or
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-huggingface-cli upload rtahmasbi/qwen3-0.6B-gsm8k-grpo ./qwen_rl_checkpoints/final
+
+huggingface-cli upload xxxx/qwen3-0.6B-gsm8k-grpo ./qwen_rl_checkpoints/final
+
+I COULD RUN IT ON vastai
 
 """
