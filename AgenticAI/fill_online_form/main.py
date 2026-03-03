@@ -548,7 +548,7 @@ builder.add_edge("tools_submit",   "agent")
 
 graph = builder.compile(checkpointer=MemorySaver())
 print(graph.get_graph().draw_ascii())
-graph.get_graph().draw_png("/tmp/graph.png")
+#graph.get_graph().draw_png("/tmp/graph.png")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
@@ -638,6 +638,8 @@ python main.py --url https://form.jotform.com/260497189942169 --user_info user_i
 python main.py --url https://form.jotform.com/260497189942169 --user_info user_info2.txt
 python main.py --url https://form.jotform.com/260497189942169 --user_info user_info3.txt
 
-python main.py --url https://mendrika-alma.github.io/form-submission/ --user_info user_info4.txt  --headless false
+python main.py --url https://mendrika-alma.github.io/form-submission/ --user_info user_info4.txt --headless false
+
+python main.py --url https://www.uber.com/careers/apply/form/153473  --user_info user_info3.txt --headless false
 
 """

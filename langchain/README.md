@@ -1,5 +1,5 @@
 # API Key
-For `langchain`, you need `LANGCHAIN_API_KEY`.
+For `LangSmith`, you need `LANGCHAIN_API_KEY`.
 
 Go to  https://smith.langchain.com/ and get one for free.
 
@@ -16,13 +16,6 @@ pip install langchain-openai
 
 export LANGCHAIN_TRACING_V2="true"
 export LANGCHAIN_API_KEY="..."
-
-```
-
-# main modules
-```py
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
 
 ```
 
@@ -61,7 +54,7 @@ https://github.com/langchain-ai/langchain/tree/master/libs/community/langchain_c
 
 
 
-# a great exampel of prompts for graph_qa
+# a great example of prompts for graph_qa
 https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/chains/graph_qa/prompts.py
 
 
@@ -79,35 +72,4 @@ https://github.com/langchain-ai/langchain/blob/41b7a5169d3b6bdb0949a409397707eb6
 
 https://github.com/langchain-ai/langchain/blob/41b7a5169d3b6bdb0949a409397707eb69b3cd07/libs/community/langchain_community/chains/graph_qa/sparql.py#L25
 
-
-
-# langchain and Ollama
-
-```py
-from langchain_ollama import ChatOllama
-
-llm = ChatOllama(
-    model="llama3.1",
-    temperature=0,
-    # other params...
-)
-print(llm("What is the capital of France?"))
-
-```
-
-# langchain and vllm
-```py
-from langchain_community.llms import VLLM
-
-llm = VLLM(
-    model="mosaicml/mpt-7b",
-    trust_remote_code=True,  # mandatory for some Hugging Face models
-    max_new_tokens=128,
-    top_k=10,
-    temperature=0.8,
-    # tensor_parallel_size=... for distributed inference
-)
-
-print(llm("What is the capital of France?"))
-```
 

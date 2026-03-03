@@ -22,23 +22,3 @@ llm.invoke("how can langsmith help with testing?")
 
 
 ## ChatOpenAI
-
-from langchain_openai import ChatOpenAI
-
-llm = ChatOpenAI()
-llm.invoke("What is the best way to learn LLM?")
-
-
-# STEP2: make a prompt
-
-from langchain_core.prompts import ChatPromptTemplate
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a world class technical documentation writer."),
-    ("user", "{input}")
-])
-
-chain = prompt | llm 
-
-chain.invoke({"input": "how can langsmith help with testing?"})
-
-
