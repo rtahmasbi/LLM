@@ -520,7 +520,7 @@ builder.add_node("agent",          call_agent)
 builder.add_node("tools_extract",  run_tools_extract)
 builder.add_node("tools_validate", run_tools_validate)
 builder.add_node("tools_fill",     run_tools_fill)
-builder.add_node("human_approval", human_approval_node)
+builder.add_node("human_approval", human_approval_node) # retunrs Command which goto agent or END
 builder.add_node("tools_submit",   run_tools_submit)
 
 builder.add_edge(START,           "agent")

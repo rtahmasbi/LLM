@@ -59,6 +59,159 @@ response = model.invoke(messages)  # Returns AIMessage
 
 ```
 
+## LLM models
+### OpenAI
+```py
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI()
+llm.invoke("What is the best way to learn LLM?")
+```
+
+### Ollama
+```py
+# pip install langchain-ollama
+from langchain_ollama import ChatOllama
+
+llm = ChatOllama(
+    model="llama3.1",
+    temperature=0,
+    # other params...
+)
+print(llm("What is the capital of France?"))
+
+```
+
+### vllm
+```py
+from langchain_community.llms import VLLM
+
+llm = VLLM(
+    model="mosaicml/mpt-7b",
+    trust_remote_code=True,  # mandatory for some Hugging Face models
+    max_new_tokens=128,
+    top_k=10,
+    temperature=0.8,
+    # tensor_parallel_size=... for distributed inference
+)
+
+print(llm("What is the capital of France?"))
+```
+
+### LlamaCpp
+```py
+#  pip install llama-cpp-python
+# pip install huggingface-hub
+
+from langchain_community.llms import LlamaCpp
+from huggingface_hub import hf_hub_download
+
+model_path = hf_hub_download(
+    repo_id="unsloth/Llama-3.2-1B-Instruct-GGUF",
+    filename="Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+)
+#model_path="hf://bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+#model_path="/path/to/llama-3.gguf",
+
+llm = LlamaCpp(
+    model_path=model_path,
+    temperature=0.7,
+    max_tokens=512,
+    verbose=False,
+)
+
+response = llm.invoke("What is the capital of France?")
+print(response)
+
+```
+
+## LLM with schema for structured
+```py
+from pydantic import BaseModel, Field
+
+class SearchQuery(BaseModel):
+    search_query: str = Field(None, description="Query that is optimized web search.")
+    justification: str = Field(
+        None, description="Why this query is relevant to the user's request."
+    )
+
+
+# Augment the LLM with schema for structured output
+structured_llm = llm.with_structured_output(SearchQuery)
+output = structured_llm.invoke("How does Calcium CT score relate to high cholesterol?")
+
+```
+
+
+
+## Runnable
+- RunnablePassthrough
+- RunnableLambda
+- RunnableParallel
+- RunnableBranch
+
+### RunnableLambda
+```py
+from langchain_core.runnables import RunnableLambda
+
+# A RunnableSequence constructed using the `|` operator
+sequence = RunnableLambda(lambda x: x + 1) | RunnableLambda(lambda x: x * 2)
+sequence.invoke(1)  # 4
+sequence.batch([1, 2, 3])  # [4, 6, 8]
+
+# A sequence that contains a RunnableParallel constructed using a dict literal
+sequence = RunnableLambda(lambda x: x + 1) | {
+    "mul_2": RunnableLambda(lambda x: x * 2),
+    "mul_5": RunnableLambda(lambda x: x * 5),
+}
+sequence.invoke(1)  # {'mul_2': 4, 'mul_5': 10}
+```
+
+
+### RunnablePassthrough
+```py
+# pip install docarray
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_community.vectorstores import DocArrayInMemorySearch
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+embeddings = OpenAIEmbeddings()
+
+vecstore_a = DocArrayInMemorySearch.from_texts(
+    ["half the info will be here", "James' birthday is the 7th December"],
+    embedding=embeddings
+)
+
+retriever_a = vecstore_a.as_retriever()
+
+retrieval = RunnableParallel(
+    {"context": retriever_a, "question": RunnablePassthrough()}
+)
+
+prompt_str = """Answer the question below using the context:
+
+Context: {context}
+
+Question: {question}
+
+Answer: """
+prompt = ChatPromptTemplate.from_template(prompt_str)
+
+
+output_parser = StrOutputParser()
+
+rag_chain = retrieval | prompt | llm | output_parser
+
+out = rag_chain.invoke("when was James born?")
+print(out)
+# James was born on the 7th of December.
+
+```
+
+
 ## langgraph and ToolNode
 ```py
 from langgraph.graph import StateGraph, START, END
@@ -169,193 +322,104 @@ agent = create_agent(
 
 
 
-## LLM with schema for structured
-```py
-from pydantic import BaseModel, Field
-
-class SearchQuery(BaseModel):
-    search_query: str = Field(None, description="Query that is optimized web search.")
-    justification: str = Field(
-        None, description="Why this query is relevant to the user's request."
-    )
-
-
-# Augment the LLM with schema for structured output
-structured_llm = llm.with_structured_output(SearchQuery)
-output = structured_llm.invoke("How does Calcium CT score relate to high cholesterol?")
-
-```
-
 ## bind_tools
+In order to run it, you need to add @tool + function description (docstring)
 ```py
 from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 # Define a tool
+@tool
 def multiply(a: int, b: int) -> int:
+    """Multiply two numbers."""
     return a * b
 
 llm_with_tools = llm.bind_tools([multiply])
-msg = llm_with_tools.invoke("What is 2 times 3?")
+response = llm_with_tools.invoke("What is 2 times 3?")
+
+# AIMessage(content='', ..., tool_calls=[{'name': 'multiply', 'args': {'a': 2, 'b': 3},...)
+
+tool_call = response.tool_calls[0]
+# {'name': 'multiply', 'args': {'a': 2, 'b': 3}, 'id': 'call_FsBmSRTP9VENAkthjH5Y6D22', 'type': 'tool_call'}
+
+# Run the tool yourself
+# LangChain does not auto-run tools unless you use an Agent.
+tool_result = multiply.invoke(tool_call["args"])
+# 6
+
+# send tool result back
+final = llm_with_tools.invoke([response, ToolMessage(content=str(tool_result), tool_call_id=tool_call["id"])])
+print(final.content)
 
 ```
+
+
+
+## create_agent
+- `AgentExecutor` and `create_openai_tools_agent` are deprecated, use 
+- `create_agent` executes the tool.
+- if you are using a graph, the no need to use `create_agent` and you shoudl use `ToolNode`.
+
+
+```py
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent
+from langchain_core.tools import tool
+
+@tool
+def multiply(a: int, b: int) -> int:
+    """Multiply two integers."""
+    return a * b
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+agent = create_agent(model=llm, tools=[multiply])
+
+result = agent.invoke({"messages": [("user", "What is 2 times 3?")]})
+print(result["messages"][-1].content)
+# 2 times 3 is 6.
+
+# result["messages"]:
+# - HumanMessage(),
+# - AIMessage(..., tool_calls=[{'name': 'multiply', 'args': {'a': 2, 'b': 3}, 'id': 'call_byLvOlFKDw1xG1cwIElZbkHd', 'type': 'tool_call'}], ...), 
+# - ToolMessage(content='6', ...
+# - AIMessage(content='2 times 3 is 6.'
+
+# you can also check here that the tool is called but not executed
+llm_with_tools = llm.bind_tools([multiply])
+response = llm_with_tools.invoke("What is 2 times 3?")
+
+```
+
 
 ## create_react_agent
+If you meed reasoning traces:
 check the `AgenticAI/basic_agents/test_create_react_agent.py` code.
 
-
-
-## langchain and Ollama
-
-```py
-# pip install langchain-ollama
-from langchain_ollama import ChatOllama
-
-llm = ChatOllama(
-    model="llama3.1",
-    temperature=0,
-    # other params...
-)
-print(llm("What is the capital of France?"))
-
-```
-
-## langchain and vllm
-```py
-from langchain_community.llms import VLLM
-
-llm = VLLM(
-    model="mosaicml/mpt-7b",
-    trust_remote_code=True,  # mandatory for some Hugging Face models
-    max_new_tokens=128,
-    top_k=10,
-    temperature=0.8,
-    # tensor_parallel_size=... for distributed inference
-)
-
-print(llm("What is the capital of France?"))
-```
-
-## langchain and LlamaCpp
-```py
-#  pip install llama-cpp-python
-# pip install huggingface-hub
-
-from langchain_community.llms import LlamaCpp
-from huggingface_hub import hf_hub_download
-
-model_path = hf_hub_download(
-    repo_id="unsloth/Llama-3.2-1B-Instruct-GGUF",
-    filename="Llama-3.2-1B-Instruct-Q4_K_M.gguf",
-)
-#model_path="hf://bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
-#model_path="/path/to/llama-3.gguf",
-
-
-llm = LlamaCpp(
-    model_path=model_path,
-    temperature=0.7,
-    max_tokens=512,
-    verbose=False,
-)
-
-response = llm.invoke("What is the capital of France?")
-print(response)
-
-```
-
-
-
-## langgraph multi agent structures
-https://langchain-opentutorial.gitbook.io/langchain-opentutorial/17-langgraph/02-structures/09-langgraph-multi-agent-structures-02
-
-
-
-https://www.marktechpost.com/2026/03/01/how-to-design-a-production-grade-multi-agent-communication-system-using-langgraph-structured-message-bus-acp-logging-and-persistent-shared-state-architecture/?amp
 
 
 ## PyPDFLoader and FAISS
 check this `AgenticAI/pdf_qa/main.py` for `RecursiveCharacterTextSplitter`, 
 
 
-## Runnable
-- RunnablePassthrough
-- RunnableLambda
-- RunnableParallel
-- RunnableBranch
-
-### RunnableLambda
-```py
-from langchain_core.runnables import RunnableLambda
-
-# A RunnableSequence constructed using the `|` operator
-sequence = RunnableLambda(lambda x: x + 1) | RunnableLambda(lambda x: x * 2)
-sequence.invoke(1)  # 4
-sequence.batch([1, 2, 3])  # [4, 6, 8]
-
-# A sequence that contains a RunnableParallel constructed using a dict literal
-sequence = RunnableLambda(lambda x: x + 1) | {
-    "mul_2": RunnableLambda(lambda x: x * 2),
-    "mul_5": RunnableLambda(lambda x: x * 5),
-}
-sequence.invoke(1)  # {'mul_2': 4, 'mul_5': 10}
-```
+## langgraph multi agent structures
+https://langchain-opentutorial.gitbook.io/langchain-opentutorial/17-langgraph/02-structures/09-langgraph-multi-agent-structures-02
 
 
-### RunnablePassthrough
-```py
-# pip install docarray
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-from langchain_community.vectorstores import DocArrayInMemorySearch
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+https://www.marktechpost.com/2026/03/01/how-to-design-a-production-grade-multi-agent-communication-system-using-langgraph-structured-message-bus-acp-logging-and-persistent-shared-state-architecture/?amp
 
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
-embeddings = OpenAIEmbeddings()
-
-vecstore_a = DocArrayInMemorySearch.from_texts(
-    ["half the info will be here", "James' birthday is the 7th December"],
-    embedding=embeddings
-)
-
-retriever_a = vecstore_a.as_retriever()
-
-retrieval = RunnableParallel(
-    {"context": retriever_a, "question": RunnablePassthrough()}
-)
-
-prompt_str = """Answer the question below using the context:
-
-Context: {context}
-
-Question: {question}
-
-Answer: """
-prompt = ChatPromptTemplate.from_template(prompt_str)
-
-
-output_parser = StrOutputParser()
-
-rag_chain = retrieval | prompt | llm | output_parser
-
-out = rag_chain.invoke("when was James born?")
-print(out)
-# James was born on the 7th of December.
-
-```
 
 
 ## stream
 ```py
-m = {
-        "messages": [
-            {
-                "role": "user",
-                "content": "What does Lilian Weng say about types of reward hacking?",
-            }
-        ]
+m = {"messages": [
+        {
+            "role": "user",
+            "content": "What does Lilian Weng say about types of reward hacking?",
+        }
+    ]
 }
 
 for chunk in graph.stream(m):
@@ -365,8 +429,6 @@ for chunk in graph.stream(m):
         print("\n\n")
 
 ```
-
-
 
 
 # claude
