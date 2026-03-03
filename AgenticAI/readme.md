@@ -460,3 +460,5 @@ https://code.claude.com/docs/en/settings#tools-available-to-claude
 | LSP | Code intelligence via language servers. Reports type errors and warnings automatically after file edits. Also supports navigation operations: jump to definitions, find references, get type info, list symbols, find implementations, trace call hierarchies. Requires a code intelligence plugin and its language server binary | No |
 
 
+# Google
+For Agent Development Kit (ADK), check `AgenticAI/google_ADK/readme.md`
