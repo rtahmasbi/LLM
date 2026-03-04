@@ -1,0 +1,23 @@
+# ── SysDiag MCP Server ────────────────────────────────────────────────────────
+# Install: pip install -r requirements.txt
+
+# Web framework & ASGI server
+fastapi==0.115.6
+uvicorn[standard]==0.32.1      # includes websockets + httptools
+
+# ngrok tunnel
+pyngrok==7.2.3
+
+# AI / agent
+openai==1.59.4
+langgraph==0.2.60
+langchain-core==0.3.28
+
+# HTTP client (used internally by openai SDK + health checks)
+httpx==0.28.1
+
+# Data validation
+pydantic==2.10.4
+
+# Environment variables
+python-dotenv==1.0.1

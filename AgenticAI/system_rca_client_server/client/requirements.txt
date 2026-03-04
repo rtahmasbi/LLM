@@ -1,0 +1,12 @@
+# Install: pip install -r requirements.txt
+# The client has no AI dependencies — it only runs commands locally
+# and speaks HTTP to the server.
+
+# HTTP client (polls server, posts tool results)
+httpx==0.28.1
+
+# Data validation (shared Pydantic models)
+pydantic==2.10.4
+
+# Environment variables
+python-dotenv==1.0.1
