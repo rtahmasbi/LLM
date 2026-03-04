@@ -24,7 +24,7 @@ from src.agent import run_diagnosis
 from src.guardrails import ALLOWED_COMMANDS, BLOCKED_COMMANDS, BLOCKED_PATH_PREFIXES
 
 
-# ── Simple terminal helpers ──────────────────────────────────────────────────
+############# helpers
 
 def _divider(char: str = "-", width: int = 60) -> None:
     print(char * width)

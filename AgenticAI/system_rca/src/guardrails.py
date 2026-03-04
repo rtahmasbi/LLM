@@ -70,7 +70,7 @@ BLOCKED_COMMANDS: set[str] = {
     # "strace",  — allowed for diagnostic PIDs only; see safe_commands
 }
 
-# ── Shell meta-characters that should never appear in a command ──────────────
+################ Shell meta-characters that should never appear in a command
 DANGEROUS_SHELL_PATTERNS: list[re.Pattern] = [
     re.compile(r"[;&|`$]"),      # shell chaining / substitution
     re.compile(r"\beval\b"),
@@ -79,7 +79,7 @@ DANGEROUS_SHELL_PATTERNS: list[re.Pattern] = [
     re.compile(r"<\("),          # process substitution
 ]
 
-# ── Approved diagnostic commands ─────────────────────────────────────────────
+################ Approved diagnostic commands
 # Entries are the base binary name; arguments are validated separately.
 ALLOWED_COMMANDS: set[str] = {
     # Process inspection

@@ -18,10 +18,10 @@ Graph topology
 
 State fields
 ────────────
-  issue           : str                  – original user report
-  messages        : list[dict]           – full conversation history
-  tool_call_count : int                  – number of tool invocations so far
-  final_report    : str                  – populated by reporter node
+  issue           : str                  - original user report
+  messages        : list[dict]           - full conversation history
+  tool_call_count : int                  - number of tool invocations so far
+  final_report    : str                  - populated by reporter node
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from openai import OpenAI
 
 from .tools import TOOL_SCHEMAS, TOOL_REGISTRY
 
-# ── Constants ────────────────────────────────────────────────────────────────
+##### Constants
 
 MODEL = "gpt-4o"
 MAX_TOOL_CALLS = 20          # hard cap to prevent runaway loops

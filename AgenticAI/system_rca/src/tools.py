@@ -18,7 +18,7 @@ from typing import Any
 
 from .guardrails import validate_command, validate_path, is_command_available
 
-# ── Safe subprocess runner ───────────────────────────────────────────────────
+########## Safe subprocess runner
 
 def _run(args: list[str], timeout: int = 15) -> str:
     """Run a subprocess and return combined stdout+stderr, truncated to 8 KB."""
@@ -42,7 +42,7 @@ def _run(args: list[str], timeout: int = 15) -> str:
         return f"[ERROR] {exc}"
 
 
-# ── Individual tool functions ────────────────────────────────────────────────
+########## Individual tool functions
 
 def run_command(command: str) -> str:
     """
@@ -154,10 +154,51 @@ def read_journal_logs(
 
 
 def read_dmesg(lines: int = 80) -> str:
-    """Return recent kernel ring-buffer messages."""
+    """Return recent kernel ring-buffer messages.
+
+    Falls back to journalctl -k or /var/log/kern.log when the process
+    lacks CAP_SYSLOG / dmesg_restrict blocks access.
+    """
     if not is_command_available("dmesg"):
-        return "[ERROR] 'dmesg' is not installed."
+        return "[UNAVAILABLE] 'dmesg' is not installed."
+
     output = _run(["dmesg", "--time-format=reltime", "-T"])
+
+    permission_phrases = (
+        "operation not permitted",
+        "permission denied",
+        "read kernel buffer failed",
+        "klogctl",
+    )
+    if any(p in output.lower() for p in permission_phrases):
+        note = (
+            "[PERMISSION DENIED] dmesg requires elevated privileges on this system.\n"
+            "  kernel.dmesg_restrict=1 is likely set.\n"
+            "  To allow unprivileged access: sudo sysctl -w kernel.dmesg_restrict=0\n\n"
+        )
+
+        # Fallback 1: journalctl -k (kernel messages via systemd journal)
+        if is_command_available("journalctl"):
+            fallback = _run(
+                ["journalctl", "-k", "-n", str(lines), "--no-pager",
+                 "--output=short-precise"]
+            )
+            if fallback and not any(p in fallback.lower() for p in permission_phrases):
+                return note + "Fallback via journalctl -k:\n" + fallback
+
+        # Fallback 2: /var/log/kern.log
+        kern_log = "/var/log/kern.log"
+        if Path(kern_log).exists() and is_command_available("tail"):
+            fallback = _run(["tail", "-n", str(lines), kern_log])
+            if fallback:
+                return note + f"Fallback via {kern_log}:\n" + fallback
+
+        return (
+            note +
+            "[NO FALLBACK AVAILABLE] Neither journalctl -k nor /var/log/kern.log "
+            "could be read. The agent should proceed without kernel log data."
+        )
+
     tail = "\n".join(output.splitlines()[-lines:])
     return tail or "(no dmesg output)"
 
@@ -239,7 +280,7 @@ def run_perf_stat(pid: int | str = "", duration: int = 3) -> str:
     return _run(args, timeout=duration + 10)
 
 
-# ── OpenAI Tool Schemas ──────────────────────────────────────────────────────
+########## OpenAI Tool Schemas
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
     {
