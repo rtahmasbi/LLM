@@ -179,3 +179,14 @@ Examples:
 
 if __name__ == "__main__":
     main()
+
+
+
+""""
+conda activate system_rca
+cd /home/ras/GITHUB/LLM/AgenticAI/system_rca/
+
+python main.py
+
+
+"""
