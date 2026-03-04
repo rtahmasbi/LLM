@@ -176,6 +176,13 @@ def run_perf_stat(pid: str = "", duration: int = 3) -> str:
         args = ["perf", "stat", "-a", "sleep", str(duration)]
     return _run(args, timeout=duration + 10)
 
+def run_ping() -> str:
+    """Return ping via `ping`."""
+    if not is_command_available("ping"):
+        return "[ERROR] 'ping' is not installed."
+    args = ["ping", "-c", "3", "google.com"]
+    return _run(args)
+
 
 ###### Dispatch table
 
@@ -193,4 +200,5 @@ TOOL_REGISTRY: dict = {
     "check_service_status": check_service_status,
     "find_open_files":    find_open_files,
     "run_perf_stat":      run_perf_stat,
+    "run_ping": run_ping,
 }

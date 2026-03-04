@@ -236,6 +236,14 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_ping",
+            "description": "check if the system is connected to the internet.",
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
 ]
 
 
