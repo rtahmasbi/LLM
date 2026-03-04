@@ -22,6 +22,7 @@ export MCP_SERVER_URL=https://abcd-1234.ngrok-free.app
 python -m client.main
 # OR
 python -m client.main --issue "Load average is 18, everything is slow"
+python -m client.main --issue "Am I connected to the internet"
 # OR
 python -m client.main --server https://abcd-1234.ngrok-free.app
 
