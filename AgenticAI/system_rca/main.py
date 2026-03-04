@@ -189,4 +189,11 @@ cd /home/ras/GITHUB/LLM/AgenticAI/system_rca/
 python main.py
 
 
+OR
+python main.py --issue "System is very slow, load average is 20"
+python main.py --issue "nginx won't start after last update" --trace
+python main.py --issue "Disk full alert on /dev/sda1" --json-out report.json
+
+
+
 """
