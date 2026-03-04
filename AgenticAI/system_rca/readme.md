@@ -13,3 +13,17 @@ cd /home/ras/GITHUB/LLM/AgenticAI/system_rca/
 python main.py
 
 ```
+
+
+# details
+`run_diagnosis` is the main agent:
+```py
+from src.agent import run_diagnosis
+```
+and the graph is:
+```
+START -> analyst
+analyst -> should_continue (conditioanl edge to "tool_executor" or "reporter")
+tool_executor -> analyst
+reporter -> END
+```
