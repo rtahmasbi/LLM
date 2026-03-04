@@ -280,6 +280,14 @@ def run_perf_stat(pid: int | str = "", duration: int = 3) -> str:
     return _run(args, timeout=duration + 10)
 
 
+def run_ping() -> str:
+    """Return ping via `ping`."""
+    if not is_command_available("ping"):
+        return "[ERROR] 'ping' is not installed."
+    args = ["ping", "-c", "3", "google.com"]
+    return _run(args)
+
+
 ########## OpenAI Tool Schemas
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
@@ -489,7 +497,16 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_ping",
+            "description": "check if the system is connected to the internet.",
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
 ]
+
 
 # Map function name → callable
 TOOL_REGISTRY: dict[str, Any] = {
@@ -506,4 +523,5 @@ TOOL_REGISTRY: dict[str, Any] = {
     "check_service_status": check_service_status,
     "find_open_files": find_open_files,
     "run_perf_stat": run_perf_stat,
+    "run_ping": run_ping,
 }
