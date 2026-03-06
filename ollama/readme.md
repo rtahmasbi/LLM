@@ -10,6 +10,11 @@ curl -fsSL https://ollama.com/install.sh | sh
 brew install ollama
 ```
 
+# list local models
+```sh
+ollama list
+```
+
 
 # Run a model
 ```sh
@@ -22,6 +27,8 @@ ollama run phi3:3.8b
 # thinking, local
 ollama run qwen3
 ollama run qwen3:14b
+ollama run qwen3.5:2b
+ollama run qwen3.5:4b
 ollama run deepseek-r1
 ollama run deepseek-r1:8b
 ollama run qwen3-vl:8b # vision+text

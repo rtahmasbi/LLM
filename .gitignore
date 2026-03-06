@@ -1,3 +1,18 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+venv/
+env/
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+
+# OS files
 .DS_Store
-**/.DS_Store
-**/__pycache__

@@ -1,3 +1,8 @@
+```
+pip install mcp
+```
+
+
 For the app and server, we can use:
 
 - `app = Flask()`     -> `app.run`
