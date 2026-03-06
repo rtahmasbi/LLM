@@ -5,8 +5,13 @@ import shlex
 import subprocess
 from typing import Callable
 
+from client.src.guardrails import validate_command, validate_path, validate_shell_string
+
 
 def _run(cmd: list[str], timeout: int = 30) -> str:
+    error = validate_command(cmd)
+    if error:
+        return error
     try:
         result = subprocess.run(
             cmd,
@@ -26,9 +31,9 @@ def _run(cmd: list[str], timeout: int = 30) -> str:
 
 
 def _safe_shell(command: str) -> str:
-    blocked = {"|", ";", "&", "$", "`", ">", "<"}
-    if any(token in command for token in blocked):
-        return "[BLOCKED] Shell operators are not allowed."
+    error = validate_shell_string(command)
+    if error:
+        return error
     return command
 
 
@@ -95,6 +100,9 @@ def read_log_file(path: str, tail_lines: int = 100) -> str:
     real_path = os.path.realpath(path)
     if not real_path.startswith("/var/log/"):
         return "[BLOCKED] Only files under /var/log are allowed."
+    error = validate_path(real_path)
+    if error:
+        return error
     return _run(["tail", "-n", str(int(tail_lines)), real_path])
 
 

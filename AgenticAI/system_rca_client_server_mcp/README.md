@@ -43,6 +43,12 @@ curl http://localhost:8000/diagnose/<session_id>
 ```
 session_id can be found in the server log
 
+
+To see all the sessions and reports:
+```sh
+curl http://localhost:8000/sessions | jq
+```
+
 ## Notes
 
 - The orchestrator launches `python -m client.mcp_server` as a subprocess.
