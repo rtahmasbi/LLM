@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from shared.models import DiagnoseRequest, DiagnoseResponse, DiagnoseState, SessionStatus
+from shared.models import DiagnoseRequest, DiagnoseResponse, DiagnoseState, FollowupRequest, SessionStatus
 from server.agent import AgentOrchestrator
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -37,6 +37,7 @@ class SessionStore:
                 "tool_call_count": 0,
                 "final_report": "",
                 "error": "",
+                "messages": [],
             }
 
     async def get(self, session_id: str) -> dict[str, Any]:
@@ -85,14 +86,35 @@ app.add_middleware(
 async def run_diagnosis(session_id: str, issue: str) -> None:
     try:
         orchestrator = AgentOrchestrator(session_id=session_id, store=store)
-        report = await orchestrator.run(issue)
+        report, messages = await orchestrator.run(issue)
         await store.update(
             session_id,
             status=SessionStatus.DONE,
             final_report=report,
+            messages=messages,
         )
     except Exception as exc:
         log.exception("[%s] Diagnosis failed: %s", session_id, exc)
+        await store.update(
+            session_id,
+            status=SessionStatus.ERROR,
+            error=str(exc),
+        )
+
+
+async def run_followup(session_id: str, question: str) -> None:
+    try:
+        session = await store.get(session_id)
+        orchestrator = AgentOrchestrator(session_id=session_id, store=store)
+        report, messages = await orchestrator.followup(session["messages"], question)
+        await store.update(
+            session_id,
+            status=SessionStatus.DONE,
+            final_report=report,
+            messages=messages,
+        )
+    except Exception as exc:
+        log.exception("[%s] Follow-up failed: %s", session_id, exc)
         await store.update(
             session_id,
             status=SessionStatus.ERROR,
@@ -128,6 +150,24 @@ async def diagnose_state(session_id: str) -> DiagnoseState:
         final_report=session["final_report"],
         error=session["error"],
     )
+
+
+@app.post("/diagnose/{session_id}/followup", response_model=DiagnoseResponse)
+async def followup(session_id: str, req: FollowupRequest, background: BackgroundTasks) -> DiagnoseResponse:
+    try:
+        session = await store.get(session_id)
+    except KeyError:
+        raise HTTPException(404, f"Session {session_id} not found")
+
+    if session["status"] == SessionStatus.RUNNING:
+        raise HTTPException(409, "Session is still running, please wait")
+
+    if not session["messages"]:
+        raise HTTPException(400, "No prior conversation found for this session")
+
+    await store.update(session_id, status=SessionStatus.RUNNING, final_report="", error="")
+    background.add_task(run_followup, session_id, req.question)
+    return DiagnoseResponse(session_id=session_id, status=SessionStatus.RUNNING)
 
 
 @app.get("/sessions")

@@ -86,12 +86,12 @@ class AgentOrchestrator:
 
         return str(result)
 
-    async def run(self, issue: str) -> str:
-        messages: list[dict[str, Any]] = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"Issue reported: {issue}"},
-        ]
-        tool_call_count = 0
+    async def _run_loop(
+        self,
+        messages: list[dict[str, Any]],
+        tool_call_count: int = 0,
+    ) -> tuple[str, list[dict[str, Any]]]:
+        """Core agentic loop. Returns (final_report, updated_messages)."""
 
         server_params = StdioServerParameters(
             command=self.client_command[0],
@@ -164,8 +164,10 @@ class AgentOrchestrator:
                                 max_tokens=MAX_TOKENS,
                                 messages=messages,
                             )
-                            return final.choices[0].message.content or "(no report)"
-                        return msg.content or "(no report)"
+                            report = final.choices[0].message.content or "(no report)"
+                            messages.append({"role": "assistant", "content": report})
+                            return report, messages
+                        return msg.content or "(no report)", messages
 
                     for tc in msg.tool_calls:
                         fn_name = tc.function.name
@@ -194,3 +196,22 @@ class AgentOrchestrator:
                             session_id=self.session_id,
                             tool_call_count=tool_call_count,
                         )
+
+    async def run(self, issue: str) -> tuple[str, list[dict[str, Any]]]:
+        """Start a fresh diagnosis and return (report, messages)."""
+        messages: list[dict[str, Any]] = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Issue reported: {issue}"},
+        ]
+        return await self._run_loop(messages)
+
+    async def followup(
+        self,
+        messages: list[dict[str, Any]],
+        question: str,
+    ) -> tuple[str, list[dict[str, Any]]]:
+        """Continue an existing conversation with a follow-up question."""
+        messages = list(messages)  # shallow copy to avoid mutating stored state
+        messages.append({"role": "user", "content": question})
+        tool_call_count = sum(1 for m in messages if m.get("role") == "tool")
+        return await self._run_loop(messages, tool_call_count=tool_call_count)

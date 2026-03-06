@@ -16,6 +16,10 @@ class DiagnoseRequest(BaseModel):
     issue: str = Field(..., min_length=1)
 
 
+class FollowupRequest(BaseModel):
+    question: str = Field(..., min_length=1)
+
+
 class DiagnoseResponse(BaseModel):
     session_id: str
     status: SessionStatus
