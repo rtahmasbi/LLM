@@ -53,7 +53,7 @@ curl -X POST http://localhost:8000/diagnose/<session_id>/followup \
 
 ## To see all the sessions and reports
 ```sh
-curl http://localhost:8000/sessions | jq
+curl http://localhost:8001/sessions | jq
 ```
 
 ## you can use it as a chatpot too
@@ -80,7 +80,7 @@ SYSDIAG_HOST=192.168.1.10 SYSDIAG_PORT=9000 python chat.py
 │   USER  (chat.py)        │             │   SERVER  (FastAPI — server/main.py)     │
 │                          │──────────── │                                          │
 │  python chat.py          │  :8000/HTTP │  • Creates session (SessionStore)        │
-│  SYSDIAG_HOST=134.255... │ ──────────► │  • Spawns background task                │
+│  SYSDIAG_HOST=1.1.1.1    │ ──────────► │  • Spawns background task                │
 │                          │ ◄────────── │  • Returns session_id immediately        │
 └──────────────────────────┘             └──────────────────┬───────────────────────┘
                                                             │  run() / followup()
@@ -120,21 +120,28 @@ SYSDIAG_HOST=192.168.1.10 SYSDIAG_PORT=9000 python chat.py
 
 **How to run:**
 
-MacBook — start the MCP tool server:
+On remote server (1.1.1.1) — start the FastAPI server:
+```bash
+MCP_CLIENT_URL=http://<client-ip>:8001/sse python -m server.main
+# if use ssh tunnel
+MCP_CLIENT_URL=http://localhost:8001/sse python -m server.main
+# if use ngrok
+MCP_CLIENT_URL=https://abc123.ngrok.io/sse python -m server.main
+```
+
+Terminal 1 (MacBook) — MCP tool server:
 ```bash
 MCP_TRANSPORT=sse MCP_HOST=0.0.0.0 MCP_PORT=8001 python -m client.mcp_server
 ```
 
-Remote server (1.1.1.1) — start the FastAPI server:
-```bash
-MCP_CLIENT_URL=http://<macbook-ip>:8001/sse python -m server.main
-# if use ssh tunnel
-MCP_CLIENT_URL=http://localhost:8001/sse python -m server.main
+Terminal 2 (MacBook) — SSH reverse tunnel:
+```sh
+ssh -R 8001:localhost:8001 user@1.1.1.1
 ```
 
-MacBook — start the interactive chat client:
+Terminal 3 (MacBook) — chat client
 ```bash
-SYSDIAG_HOST=134.255.219.212 SYSDIAG_PORT=8000 python chat.py
+SYSDIAG_HOST=1.1.1.1 SYSDIAG_PORT=8000 python chat.py
 ```
 
 **Flow summary:**
@@ -146,6 +153,7 @@ SYSDIAG_HOST=134.255.219.212 SYSDIAG_PORT=8000 python chat.py
 5. **MCP Server** (on MacBook) runs the diagnostic command locally and returns the result.
 6. Results are fed back into the conversation until GPT produces a final RCA report.
 7. **User** receives the report interactively via `chat.py` and can ask follow-up questions.
+
 
 ## MacBook Behind NAT (port 8001 not reachable from remote server)
 
