@@ -58,4 +58,61 @@ curl http://localhost:8000/sessions | jq
 
 ## Notes
 
-- The orchestrator launches `python -m client.mcp_server` as a subprocess.
+- The orchestrator launches `python -m client.mcp_server` as a subprocess (inside the `_run_loop` function)
+
+## Architecture: Component Interaction Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          USER (HTTP Client)                          │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │  POST /diagnose  {issue: "..."}
+                               │  GET  /diagnose/{session_id}
+                               │  POST /diagnose/{session_id}/followup
+                               ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    SERVER  (FastAPI — server/main.py)               │
+│                                                                     │
+│  • Creates session (SessionStore)                                   │
+│  • Spawns background task → AgentOrchestrator                       │
+│  • Returns session_id immediately (async polling model)             │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │  run() / followup()
+                               ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│               AGENT ORCHESTRATOR  (server/agent.py)                 │
+│                                                                     │
+│  1. Builds StdioServerParameters                                    │
+│  2. Launches MCP subprocess (stdio_client)                          │
+│  3. Opens ClientSession, calls list_tools()                         │
+│  4. Enters agentic loop:                                            │
+│     ┌─────────────────────────────────────────────────────┐        │
+│     │  messages → OpenAI GPT-4o  →  tool_calls or report  │        │
+│     │       ↑                              │               │        │
+│     │       └──── tool result ────────────┘               │        │
+│     └─────────────────────────────────────────────────────┘        │
+└──────────┬───────────────────────────────────┬─────────────────────┘
+           │  Chat API  (HTTPS)                │  mcp_session.call_tool()
+           ▼                                   ▼  (over stdin/stdout pipe)
+┌──────────────────────┐         ┌─────────────────────────────────────┐
+│   OpenAI  (GPT-4o)   │         │   MCP SERVER  (client/mcp_server.py)│
+│                      │         │                                     │
+│  Decides which tool  │         │  FastMCP exposes TOOL_REGISTRY:     │
+│  to call next, or    │         │  • run_ping                         │
+│  writes final report │         │  • list_processes                   │
+└──────────────────────┘         │  • check_disk / check_memory / …    │
+                                 │                                     │
+                                 │  Executes real shell commands on    │
+                                 │  the target machine, returns output │
+                                 └─────────────────────────────────────┘
+```
+
+**Flow summary:**
+
+1. **User** sends an issue description via HTTP to the FastAPI server.
+2. **Server** creates a session and fires off `AgentOrchestrator` in the background.
+3. **Orchestrator** launches `client/mcp_server.py` as a subprocess (stdio pipe), discovers its tools, then enters a loop.
+4. Each iteration: sends the conversation to **OpenAI GPT-4o**. If GPT wants a tool, the orchestrator calls it over the **MCP stdio pipe**.
+5. **MCP Server** runs the actual diagnostic command on the machine and returns the result.
+6. Results are fed back into the conversation until GPT produces a final RCA report.
+7. **User** polls `GET /diagnose/{session_id}` until status is `DONE`, then reads the report.

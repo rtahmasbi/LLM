@@ -13,6 +13,10 @@ from client.src.tools import TOOL_REGISTRY
 
 mcp = FastMCP("SysDiag Client")
 
+# this loop is similar to:
+# @mcp.tool(name="list_processes")
+# def list_processes(...): ...
+
 for tool_name, fn in TOOL_REGISTRY.items():
     mcp.tool(name=tool_name)(fn)
 
