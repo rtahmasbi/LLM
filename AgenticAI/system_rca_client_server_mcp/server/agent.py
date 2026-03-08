@@ -7,6 +7,7 @@ from typing import Any
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from mcp.client.sse import sse_client
 from openai import AsyncOpenAI
 
 log = logging.getLogger("sysdiag.agent")
@@ -93,12 +94,18 @@ class AgentOrchestrator:
     ) -> tuple[str, list[dict[str, Any]]]:
         """Core agentic loop. Returns (final_report, updated_messages)."""
 
-        server_params = StdioServerParameters(
-            command=self.client_command[0],
-            args=self.client_command[1:],
-        )
+        mcp_url = os.getenv("MCP_CLIENT_URL")
 
-        async with stdio_client(server_params) as (read, write):
+        if mcp_url:
+            cm = sse_client(mcp_url)
+        else:
+            server_params = StdioServerParameters(
+                command=self.client_command[0],
+                args=self.client_command[1:],
+            )
+            cm = stdio_client(server_params)
+
+        async with cm as (read, write):
             async with ClientSession(read, write) as mcp_session:
                 await mcp_session.initialize()
                 tools_info = await mcp_session.list_tools()

@@ -22,4 +22,10 @@ for tool_name, fn in TOOL_REGISTRY.items():
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    transport = os.getenv("MCP_TRANSPORT", "stdio")
+    if transport == "sse":
+        host = os.getenv("MCP_HOST", "0.0.0.0")
+        port = int(os.getenv("MCP_PORT", "8001"))
+        mcp.run(transport="sse", host=host, port=port)
+    else:
+        mcp.run(transport="stdio")

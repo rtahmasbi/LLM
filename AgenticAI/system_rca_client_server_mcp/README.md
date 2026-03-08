@@ -56,6 +56,16 @@ curl -X POST http://localhost:8000/diagnose/<session_id>/followup \
 curl http://localhost:8000/sessions | jq
 ```
 
+## you can use it as a chatpot too
+```sh
+# defaults to localhost:8000
+python chat.yp
+
+# custom host/port
+SYSDIAG_HOST=192.168.1.10 SYSDIAG_PORT=9000 python chat.py
+```
+
+
 ## Notes
 
 - The orchestrator launches `python -m client.mcp_server` as a subprocess (inside the `_run_loop` function)
@@ -63,56 +73,74 @@ curl http://localhost:8000/sessions | jq
 ## Architecture: Component Interaction Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          USER (HTTP Client)                          │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │  POST /diagnose  {issue: "..."}
-                               │  GET  /diagnose/{session_id}
-                               │  POST /diagnose/{session_id}/followup
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    SERVER  (FastAPI — server/main.py)               │
-│                                                                     │
-│  • Creates session (SessionStore)                                   │
-│  • Spawns background task → AgentOrchestrator                       │
-│  • Returns session_id immediately (async polling model)             │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │  run() / followup()
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│               AGENT ORCHESTRATOR  (server/agent.py)                 │
-│                                                                     │
-│  1. Builds StdioServerParameters                                    │
-│  2. Launches MCP subprocess (stdio_client)                          │
-│  3. Opens ClientSession, calls list_tools()                         │
-│  4. Enters agentic loop:                                            │
-│     ┌─────────────────────────────────────────────────────┐        │
-│     │  messages → OpenAI GPT-4o  →  tool_calls or report  │        │
-│     │       ↑                              │               │        │
-│     │       └──── tool result ────────────┘               │        │
-│     └─────────────────────────────────────────────────────┘        │
-└──────────┬───────────────────────────────────┬─────────────────────┘
-           │  Chat API  (HTTPS)                │  mcp_session.call_tool()
-           ▼                                   ▼  (over stdin/stdout pipe)
-┌──────────────────────┐         ┌─────────────────────────────────────┐
-│   OpenAI  (GPT-4o)   │         │   MCP SERVER  (client/mcp_server.py)│
-│                      │         │                                     │
-│  Decides which tool  │         │  FastMCP exposes TOOL_REGISTRY:     │
-│  to call next, or    │         │  • run_ping                         │
-│  writes final report │         │  • list_processes                   │
-└──────────────────────┘         │  • check_disk / check_memory / …    │
-                                 │                                     │
-                                 │  Executes real shell commands on    │
-                                 │  the target machine, returns output │
-                                 └─────────────────────────────────────┘
+  MacBook (client machine)                Remote Server (134.255.219.212)
+  ─────────────────────────               ────────────────────────────────────────────
+
+┌──────────────────────────┐             ┌──────────────────────────────────────────┐
+│   USER  (chat.py)        │             │   SERVER  (FastAPI — server/main.py)     │
+│                          │──────────── │                                          │
+│  python chat.py          │  :8000/HTTP │  • Creates session (SessionStore)        │
+│  SYSDIAG_HOST=134.255... │ ──────────► │  • Spawns background task                │
+│                          │ ◄────────── │  • Returns session_id immediately        │
+└──────────────────────────┘             └──────────────────┬───────────────────────┘
+                                                            │  run() / followup()
+                                                            ▼
+                                         ┌──────────────────────────────────────────┐
+                                         │   AGENT ORCHESTRATOR  (server/agent.py)  │
+                                         │                                          │
+                                         │  1. Reads MCP_CLIENT_URL env var         │
+                                         │  2. Connects to MacBook MCP via SSE      │
+                                         │  3. Opens ClientSession, list_tools()    │
+                                         │  4. Enters agentic loop:                 │
+                                         │  ┌────────────────────────────────────┐  │
+                                         │  │ messages → OpenAI GPT-4o →         │  │
+                                         │  │   tool_calls or final report        │  │
+                                         │  │     ↑            │                  │  │
+                                         │  │     └─tool result┘                  │  │
+                                         │  └────────────────────────────────────┘  │
+                                         └───────────┬──────────────────┬───────────┘
+                                                     │ Chat API (HTTPS) │ call_tool()
+                                                     ▼                  │ SSE :8001
+                                         ┌─────────────────┐            │
+                                         │  OpenAI (GPT-4o) │            │
+                                         │                  │            │
+                                         │  Decides which   │            ▼
+                                         │  tool to call,   │  ┌─────────────────────────────┐
+                                         │  or writes final │  │  MCP SERVER  (MacBook)      │
+                                         │  RCA report      │  │  client/mcp_server.py       │
+                                         └─────────────────┘  │  transport: SSE  port: 8001  │
+                                                              │                             │
+                                                              │  FastMCP exposes tools:     │
+                                                              │  • run_ping                 │
+                                                              │  • list_processes           │
+                                                              │  • check_disk               │
+                                                              │  • check_memory / …         │
+                                                              └─────────────────────────────┘
+```
+
+**How to run:**
+
+MacBook — start the MCP tool server:
+```bash
+MCP_TRANSPORT=sse MCP_HOST=0.0.0.0 MCP_PORT=8001 python -m client.mcp_server
+```
+
+Remote server (134.255.219.212) — start the FastAPI server:
+```bash
+MCP_CLIENT_URL=http://<macbook-ip>:8001/sse python -m server.main
+```
+
+MacBook — start the interactive chat client:
+```bash
+SYSDIAG_HOST=134.255.219.212 SYSDIAG_PORT=8000 python chat.py
 ```
 
 **Flow summary:**
 
-1. **User** sends an issue description via HTTP to the FastAPI server.
+1. **User** runs `chat.py` on MacBook, which sends the issue to the remote FastAPI server on port `8000`.
 2. **Server** creates a session and fires off `AgentOrchestrator` in the background.
-3. **Orchestrator** launches `client/mcp_server.py` as a subprocess (stdio pipe), discovers its tools, then enters a loop.
-4. Each iteration: sends the conversation to **OpenAI GPT-4o**. If GPT wants a tool, the orchestrator calls it over the **MCP stdio pipe**.
-5. **MCP Server** runs the actual diagnostic command on the machine and returns the result.
+3. **Orchestrator** connects to the MacBook's MCP tool server over SSE on port `8001`.
+4. Each iteration: sends the conversation to **OpenAI GPT-4o**. If GPT wants a tool, the orchestrator calls it over **SSE** to the MacBook.
+5. **MCP Server** (on MacBook) runs the diagnostic command locally and returns the result.
 6. Results are fed back into the conversation until GPT produces a final RCA report.
-7. **User** polls `GET /diagnose/{session_id}` until status is `DONE`, then reads the report.
+7. **User** receives the report interactively via `chat.py` and can ask follow-up questions.
