@@ -128,11 +128,13 @@ MCP_TRANSPORT=sse MCP_HOST=0.0.0.0 MCP_PORT=8001 python -m client.mcp_server
 Remote server (1.1.1.1) — start the FastAPI server:
 ```bash
 MCP_CLIENT_URL=http://<macbook-ip>:8001/sse python -m server.main
+# if use ssh tunnel
+MCP_CLIENT_URL=http://localhost:8001/sse python -m server.main
 ```
 
 MacBook — start the interactive chat client:
 ```bash
-SYSDIAG_HOST=1.1.1.1 SYSDIAG_PORT=8000 python chat.py
+SYSDIAG_HOST=134.255.219.212 SYSDIAG_PORT=8000 python chat.py
 ```
 
 **Flow summary:**
