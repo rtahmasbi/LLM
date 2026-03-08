@@ -94,28 +94,28 @@ SYSDIAG_HOST=192.168.1.10 SYSDIAG_PORT=9000 python chat.py
                                          │  4. Enters agentic loop:                 │
                                          │  ┌────────────────────────────────────┐  │
                                          │  │ messages → OpenAI GPT-4o →         │  │
-                                         │  │   tool_calls or final report        │  │
-                                         │  │     ↑            │                  │  │
-                                         │  │     └─tool result┘                  │  │
+                                         │  │   tool_calls or final report       │  │
+                                         │  │     ↑            │                 │  │
+                                         │  │     └─tool result┘                 │  │
                                          │  └────────────────────────────────────┘  │
                                          └───────────┬──────────────────┬───────────┘
                                                      │ Chat API (HTTPS) │ call_tool()
                                                      ▼                  │ SSE :8001
-                                         ┌─────────────────┐            │
-                                         │  OpenAI (GPT-4o) │            │
-                                         │                  │            │
-                                         │  Decides which   │            ▼
+                                         ┌──────────────────┐           │
+                                         │  OpenAI (GPT-4o) │           │
+                                         │                  │           │
+                                         │  Decides which   │           ▼
                                          │  tool to call,   │  ┌─────────────────────────────┐
                                          │  or writes final │  │  MCP SERVER  (MacBook)      │
                                          │  RCA report      │  │  client/mcp_server.py       │
-                                         └─────────────────┘  │  transport: SSE  port: 8001  │
-                                                              │                             │
-                                                              │  FastMCP exposes tools:     │
-                                                              │  • run_ping                 │
-                                                              │  • list_processes           │
-                                                              │  • check_disk               │
-                                                              │  • check_memory / …         │
-                                                              └─────────────────────────────┘
+                                         └──────────────────┘  │  transport: SSE  port: 8001 │
+                                                               │                             │
+                                                               │  FastMCP exposes tools:     │
+                                                               │  • run_ping                 │
+                                                               │  • list_processes           │
+                                                               │  • check_disk               │
+                                                               │  • check_memory / …         │
+                                                               └─────────────────────────────┘
 ```
 
 **How to run:**
