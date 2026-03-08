@@ -144,3 +144,30 @@ SYSDIAG_HOST=134.255.219.212 SYSDIAG_PORT=8000 python chat.py
 5. **MCP Server** (on MacBook) runs the diagnostic command locally and returns the result.
 6. Results are fed back into the conversation until GPT produces a final RCA report.
 7. **User** receives the report interactively via `chat.py` and can ask follow-up questions.
+
+## MacBook Behind NAT (port 8001 not reachable from remote server)
+
+If your MacBook is behind a router/firewall, the remote server cannot reach port `8001` directly. Two solutions:
+
+### Option 1: SSH Reverse Tunnel (recommended — free, no extra tools)
+
+On your MacBook, open a reverse tunnel so the remote server can reach your local MCP server via its own `localhost`:
+```bash
+ssh -R 8001:localhost:8001 user@134.255.219.212
+```
+Keep this session open, then start the remote server with:
+```bash
+MCP_CLIENT_URL=http://localhost:8001/sse python -m server.main
+```
+
+### Option 2: ngrok
+
+On your MacBook:
+```bash
+ngrok http 8001
+# outputs something like: https://abc123.ngrok.io
+```
+Then on the remote server:
+```bash
+MCP_CLIENT_URL=https://abc123.ngrok.io/sse python -m server.main
+```
