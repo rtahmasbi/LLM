@@ -181,3 +181,43 @@ Then on the remote server:
 ```bash
 MCP_CLIENT_URL=https://abc123.ngrok.io/sse python -m server.main
 ```
+
+
+## Other Considerations
+
+### Security
+- **No authentication** on the FastAPI server — anyone who can reach port `8000` can trigger diagnoses
+- **No auth on the MCP server** — anyone who can reach port `8001` can execute diagnostic tools on your MacBook
+- **API key exposure** — `OPENAI_API_KEY` is in the server environment; consider a secrets manager
+- **Tool guardrails** — ensure MCP tools are read-only (no destructive commands possible)
+
+### Reliability
+- **Session store is in-memory** — all sessions lost if the server restarts; consider Redis or SQLite
+- **No retry logic** — if OpenAI or the MCP server is temporarily unavailable, the session just fails
+- **SSE connection drops** — if the SSH tunnel or MCP server disconnects mid-diagnosis, the session silently errors
+
+### Scalability
+- **Single server process** — `SessionStore` uses an in-memory dict with an `asyncio.Lock`; won't scale across multiple server instances
+- **No request queuing** — many concurrent diagnoses all hit OpenAI simultaneously; use `asyncio.Semaphore` to limit concurrency
+
+### Observability
+- **No structured logging** — currently plain text logs; consider JSON logs for easier parsing
+- **No metrics** — no visibility into tool call counts, session durations, OpenAI costs
+- **No tracing** — hard to debug why a specific diagnosis went wrong
+
+### Cost Control
+- **No token budget tracking** — each session can consume up to `MAX_TOKENS × MAX_TOOL_CALLS` tokens with no cost cap
+- **No rate limiting per user** — a single client can spam `/diagnose` and run up OpenAI bills
+
+### UX / Operability
+- **Polling model is clunky** — `chat.py` polls every 3 seconds; WebSocket or SSE streaming to the client would give real-time output
+- **No session persistence** — if `chat.py` crashes mid-session, you lose the `session_id` and can't resume
+- **No timeout** — a stuck session runs forever; add a max wall-clock time per session
+
+### Deployment
+- **No process manager** — if the server crashes, it stays down; use `systemd`, `supervisord`, or Docker with restart policies
+- **No health check for MCP** — `/health` only checks FastAPI, not whether the MCP connection to MacBook is alive
+
+---
+The highest-priority items are probably authentication, session persistence, and SSE connection resilience — since a dropped SSH tunnel will silently break ongoing diagnoses.
+
