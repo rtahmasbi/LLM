@@ -2,6 +2,29 @@
 
 # [AgenticAI](AgenticAI/)
 Lot of examples with `langgraph`. 
+- [basic_agents](AgenticAI/basic_agents/)
+- [fill_online_form](AgenticAI/fill_online_form/)
+- [system_rca_client_server_mcp](AgenticAI/system_rca_client_server_mcp/)
+- [pdf_qa](AgenticAI/pdf_qa)
+- [stock_agent](AgenticAI/stock_agent)
+- [more ...](AgenticAI/)
+
+
+## [MCP](MCP/)
+
+
+## Agentic campanies
+- crewai [link](https://www.crewai.com/)
+- autogen-studio - design and control AI agents and workflows [link](https://autogen-studio.com/)
+- zapier: Automate AI Workflows, Agents, and Apps [link](https://zapier.com/)
+- n8n [link](https://n8n.io/)
+- letta: Stateful AI agents [link](https://github.com/letta-ai)
+
+
+## LLMs as Operating Systems
+- MemGPT: Towards LLMs as Operating Systems [link](https://arxiv.org/pdf/2310.08560)
+
+
 
 
 # [Fine Tune](FineTune/)
@@ -9,21 +32,18 @@ Lot of examples with `langgraph`.
 - QLoRA
 - [axolotl](FineTune)
 
-# [RAG](RAG/)
-- langchain_chroma
-- vectorstore
-
-# LLM's
-## [OpenAI](OpenAI/)
-
-## [Llama](Llama/)
-
-## [Deepseek](Deepseek/)
-
-## [Other LLM's](Other_LLMs/)
-- TinyLlama
-- Mistral
-- facebook/opt-350m
+## Adapters
+- Low-Rank Adaptation (LoRA)
+- Low-Rank Hadamard Product (LoHa)
+- Low-Rank Kronecker Product (LoKr)
+- Orthogonal Finetuning (OFT)
+- Orthogonal Butterfly (BOFT)
+- Adaptive Low-Rank Adaptation (AdaLoRA)
+- Llama-Adapter
+- Mixture of LoRA Experts (X-LoRA)
+- Householder Reflection Adaptation (HRA)
+- Bone
+- MiSS
 
 
 # [Reinforcement Learning](ReinforcementLearning/)
@@ -57,9 +77,54 @@ Run an open source quickly. It also support lots of applications such as claude,
 
 
 
-# [MCP](MCP/)
+# [RAG](RAG/)
+- [Chunking Strategies](https://docs.langchain.com/oss/python/integrations/splitters)
+    - RecursiveCharacterTextSplitter
+    - CharacterTextSplitter
+    - MarkdownHeaderTextSplitter
+    - RecursiveJsonSplitter
+- [Reranking strategies](https://reference.langchain.com/python/langchain-community/document_compressors)
+    - CohereRerank
+    - FlashrankRerank
+    - CrossEncoderReranker
+    - LLMListwiseRerank
+    - Colbert
+    - Jina
+- [vectorstore](https://reference.langchain.com/python/langchain-community/vector-stores)
+    - InMemoryVectorStore
+    - Chroma
+    - FAISS
+    - ElasticsearchStore
+    - MongoDBAtlasVectorSearch
+    - QdrantVectorStore
+- [retrievers](https://docs.langchain.com/oss/python/integrations/retrievers)
+    - ArxivRetriever
+    - ElasticsearchRetriever
+    - WikipediaRetriever
+- [embedding](https://docs.langchain.com/oss/python/integrations/embeddings)
+    - OpenAIEmbeddings
+    - OllamaEmbeddings
+    - MistralAIEmbeddings
+- [document_loaders](https://docs.langchain.com/oss/python/integrations/document_loaders)
+    - CSVLoader
+    - JSONLoader
+    - PyPDF
+    - S3FileLoader
+    - TwitterTweetLoader
+    - WhatsAppChatLoader
+    - FigmaFileLoader
 
 
+
+
+# LLM's
+- [OpenAI](OpenAI/)
+- [Llama](Llama/)
+- [Deepseek](Deepseek/)
+- [Qwen](Qwen/)
+- [TinyLlama](Other_LLMs/)
+- [Mistral](Other_LLMs/)
+- [facebook/opt-350m](Other_LLMs/)
 
 
 
@@ -81,6 +146,8 @@ https://github.com/rmovva/LLM-publication-patterns-public
 https://github.com/HenryHZY/Awesome-Multimodal-LLM
 
 https://github.com/DefTruth/Awesome-LLM-Inference
+
+https://github.com/karpathy/
 
 
 ## TensorFlow-Examples
@@ -107,7 +174,7 @@ https://www.linkedin.com/pulse/evaluating-large-language-models-llms-standard-se
 While BLEU and ROUGE assess text similarity by analyzing matching n-gram statistics between the generated text and the reference text, BERTScore assesses similarity in the embedding space by assigning a score that reflects how closely the generated text aligns with the reference text in that space.
 
 
-## great
+## LLM evaluation
 https://github.com/NirDiamant/RAG_Techniques/blob/main/evaluation/evaluation_deep_eval.ipynb
 
 ```py
@@ -117,7 +184,7 @@ from deepeval.test_case import LLMTestCase, LLMTestCaseParams
 ```
 
 
-# Judging LLM-as-a-Judge
+# LLM-as-a-Judge
 https://arxiv.org/pdf/2306.05685
 
 
@@ -251,7 +318,12 @@ accelerate launch --config_file=examples/accelerate_configs/deepspeed_zero{1,2,3
 
 
 ## cloud GPU
-https://www.runpod.io/console/console/pods
+https://vast.ai/
+https://www.runpod.io/pricing
+https://lambda.ai/
+https://coreweave.com/pricing
+https://www.crusoe.ai/cloud/pricing
+
 
 
 ## groq
@@ -455,13 +527,6 @@ https://artificialanalysis.ai/leaderboards/models
 
 
 
-# letta
-https://github.com/letta-ai
-
-https://arxiv.org/pdf/2310.08560
-MemGPT: Towards LLMs as Operating Systems
-
-
 
 # [Diffusion models](Diffusion/)
 
@@ -470,20 +535,3 @@ MemGPT: Towards LLMs as Operating Systems
 https://github.com/karpathy/nanochat
 
 The fastest way to feel the magic is to run the speedrun script speedrun.sh, which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours.
-
-
-# Agentic campanies
-## crewai
-https://www.crewai.com/
-
-## autogen-studio
-AI Agents
-
-
-## zapier
-Automate AI Workflows, Agents, and Apps
-https://zapier.com/
-
-## n8n
-https://n8n.io/
-

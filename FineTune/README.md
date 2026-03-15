@@ -391,6 +391,7 @@ https://huggingface.co/docs/peft/en/conceptual_guides/adapter
 
 Adapter-based methods add extra trainable parameters after the attention and fully-connected layers of a frozen pretrained model to reduce memory-usage and speed up training.
 
+- Low-Rank Adaptation (LoRA)
 - Low-Rank Hadamard Product (LoHa)
 - Low-Rank Kronecker Product (LoKr)
 - Orthogonal Finetuning (OFT)
@@ -399,6 +400,8 @@ Adapter-based methods add extra trainable parameters after the attention and ful
 - Llama-Adapter
 - Mixture of LoRA Experts (X-LoRA)
 - Householder Reflection Adaptation (HRA)
+- Bone
+- MiSS
 
 
 more on Orthogonal Finetuning (OFT and BOFT):
