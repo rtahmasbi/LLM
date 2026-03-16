@@ -51,15 +51,22 @@ Lot of examples with `langgraph`.
 - Reinforcement learning from AI feedback (RLAIF)
 
 ## Trainers
-- `SFTTrainer` - Supervised fine-tuning, (input columsn: text, label) [data example](https://huggingface.co/datasets/stanfordnlp/imdb)
+- `SFTTrainer` - Supervised fine-tuning, (input columsn: text, label)
+    - [data format example](https://huggingface.co/datasets/stanfordnlp/imdb)
 - `DPOTrainer` - Direct Preference Optimization
-- `RewardTrainer` - Reward Modeling (input columsn: chosen, rejected) [data example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
+    - [Example](ReinforcementLearning/example_dpo.py)
+- `RewardTrainer` - Reward Modeling (input columsn: chosen, rejected)
+    - [Example](ReinforcementLearning/example_reward.py)
+    - [data format example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
 - `CPOTrainer`
 - `PPOTrainer` - PPO (Proximal Policy Optimisation)
+    - [Example](ReinforcementLearning/example_ppo.py)
 - `ORPOTrainer`
 - `KTOTrainer`
 - Binary Classifier Optimization (BCO)
-- Group Relative Policy Optimization
+- Group Relative Policy Optimization (GRPO)
+    - [Example 1](ReinforcementLearning/example_grpo.py)
+    - [Example 2](ReinforcementLearning/example_grpo2.py)
 
 
 
