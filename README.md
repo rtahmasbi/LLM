@@ -21,10 +21,6 @@ Lot of examples with `langgraph`.
 - letta: Stateful AI agents [link](https://github.com/letta-ai)
 
 
-## LLMs as Operating Systems
-- MemGPT: Towards LLMs as Operating Systems [link](https://arxiv.org/pdf/2310.08560)
-
-
 ## Agent Performance Evaluation and Improvement
 **Effectiveness Metrics**
 
@@ -589,3 +585,10 @@ https://artificialanalysis.ai/leaderboards/models
 https://github.com/karpathy/nanochat
 
 The fastest way to feel the magic is to run the speedrun script speedrun.sh, which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours.
+
+
+
+# LLMs as Operating Systems
+- MemGPT: Towards LLMs as Operating Systems [link](https://arxiv.org/pdf/2310.08560)
+
+
