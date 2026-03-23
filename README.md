@@ -10,15 +10,13 @@ Lot of examples with `langgraph`.
 - [more ...](AgenticAI/)
 
 
-## [MCP](MCP/)
+## server app
+For the app and server, we can use:
+- `app = Flask()`     -> `app.run`
+- `app = FastMCP()`   -> `app.run`
+- `app = FastAPI()`   -> `uvicorn.run(app, host="0.0.0.0", port=5000)`
+- `app = Starlette()` -> `uvicorn.run(app, host="0.0.0.0", port=5000)`
 
-
-## Agentic campanies
-- crewai [link](https://www.crewai.com/)
-- autogen-studio - design and control AI agents and workflows [link](https://autogen-studio.com/)
-- zapier: Automate AI Workflows, Agents, and Apps [link](https://zapier.com/)
-- n8n [link](https://n8n.io/)
-- letta: Stateful AI agents [link](https://github.com/letta-ai)
 
 
 ## Agent Performance Evaluation and Improvement
@@ -68,6 +66,12 @@ Reasoning_Score = Σ(dimension_scores) / 12   # normalized 0–1
 ```
 
 
+## Agentic campanies
+- crewai [link](https://www.crewai.com/)
+- autogen-studio - design and control AI agents and workflows [link](https://autogen-studio.com/)
+- zapier: Automate AI Workflows, Agents, and Apps [link](https://zapier.com/)
+- n8n [link](https://n8n.io/)
+- letta: Stateful AI agents [link](https://github.com/letta-ai)
 
 
 # [Fine Tune](FineTune/)
