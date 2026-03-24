@@ -1,0 +1,9 @@
+# AGENTS.md Generation & Improvement Pipeline
+# Install with: pip install -r requirements.txt
+
+# LLM API
+openai>=1.30.0
+
+# Semantic clustering (Stage 3 of generate_agents_md.py)
+numpy>=1.26.0
+scikit-learn>=1.4.0
