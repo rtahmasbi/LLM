@@ -131,6 +131,11 @@ b[0][0] = 3.14
 t[0][0] # tensor(3.14)
 ```
 
+# permute vs transpose
+```py
+# For a 4D tensor x with shape (A, B, C, D), x.permute(0, 3, 1, 2) would result in a tensor with shape (A, D, B, C)
+# For a 4D tensor x with shape (A, B, C, D), x.transpose(1, 2) would result in a tensor with shape (A, C, B, D). This is equivalent to x.permute(0, 2, 1, 3)
+```
 
 # simple linear regression
 ## linear model
