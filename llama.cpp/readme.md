@@ -11,11 +11,15 @@ https://github.com/ggml-org/llama.cpp/blob/master/docs/install.md
 
 
 # run
+`-m` for the local model, `-hf` to read from HF.
 ```sh
 cd /home/ras/llama-b8495/
 ./llama-cli -hf ggml-org/gemma-3-1b-it-GGUF
 
 ./llama-cli -hf bartowski/Meta-Llama-3-8B-Instruct-GGUF
+./llama-cli -hf Qwen/Qwen2.5-1.5B-Instruct-GGUF
+./llama-cli -hf Qwen/Qwen2.5-7B-Instruct-GGUF
+
 ```
 
 
@@ -24,6 +28,30 @@ cd /home/ras/llama-b8495/
 /home/ras/.cache/llama.cpp/
 ```
 
+
+# completion-bash
+```sh
+build/bin/llama-cli --completion-bash > ~/.llama-completion.bash
+source ~/.llama-completion.bash
+```
+
+# llama-server
+```sh
+llama-server -m model.gguf --port 8080
+```
+
+# llama-bench
+```sh
+./llama-bench -hf Qwen/Qwen2.5-1.5B-Instruct-GGUF
+
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| qwen2 1.5B Q4_K - Medium       |   1.04 GiB |     1.78 B | CPU        |       8 |           pp512 |        218.98 ± 0.81 |
+| qwen2 1.5B Q4_K - Medium       |   1.04 GiB |     1.78 B | CPU        |       8 |           tg128 |         27.38 ± 0.00 |
+
+build: 7cadbfce1 (8495)
+
+```
 
 
 # python

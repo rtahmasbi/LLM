@@ -118,6 +118,7 @@ Reasoning_Score = Σ(dimension_scores) / 12   # normalized 0–1
 
 
 # [llama.cpp](llama.cpp/)
+LLM inference in C/C++
 
 # [vLLM](vLLM/)
 - Optimizing KV pairs
