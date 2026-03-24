@@ -188,6 +188,11 @@ cd /home/ras/temp/
 git clone https://github.com/tiangolo/fastapi.git
 
 
+conda create -n improve_agent_programmatically python=3.11
+conda activate improve_agent_programmatically
+pip install -r requirements.txt
+
+
 cd ~/GITHUB/LLM/AgenticAI/improve_agent_programmatically
 python generate_agents_md.py --repo /home/ras/temp/fastapi --out AGENTS_fastapi.md
 
