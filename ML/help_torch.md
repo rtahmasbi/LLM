@@ -311,31 +311,54 @@ softmax for 2 classes = sigmoid (a surprising but useful result).
 
 
 # In PyTorch
+```
 CrossEntropyLoss = LogSoftmax + NLLLoss
 BCEWithLogitsLoss = Sigmoid + BCE
-
+```
 ## BCE (Binary Cross Entropy)
 BCE is used for binary classification or multi-label classification.
-The formula is:
-L = -[y\log(p) + (1-y)\log(1-p)]
 
+The formula is:
+```
+L = -[y\log(p) + (1-y)\log(1-p)]
+```
 ## NLLLoss (Negative Log Likelihood Loss)
 NLLLoss is used for multi-class classification where exactly one class is correct.
+
 The loss is:
+```
 L = -\log p(y)
+```
+
+## which loss to use?
+For loss functions, `model_output.shape == loss_input.shape`
 
 
-| Loss              | Problem type         | Output layer | Sum of probs = 1? |
-| ----------------- | -------------------- | ------------ | ----------------- |
-| NLLLoss           | multi-class          | log-softmax  | Yes               |
-| CrossEntropyLoss  | multi-class          | raw logits   | Yes               |
-| BCELoss           | binary / multi-label | sigmoid      | No                |
-| BCEWithLogitsLoss | binary / multi-label | raw logits   | No                |
+| Loss              | Problem type         | Output layer | Sum of probs = 1? | Input (model output) shape        | Target shape                | Output (after activation) shape |
+| ----------------- | -------------------- | ------------ | ----------------- | --------------------------------- | --------------------------- | ------------------------------- |
+| NLLLoss           | multi-class          | log-softmax  | Yes               | `(N, C)` or `(N, C, d1, ..., dk)` | `(N)` or `(N, d1, ..., dk)` | same as input `(N, C, ...)`     |
+| CrossEntropyLoss  | multi-class          | raw logits   | Yes               | `(N, C)` or `(N, C, d1, ..., dk)` | `(N)` or `(N, d1, ..., dk)` | `(N, C, ...)` (after softmax)   |
+| BCELoss           | binary / multi-label | sigmoid      | No                | `(N, *)`                          | `(N, *)`                    | `(N, *)` (after sigmoid)        |
+| BCEWithLogitsLoss | binary / multi-label | raw logits   | No                | `(N, *)`                          | `(N, *)`                    | `(N, *)` (after sigmoid)        |
 
 
 
 ```py
+
+torch.nn.NLLLoss(weight=None, size_average=None, ignore_index=-100, reduce=None, reduction='mean')
 torch.nn.CrossEntropyLoss(weight=None, size_average=None, ignore_index=-100, reduce=None, reduction='mean', label_smoothing=0.0)
+torch.nn.BCELoss(weight=None, size_average=None, reduce=None, reduction='mean')
+torch.nn.BCEWithLogitsLoss(weight=None, size_average=None, reduce=None, reduction='mean', pos_weight=None)
+
+torch.nn.MSELoss(size_average=None, reduce=None, reduction='mean')
+torch.nn.GaussianNLLLoss(*, full=False, eps=1e-06, reduction='mean')
+torch.nn.KLDivLoss(size_average=None, reduce=None, reduction='mean', log_target=False)
+torch.nn.modules.loss.L1Loss(size_average=None, reduce=None, reduction='mean')
+torch.nn.modules.loss.CosineEmbeddingLoss(margin=0.0, size_average=None, reduce=None, reduction='mean')
+torch.nn.modules.loss.PoissonNLLLoss(log_input=True, full=False, size_average=None, eps=1e-08, reduce=None, reduction='mean')
+
+torch.nn.modules.loss.CTCLoss(blank=0, reduction='mean', zero_infinity=False)
+# continuous (unsegmented) time series and a target sequence with C as the number of classes
 
 ```
 
