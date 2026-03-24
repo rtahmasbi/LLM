@@ -5,8 +5,9 @@ Lot of examples with `langgraph`.
 - [basic_agents](AgenticAI/basic_agents/)
 - [fill_online_form](AgenticAI/fill_online_form/)
 - [system_rca_client_server_mcp](AgenticAI/system_rca_client_server_mcp/)
-- [pdf_qa](AgenticAI/pdf_qa)
-- [stock_agent](AgenticAI/stock_agent)
+- [pdf_qa](AgenticAI/pdf_qa/)
+- [stock_agent](AgenticAI/stock_agent/)
+- [improve_agent_programmatically](AgenticAI/improve_agent_programmatically/)
 - [more ...](AgenticAI/)
 
 
