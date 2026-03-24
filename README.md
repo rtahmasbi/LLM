@@ -117,6 +117,8 @@ Reasoning_Score = Σ(dimension_scores) / 12   # normalized 0–1
 
 
 
+# [llama.cpp](llama.cpp/)
+
 # [vLLM](vLLM/)
 - Optimizing KV pairs
 - `PagedAttention` algorithm allows storing continuous KV pairs in non-contiguous memory space
