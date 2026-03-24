@@ -469,9 +469,13 @@ def embed_and_cluster(chunks: list[dict], client: "OpenAI") -> list[dict]:
         if label != -1:
             cluster_map[label].append(chunk)
 
+    # Cap at top-20 largest clusters — 202 clusters generates too many API calls
+    # and most small clusters are noise. Pick by size descending.
+    top_clusters = sorted(cluster_map.items(), key=lambda kv: len(kv[1]), reverse=True)[:20]
+
     # Name each cluster
     named_clusters = []
-    for label, cluster_chunks in cluster_map.items():
+    for label, cluster_chunks in top_clusters:
         files = list({c["file"] for c in cluster_chunks})
         sample = cluster_chunks[:5]
 
@@ -483,7 +487,7 @@ def embed_and_cluster(chunks: list[dict], client: "OpenAI") -> list[dict]:
                     "Name this cluster of related code in 2-4 words "
                     "(e.g. 'Authentication Layer', 'Router Definitions', 'Dependency Injection').\n\n"
                     "Files: " + ", ".join(files[:5]) + "\n\n"
-                    "Sample code:\n" + "\n\n".join(c["text"][:300] for c in sample) + "\n\n"
+                    "Sample code:\n" + "\n\n".join(_sanitize(c["text"][:300]) for c in sample) + "\n\n"
                     "Respond with ONLY the cluster name, nothing else."
                 )
             }],
@@ -504,6 +508,22 @@ def embed_and_cluster(chunks: list[dict], client: "OpenAI") -> list[dict]:
 # STAGE 4 — LLM SYNTHESIS
 # ===========================================================================
 
+def _sanitize(text: str) -> str:
+    """
+    Remove characters that cause JSON serialization failures in the OpenAI API:
+    - Null bytes and other ASCII control characters (except tab/newline/CR)
+    - Lone surrogates and other invalid Unicode
+    - Excessively long lines (truncate at 500 chars)
+    """
+    # Strip null bytes and control chars except \t \n \r
+    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
+    # Replace lone surrogates that slip through on some platforms
+    text = text.encode("utf-8", errors="replace").decode("utf-8", errors="replace")
+    # Truncate any single line that is absurdly long (e.g. minified JS in a .py)
+    lines = [l[:500] for l in text.splitlines()]
+    return "\n".join(lines)
+
+
 def synthesize_conventions(
     clusters: list[dict],
     structure: dict,
@@ -516,13 +536,15 @@ def synthesize_conventions(
     """
     all_conventions: dict[str, list[dict]] = defaultdict(list)
 
-    for cluster in clusters:
-        sample_code = "\n\n---\n\n".join(
+    for i, cluster in enumerate(clusters):
+        print(f"  [synthesis] cluster {i+1}/{len(clusters)}: {cluster['name']}", file=sys.stderr)
+        sample_code = _sanitize("\n\n---\n\n".join(
             f"# {c['file']} — {c['name']}\n{c['text']}"
             for c in cluster["representative_chunks"]
-        )
+        ))
 
-        response = client.chat.completions.create(
+        try:
+            response = client.chat.completions.create(
             model=SYNTH_MODEL,
             response_format={"type": "json_object"},
             messages=[
@@ -566,6 +588,10 @@ def synthesize_conventions(
                 }
             ],
         )
+        except Exception as e:
+            print(f"  [synthesis] cluster {i} ('{cluster['name']}') skipped: {e}",
+                  file=sys.stderr)
+            continue
 
         try:
             parsed = json.loads(response.choices[0].message.content)

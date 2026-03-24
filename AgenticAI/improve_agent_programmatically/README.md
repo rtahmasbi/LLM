@@ -180,3 +180,16 @@ This project was developed and tested against [FastAPI](https://github.com/tiang
 - Large active test suite makes command validation reliable
 - Enough architectural complexity to stress-test the generation pipeline
 - Familiar to many developers — easy to human-evaluate whether the output is accurate
+
+
+# my run
+```sh
+cd /home/ras/temp/
+git clone https://github.com/tiangolo/fastapi.git
+
+
+cd ~/GITHUB/LLM/AgenticAI/improve_agent_programmatically
+python generate_agents_md.py --repo /home/ras/temp/fastapi --out AGENTS_fastapi.md
+
+
+```
