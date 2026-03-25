@@ -197,4 +197,13 @@ cd ~/GITHUB/LLM/AgenticAI/improve_agent_programmatically
 python generate_agents_md.py --repo /home/ras/temp/fastapi --out AGENTS_fastapi.md
 
 
+
+python improve_agents_md.py \
+    --repo   /home/ras/temp/fastapi \
+    --input  AGENTS_v0.md \
+    --iters  3 \
+    --out-dir ./versions
+
+
+
 ```

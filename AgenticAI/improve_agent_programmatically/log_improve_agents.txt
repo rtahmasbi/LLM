@@ -1,0 +1,121 @@
+python improve_agents_md.py \
+    --repo   /home/ras/temp/fastapi \
+    --input  AGENTS_v0.md \
+    --iters  3 \
+    --out-dir ./versions
+
+🔍 Extracting repo context from fastapi...
+
+────────────────────────────────────────────────────────────
+  Evaluating baseline...
+
+============================================================
+  AGENTS.md Scorecard  —  v0    Overall: 60%
+============================================================
+  ⚠️ Specificity                  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%
+       1 specific signals, 4 vague phrases. Add concrete
+       examples and file paths.
+  ⚠️ Command Validity             █████████░░░░░░░░░░░░░░░░░░░░░  33%
+       1/3 commands run clean. Failing: 'pytest' → exit 127;
+       'ruff check .' → exit 1
+  ⚠️ Section Coverage             ██████████████░░░░░░░░░░░░░░░░  48%
+       Missing: type checking, architecture map, anti-
+       patterns, risk map
+  〰️ Repo Grounding               ███████████████░░░░░░░░░░░░░░░  50%
+       No file/module references found to verify.
+  〰️ Machine Parsability          █████████████████████░░░░░░░░░  70%
+       3 code blocks missing language tag
+  ✅ Actionability                ████████████████████████░░░░░░  80%
+       4/5 sections are actionable. Inert sections: Code
+       Style
+  ✅ Novelty vs README            ██████████████████████████████  100%
+       4/4 sentences are novel vs README.
+  ✅ Information Density          ██████████████████████████████  100%
+       14 high-signal lines, 13 filler lines, 35 total.
+       Density: 64%.
+============================================================
+
+  Saved: versions/AGENTS_v0.md
+
+  🔧 Generating improved version (targeting weakest metrics)...
+
+────────────────────────────────────────────────────────────
+  Evaluating v1...
+
+============================================================
+  AGENTS.md Scorecard  —  v1    Overall: 81%
+============================================================
+  ⚠️ Command Validity             ███████░░░░░░░░░░░░░░░░░░░░░░░  25%
+       1/4 commands run clean. Failing: 'mypy fastapi
+       --config-file mypy.ini' → exit 127; 'pytest --strict-
+       config --strict-markers --timeout=20 --color=yes' →
+       exit 127
+  〰️ Machine Parsability          ███████████████████░░░░░░░░░░░  65%
+       6 code blocks missing language tag; Long file lacks
+       navigation anchors
+  〰️ Actionability                ████████████████████░░░░░░░░░░  67%
+       8/12 sections are actionable. Inert sections: §1
+       Environment & Commands, §2 Architecture Map, §4 PR &
+       Contribution Rules, §6 File Change Risk Map
+  ✅ Specificity                  ███████████████████████████░░░  90%
+       4 specific signals, 0 vague phrases.
+  ✅ Section Coverage             ██████████████████████████████  100%
+       All key sections present.
+  ✅ Novelty vs README            ██████████████████████████████  100%
+       37/37 sentences are novel vs README.
+  ✅ Information Density          ██████████████████████████████  100%
+       41 high-signal lines, 38 filler lines, 98 total.
+       Density: 68%.
+  ✅ Repo Grounding               ██████████████████████████████  100%
+       9/9 file references exist in repo.
+============================================================
+
+  Saved: versions/AGENTS_v1.md
+
+  🔧 Generating improved version (targeting weakest metrics)...
+
+────────────────────────────────────────────────────────────
+  Evaluating v2...
+
+============================================================
+  AGENTS.md Scorecard  —  v2    Overall: 79%
+============================================================
+  ⚠️ Command Validity             ███████░░░░░░░░░░░░░░░░░░░░░░░  25%
+       1/4 commands run clean. Failing: 'mypy fastapi
+       --config-file=./mypy.ini' → exit 127; 'pytest
+       --strict-config --strict-markers --timeout=20
+       --color=yes' → exit 127
+  〰️ Machine Parsability          ███████████████████░░░░░░░░░░░  65%
+       6 code blocks missing language tag; Long file lacks
+       navigation anchors
+  〰️ Specificity                  ███████████████████░░░░░░░░░░░  66%
+       4 specific signals, 2 vague phrases.
+  〰️ Actionability                ██████████████████████░░░░░░░░  75%
+       9/12 sections are actionable. Inert sections: §1
+       Environment & Commands, §2 Architecture Map, §6 File
+       Change Risk Map
+  ✅ Section Coverage             ██████████████████████████████  100%
+       All key sections present.
+  ✅ Novelty vs README            ██████████████████████████████  100%
+       37/37 sentences are novel vs README.
+  ✅ Information Density          ██████████████████████████████  100%
+       41 high-signal lines, 39 filler lines, 99 total.
+       Density: 68%.
+  ✅ Repo Grounding               ██████████████████████████████  100%
+       8/8 file references exist in repo.
+============================================================
+
+  Saved: versions/AGENTS_v2.md
+
+  📊 Score plateaued (81% → 79%). Stopping.
+
+============================================================
+  IMPROVEMENT SUMMARY
+============================================================
+  baseline  overall: 60%
+      v1    overall: 81%  (+21%)
+      v2    overall: 79%  (-2%)
+
+  Full scores → versions/scores.json
+  Files       → versions/AGENTS_v*.md
+
