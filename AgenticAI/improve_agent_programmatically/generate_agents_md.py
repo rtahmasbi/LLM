@@ -30,6 +30,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Optional
 
+from llm_client import build_client
+
 # ---------------------------------------------------------------------------
 # Optional heavy deps — degrade gracefully if missing
 # ---------------------------------------------------------------------------
@@ -41,13 +43,6 @@ try:
 except ImportError:
     HAS_SKLEARN = False
     print("[warn] scikit-learn not installed — semantic clustering disabled", file=sys.stderr)
-
-try:
-    from openai import OpenAI
-    HAS_OPENAI = True
-except ImportError:
-    HAS_OPENAI = False
-    print("[warn] openai not installed — LLM synthesis disabled", file=sys.stderr)
 
 
 # ---------------------------------------------------------------------------
@@ -884,10 +879,10 @@ def generate(repo_path: str, output_path: str = "AGENTS.md") -> str:
     repo = Path(repo_path).resolve()
     if not repo.exists():
         raise FileNotFoundError(f"Repo not found: {repo}")
-
-    client = OpenAI() if HAS_OPENAI and os.getenv("OPENAI_API_KEY") else None
+    
+    client = build_client(provider=getattr(args, "provider", None))
     if client is None:
-        print("[warn] Running without OpenAI — LLM synthesis and clustering disabled",
+        print("[warn] Running without LLM — LLM synthesis and clustering disabled",
               file=sys.stderr)
 
     print(f"[1/6] Static analysis: {repo.name}", file=sys.stderr)
@@ -953,10 +948,13 @@ if __name__ == "__main__":
         "--no-llm", action="store_true",
         help="Skip LLM synthesis (static analysis + git only)"
     )
+    parser.add_argument(
+        "--provider", choices=["openai", "claude"], default=None,
+        help="LLM provider (default: auto-detect from env vars)"
+    )
     args = parser.parse_args()
-
     if args.no_llm:
-        # Monkey-patch to disable OpenAI
-        HAS_OPENAI = False
-
+        generate(args.repo, args.out, provider=None)
+    else:
+        generate(args.repo, args.out, provider=args.provider)
     generate(args.repo, args.out)

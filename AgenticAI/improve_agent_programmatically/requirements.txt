@@ -1,8 +1,10 @@
 # AGENTS.md Generation & Improvement Pipeline
 # Install with: pip install -r requirements.txt
 
-# LLM API
-openai>=1.30.0
+# LLM providers -- install at least one
+openai>=1.30.0          # for OpenAI GPT-4o + embeddings
+anthropic>=0.25.0       # for Claude
+
 
 # Semantic clustering (Stage 3 of generate_agents_md.py)
 numpy>=1.26.0

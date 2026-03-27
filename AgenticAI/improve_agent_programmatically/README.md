@@ -205,5 +205,16 @@ python improve_agents_md.py \
     --out-dir ./versions
 
 
+# Auto-detect (uses whichever key is set; OpenAI takes priority if both set)
+python improve_agents_md.py --repo ./fastapi --input AGENTS_v0.md --iters 3
+
+# Force Claude
+export ANTHROPIC_API_KEY=sk-ant-...
+python improve_agents_md.py --repo ./fastapi --input AGENTS_v0.md --provider claude
+
+# Force OpenAI
+export OPENAI_API_KEY=sk-...
+python improve_agents_md.py --repo ./fastapi --input AGENTS_v0.md --provider openai
+
 
 ```
