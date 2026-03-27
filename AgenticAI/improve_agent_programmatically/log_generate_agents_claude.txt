@@ -1,0 +1,519 @@
+(improve_agent_programmatically) ras@server1:~/GITHUB/LLM/AgenticAI/improve_agent_programmatically$ cat AGENTS_fastapi.md
+# AGENTS.md
+
+AI agent guide for the FastAPI repository. Max 500 lines. Actionable only.
+
+## §1 Environment & Commands
+
+**Installation:**
+```bash
+pip install -e '.[standard,standard-no-fastapi-cloud-cli,all]'
+```
+
+**Running Tests:**
+```bash
+pytest tests/
+pytest tests/test_tutorial/  # Tutorial examples
+pytest -v tests/test_security/  # Security features
+```
+
+**Linting & Formatting:**
+```bash
+ruff check .
+ruff format .
+mypy fastapi/
+```
+
+**Documentation:**
+```bash
+python scripts/docs.py live
+# Serves docs with hot reload at http://127.0.0.1:8000
+```
+
+**Translation Scripts:**
+```bash
+python scripts/translate.py validate  # Check translation status
+```
+
+## §2 Architecture Map
+
+**Core Framework Layers:**
+
+```
+fastapi/
+├── applications.py          # FastAPI() main application class
+├── routing.py              # APIRouter, route handling, dependency injection
+├── dependencies/
+│   └── utils.py           # Dependency resolution engine (HIGH COUPLING)
+├── _compat/
+│   └── v2.py             # Pydantic v1/v2 compatibility (HIGH COUPLING)
+├── openapi/
+│   └── utils.py          # OpenAPI schema generation (HIGH COUPLING)
+└── __init__.py           # Public API surface (HIGH CHURN)
+```
+
+**Request Flow:**
+1. `applications.py:FastAPI` receives HTTP request via Starlette
+2. `routing.py:APIRouter` matches route, extracts path parameters
+3. `dependencies/utils.py` resolves dependencies (query, body, headers, etc.)
+4. `_compat/v2.py` handles Pydantic v1/v2 model validation
+5. Endpoint function executes
+6. `openapi/utils.py` provides schema metadata (if docs requested)
+7. Response serialization via Pydantic + Starlette
+
+**High-Coupling Triangle (⚠️ change with care):**
+- `dependencies/utils.py` ↔ `routing.py` (12 co-commits)
+- `dependencies/utils.py` ↔ `_compat/v2.py` (11 co-commits)
+- `dependencies/utils.py` ↔ `openapi/utils.py` (11 co-commits)
+
+Changes to `dependencies/utils.py` likely require changes to all three others.
+
+**Documentation Source:**
+```
+docs_src/
+├── <topic>/__init__.py              # Empty marker files
+└── <topic>/tutorial001_py310.py     # Runnable example code
+```
+
+All `docs_src/` files must be executable examples. They're tested automatically.
+
+## §3 Code Conventions
+
+**Dependency Injection Pattern:**
+
+✅ **Correct:**
+```python
+from fastapi import Depends, FastAPI
+from typing import Annotated
+
+async def get_db():
+    db = DatabaseConnection()
+    try:
+        yield db
+    finally:
+        await db.close()
+
+@app.get("/items/")
+async def read_items(db: Annotated[DatabaseConnection, Depends(get_db)]):
+    return await db.query("SELECT * FROM items")
+```
+
+❌ **Incorrect:**
+```python
+# Don't use un-annotated Depends
+async def read_items(db = Depends(get_db)):  # Missing Annotated
+    ...
+
+# Don't create dependencies inside route functions
+@app.get("/items/")
+async def read_items():
+    db = DatabaseConnection()  # Should be injected
+    ...
+```
+
+**Path Operation Decorators:**
+
+✅ **Correct:**
+```python
+from fastapi import APIRouter, status
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_user(user: UserCreate):
+    ...
+
+@router.get("/{user_id}", response_model=User)
+async def get_user(user_id: int):
+    ...
+```
+
+❌ **Incorrect:**
+```python
+# Don't hardcode status codes
+@router.post("/", status_code=201)  # Use status.HTTP_201_CREATED
+    ...
+
+# Don't mix router and app decorators
+@app.get("/users/")  # Should use router if router exists
+    ...
+```
+
+**Type Annotations (Required):**
+
+✅ **Correct:**
+```python
+from typing import Annotated, Optional
+from fastapi import Query, Path, Body
+
+@app.get("/items/")
+async def read_items(
+    q: Annotated[Optional[str], Query(max_length=50)] = None,
+    skip: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(le=100)] = 10,
+) -> list[Item]:
+    ...
+```
+
+❌ **Incorrect:**
+```python
+# Don't omit return type annotations
+async def read_items(q: str = None):  # Missing Annotated, Optional, return type
+    ...
+
+# Don't use old-style Query/Path
+async def read_items(q: Optional[str] = Query(None)):  # Use Annotated
+    ...
+```
+
+**Pydantic Models:**
+
+✅ **Correct:**
+```python
+from pydantic import BaseModel, Field, ConfigDict
+
+class Item(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    name: str = Field(..., min_length=1, max_length=100)
+    price: float = Field(..., gt=0)
+    is_offer: bool = False
+```
+
+❌ **Incorrect:**
+```python
+class Item(BaseModel):
+    class Config:  # Pydantic v1 style (but v1 support exists in _compat)
+        orm_mode = True
+    
+    name: str  # Missing validation
+    price: float
+```
+
+**Async vs Sync:**
+
+✅ **Correct:**
+```python
+# Use async for I/O-bound operations
+@app.get("/external/")
+async def call_external():
+    async with httpx.AsyncClient() as client:
+        response = await client.get("https://api.example.com")
+    return response.json()
+
+# Use sync for CPU-bound or blocking operations
+@app.get("/compute/")
+def heavy_computation(n: int):
+    return sum(i * i for i in range(n))  # Runs in thread pool
+```
+
+❌ **Incorrect:**
+```python
+# Don't use async without await (pointless overhead)
+@app.get("/items/")
+async def get_items():
+    return [{"id": 1}]  # Should be sync
+
+# Don't block event loop with sync I/O in async
+@app.get("/bad/")
+async def bad_async():
+    time.sleep(5)  # Blocks event loop! Use asyncio.sleep()
+    ...
+```
+
+**Response Models:**
+
+✅ **Correct:**
+```python
+from fastapi import Response
+from fastapi.responses import JSONResponse, StreamingResponse
+
+@app.get("/items/", response_model=list[Item])
+async def read_items() -> list[Item]:  # Return type matches response_model
+    return await get_all_items()
+
+@app.get("/custom/")
+async def custom_response():
+    return JSONResponse(
+        content={"message": "Success"},
+        headers={"X-Custom": "value"}
+    )
+```
+
+❌ **Incorrect:**
+```python
+# Don't return Response when response_model is set
+@app.get("/items/", response_model=Item)
+async def read_items():
+    return Response(content="...")  # Bypasses serialization!
+
+# Don't mismatch return type and response_model
+@app.get("/items/", response_model=Item)
+async def read_items() -> dict:  # Mismatch
+    ...
+```
+
+**Exception Handling:**
+
+✅ **Correct:**
+```python
+from fastapi import HTTPException, status
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    if item := await get_item(item_id):
+        return item
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Item {item_id} not found"
+    )
+```
+
+❌ **Incorrect:**
+```python
+# Don't raise non-HTTPException errors without handler
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    raise ValueError("Bad item")  # 500 error, not user-friendly
+
+# Don't hardcode status codes in exceptions
+raise HTTPException(status_code=404, detail="Not found")  # Use status enum
+```
+
+## §4 PR & Contribution Rules
+
+**Branch Naming:**
+```
+feat/<description>       # New features
+fix/<description>        # Bug fixes
+docs/<description>       # Documentation only
+refactor/<description>   # Code refactoring
+```
+
+**Merge Strategy:**
+- All PRs are **squashed** on merge
+- Write clear commit title (becomes squash commit message)
+- PR description should explain "why", not "what" (code shows "what")
+
+**PR Checklist:**
+- [ ] Add tests for new functionality
+- [ ] Update or add docstrings (Google style)
+- [ ] Add example in `docs_src/` if new feature
+- [ ] Run `ruff format .` before committing
+- [ ] Run `mypy fastapi/` on changed files
+- [ ] Ensure all `docs_src/` examples are executable
+
+**Documentation Examples:**
+```python
+# docs_src/<feature>/tutorial001_py310.py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+# Must be runnable standalone:
+# python docs_src/<feature>/tutorial001_py310.py
+
+@app.get("/")
+def read_root():
+    return {"message": "Example works"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app)
+```
+
+**Type Hints Required:**
+- All public APIs must have complete type annotations
+- Use `Annotated` for dependency injection parameters
+- Return types required on all endpoint functions
+- ⚠️ `docs_src/` files have low type coverage by design (kept simple for docs)
+
+**Testing New Features:**
+```python
+# tests/test_<feature>.py
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+def test_new_feature():
+    app = FastAPI()
+    
+    @app.get("/test")
+    def endpoint():
+        return {"result": "value"}
+    
+    client = TestClient(app)
+    response = client.get("/test")
+    assert response.status_code == 200
+    assert response.json() == {"result": "value"}
+```
+
+## §5 Anti-Patterns & Gotchas
+
+**FastAPI-Specific Anti-Patterns:**
+
+❌ **Mutating Global State in Dependencies:**
+```python
+# WRONG: Dependencies run per-request but this mutates global state
+cache = {}
+
+async def get_cache():
+    cache["last_access"] = datetime.now()  # Race condition!
+    return cache
+
+# RIGHT: Use request.state or proper caching
+from starlette.requests import Request
+
+async def get_cache(request: Request):
+    if not hasattr(request.state, "cache"):
+        request.state.cache = {}
+    return request.state.cache
+```
+
+❌ **Mixing Sync and Async Incorrectly:**
+```python
+# WRONG: Blocking call in async function
+@app.get("/users/")
+async def get_users():
+    users = blocking_db_query()  # Blocks event loop!
+    return users
+
+# RIGHT: Use run_in_executor or make it sync
+from fastapi.concurrency import run_in_threadpool
+
+@app.get("/users/")
+async def get_users():
+    users = await run_in_threadpool(blocking_db_query)
+    return users
+```
+
+❌ **Dependency Circular Imports:**
+```python
+# WRONG: Circular dependency between modules
+# users.py
+from .items import get_item_dep
+
+def get_user_dep():
+    item = Depends(get_item_dep)  # Circular!
+    ...
+
+# items.py
+from .users import get_user_dep  # Circular!
+
+# RIGHT: Put shared dependencies in separate module
+# dependencies.py
+def get_shared_dep():
+    ...
+```
+
+❌ **Incorrect Response Model Usage:**
+```python
+# WRONG: response_model doesn't filter extra fields
+class UserOut(BaseModel):
+    name: str
+    email: str
+
+@app.get("/users/", response_model=UserOut)
+def get_user():
+    return UserInDB(
+        name="John",
+        email="john@example.com",
+        password_hash="secret"  # LEAKED! response_model doesn't auto-exclude
+    )
+
+# RIGHT: Use explicit model with exclude or response_model_exclude
+class UserOut(BaseModel):
+    name: str
+    email: str
+    
+    model_config = ConfigDict(from_attributes=True)
+
+@app.get("/users/", response_model=UserOut)
+def get_user():
+    user = UserInDB(...)  # Has password_hash
+    return UserOut.model_validate(user)  # Safely converts
+```
+
+❌ **Modifying Request Body Pydantic Model:**
+```python
+# WRONG: Request models are reused, don't mutate
+@app.post("/items/")
+async def create_item(item: Item):
+    item.id = generate_id()  # Mutates input model!
+    item.created_at = datetime.now()
+    return item
+
+# RIGHT: Create new model or use .model_copy()
+@app.post("/items/")
+async def create_item(item: Item):
+    item_with_id = item.model_copy(update={
+        "id": generate_id(),
+        "created_at": datetime.now()
+    })
+    return item_with_id
+```
+
+❌ **Background Tasks Resource Management:**
+```python
+# WRONG: Resources closed before background task runs
+from fastapi import BackgroundTasks
+
+@app.post("/upload/")
+async def upload(file: UploadFile, background_tasks: BackgroundTasks):
+    content = await file.read()
+    background_tasks.add_task(process_file, content)  # OK
+    background_tasks.add_task(process_file, file)  # WRONG: file closed after response
+    return {"status": "uploaded"}
+
+# RIGHT: Extract data before passing to background task
+@app.post("/upload/")
+async def upload(file: UploadFile, background_tasks: BackgroundTasks):
+    content = await file.read()
+    filename = file.filename
+    background_tasks.add_task(process_file, content, filename)
+    return {"status": "uploaded"}
+```
+
+❌ **Path Parameter Type Mismatches:**
+```python
+# WRONG: Path parameter type doesn't match function signature
+@app.get("/items/{item_id}")
+async def get_item(item_id: str):  # Function expects str
+    return {"item_id": int(item_id)}  # But converts to int manually
+
+# RIGHT: Use correct type, FastAPI validates automatically
+@app.get("/items/{item_id}")
+async def get_item(item_id: int):  # Auto-validates and converts
+    return {"item_id": item_id}
+```
+
+❌ **Dependency Injection Execution Order:**
+```python
+# WRONG: Assuming dependencies execute in specific order
+@app.get("/")
+async def endpoint(
+    user: Annotated[User, Depends(get_user)],
+    db: Annotated[DB, Depends(get_db)],  # No guaranteed order!
+):
+    ...
+
+# RIGHT: If order matters, use nested dependencies
+async def get_user(db: Annotated[DB, Depends(get_db)]):
+    # Now get_db always runs before get_user
+    ...
+
+@app.get("/")
+async def endpoint(user: Annotated[User, Depends(get_user)]):
+    ...
+```
+
+❌ **OpenAPI Schema Confusion:**
+```python
+# WRONG: Expecting automatic schema merging
+@app.get("/items/", response_model=Item)
+@app.get("/items/", response_model=list[Item])  # Second decorator OVERRIDES first!
+async def get_items():
+    ...
+
+# RIGHT: Different endpoints or use Union
+from typing import Union
+

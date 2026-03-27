@@ -193,7 +193,14 @@ conda create -n improve_agent_programmatically python=3.11
 conda activate improve_agent_programmatically
 pip install -r requirements.txt
 
-python generate_agents_md.py --repo /home/ras/temp/fastapi --out AGENTS_fastapi.md
+# OpenAI (with clustering)
+python generate_agents_md.py --repo /home/ras/temp/fastapi --out out_AGENTS_fastapi_openai.md  --provider openai
+
+# Claude (no clustering, all other stages run)
+python generate_agents_md.py --repo /home/ras/temp/fastapi --out out_AGENTS_fastapi_claude.md --provider claude
+
+# No LLM at all (free, static only)
+python generate_agents_md.py --repo /home/ras/temp/fastapi --out out_AGENTS_fastapi_no_llm.md --no-llm
 
 
 
