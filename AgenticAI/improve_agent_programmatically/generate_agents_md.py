@@ -875,12 +875,12 @@ def _render_template(
 # MAIN
 # ===========================================================================
 
-def generate(repo_path: str, output_path: str = "AGENTS.md") -> str:
+def generate(repo_path: str, output_path: str = "AGENTS.md", provider=None) -> str:
     repo = Path(repo_path).resolve()
     if not repo.exists():
         raise FileNotFoundError(f"Repo not found: {repo}")
     
-    client = build_client(provider=getattr(args, "provider", None))
+    client = build_client(provider=provider)
     if client is None:
         print("[warn] Running without LLM — LLM synthesis and clustering disabled",
               file=sys.stderr)
@@ -957,4 +957,3 @@ if __name__ == "__main__":
         generate(args.repo, args.out, provider=None)
     else:
         generate(args.repo, args.out, provider=args.provider)
-    generate(args.repo, args.out)
