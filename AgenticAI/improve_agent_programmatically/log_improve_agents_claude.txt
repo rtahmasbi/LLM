@@ -1,0 +1,113 @@
+[llm] Using LLMClient(provider='claude', model='claude-sonnet-4-5')
+
+Extracting repo context from fastapi...
+
+────────────────────────────────────────────────────────────
+  Evaluating baseline...
+
+============================================================
+  AGENTS.md Scorecard  -  v0    Overall: 60%
+============================================================
+  [!] Specificity                  ..............................  0%
+       1 specific signals, 4 vague phrases. Add concrete
+       examples and file paths.
+  [!] Command Validity             XXXXXXXXX.....................  33%
+       1/3 commands run clean. Failing: 'pytest' -> exit 127;
+       'ruff check .' -> exit 1
+  [!] Section Coverage             XXXXXXXXXXXXXX................  48%
+       Missing: type checking, architecture map, anti-
+       patterns, risk map
+  [ ] Repo Grounding               XXXXXXXXXXXXXXX...............  50%
+       No file/module references found to verify.
+  [ ] Machine Parsability          XXXXXXXXXXXXXXXXXXXXX.........  70%
+       3 code blocks missing language tag
+  [ok] Actionability                XXXXXXXXXXXXXXXXXXXXXXXX......  80%
+       4/5 sections are actionable. Inert sections: Code
+       Style
+  [ok] Novelty vs README            XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  100%
+       4/4 sentences are novel vs README.
+  [ok] Information Density          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  100%
+       14 high-signal lines, 13 filler lines, 35 total.
+       Density: 64%.
+============================================================
+
+  Saved: agents_versions/AGENTS_v0.md
+
+  Improving (targeting weakest 3 metrics)...
+
+────────────────────────────────────────────────────────────
+  Evaluating v1...
+
+============================================================
+  AGENTS.md Scorecard  -  v1    Overall: 80%
+============================================================
+  [!] Command Validity             XXX...........................  10%
+       1/10 commands run clean. Failing: 'python -m pytest'
+       -> exit 1; 'ruff check --fix .' -> exit 1
+  [ ] Machine Parsability          XXXXXXXXXXXXXXXXXXX...........  65%
+       39 code blocks missing language tag; Long file lacks
+       navigation anchors
+  [ok] Actionability                XXXXXXXXXXXXXXXXXXXXXXXXXX....  87%
+       13/15 sections are actionable. Inert sections: §2
+       Architecture Map, §5 Anti-Patterns & Gotchas
+  [ok] Information Density          XXXXXXXXXXXXXXXXXXXXXXXXXX....  88%
+       163 high-signal lines, 95 filler lines, 427 total.
+       Density: 49%.
+  [ok] Specificity                  XXXXXXXXXXXXXXXXXXXXXXXXXXX...  93%
+       5 specific signals, 1 vague phrases.
+  [ok] Section Coverage             XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  100%
+       All key sections present.
+  [ok] Novelty vs README            XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  100%
+       131/131 sentences are novel vs README.
+  [ok] Repo Grounding               XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  100%
+       15/15 file references exist in repo.
+============================================================
+
+  Saved: agents_versions/AGENTS_v1.md
+
+  Improving (targeting weakest 3 metrics)...
+
+────────────────────────────────────────────────────────────
+  Evaluating v2...
+
+============================================================
+  AGENTS.md Scorecard  -  v2    Overall: 79%
+============================================================
+  [!] Command Validity             XXXX..........................  14%
+       1/7 commands run clean. Failing: 'python -m pytest
+       --strict-config --strict-markers --ignore=docs_src' ->
+       exit 1; 'mypy fastapi/' -> exit 127
+  [ ] Machine Parsability          XXXXXXXXXXXXXXXXXXX...........  65%
+       34 code blocks missing language tag; Long file lacks
+       navigation anchors
+  [ok] Information Density          XXXXXXXXXXXXXXXXXXXXXXXX......  82%
+       155 high-signal lines, 102 filler lines, 441 total.
+       Density: 46%.
+  [ok] Actionability                XXXXXXXXXXXXXXXXXXXXXXXXX.....  86%
+       12/14 sections are actionable. Inert sections: §2
+       Architecture Map, §5 Anti-Patterns & Gotchas
+  [ok] Section Coverage             XXXXXXXXXXXXXXXXXXXXXXXXXX....  88%
+       Missing: risk map
+  [ok] Repo Grounding               XXXXXXXXXXXXXXXXXXXXXXXXXXXX..  95%
+       21/22 file references exist in repo. Missing:
+       test_additional_responses.py
+  [ok] Specificity                  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  100%
+       5 specific signals, 0 vague phrases.
+  [ok] Novelty vs README            XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  100%
+       160/160 sentences are novel vs README.
+============================================================
+
+  Saved: agents_versions/AGENTS_v2.md
+
+  Score plateaued (80% -> 79%). Stopping.
+
+============================================================
+  IMPROVEMENT SUMMARY
+============================================================
+  baseline  overall: 60%
+      v1    overall: 80%  (+20%)
+      v2    overall: 79%  (-2%)
+
+  Full scores -> agents_versions/scores.json
+  Files       -> agents_versions/AGENTS_v*.md
+
