@@ -103,6 +103,8 @@ Reasoning_Score = Σ(dimension_scores) / 12   # normalized 0–1
     - [data format example](https://huggingface.co/datasets/stanfordnlp/imdb)
 - `DPOTrainer` - Direct Preference Optimization
     - [Example](ReinforcementLearning/example_dpo.py)
+    - [A Survey of Direct Preference Optimization](https://arxiv.org/pdf/2503.11701)
+    - [A Comprehensive Survey of Direct Preference Optimization](https://github.com/Mr-Loevan/DPO-Survey)
 - `RewardTrainer` - Reward Modeling (input columsn: chosen, rejected)
     - [Example](ReinforcementLearning/example_reward.py)
     - [data format example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
