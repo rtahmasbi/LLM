@@ -99,13 +99,13 @@ Reasoning_Score = Σ(dimension_scores) / 12   # normalized 0–1
 - Reinforcement learning from AI feedback (RLAIF)
 
 ## Trainers
-- `SFTTrainer` - Supervised fine-tuning, (input columsn: text, label)
+- `SFTTrainer` - Supervised fine-tuning, (input columns: text, label)
     - [data format example](https://huggingface.co/datasets/stanfordnlp/imdb)
 - `DPOTrainer` - Direct Preference Optimization
     - [Example](ReinforcementLearning/example_dpo.py)
     - [A Survey of Direct Preference Optimization](https://arxiv.org/pdf/2503.11701)
     - [A Comprehensive Survey of Direct Preference Optimization](https://github.com/Mr-Loevan/DPO-Survey)
-- `RewardTrainer` - Reward Modeling (input columsn: chosen, rejected)
+- `RewardTrainer` - Reward Modeling (input columns: chosen, rejected)
     - [Example](ReinforcementLearning/example_reward.py)
     - [data format example](https://huggingface.co/datasets/Anthropic/hh-rlhf?row=0)
 - `CPOTrainer`
@@ -476,7 +476,6 @@ We train our models using the open source library GPTNeoX (Andonian et al., 2021
 # Megatron-LM
 Training Multi-Billion Parameter Language Models
 
-################################################################################
 ## main paper
 Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism (2020)
 Mohammad Shoeybi, ...
@@ -487,7 +486,6 @@ we train an 8.3 billion parameter transformer language model similar to GPT-2 an
 
 (it seems that all the big LLM use this library)
 
-################################################################################
 ## more info
 https://github.com/NVIDIA/Megatron-LM
 
@@ -508,7 +506,6 @@ GPT Text Generation: We have included a simple REST server to use for text gener
 https://github.com/NVIDIA/Megatron-LM/blob/main/tools/run_text_generation_server.py
 
 
-################################################################################
 ## GPT-2 model created by NVIDIA
 https://github.com/NVIDIA/Megatron-LM/blob/main/megatron/model/gpt_model.py
 
@@ -546,8 +543,9 @@ megatron/model/module.py
 # Language Model Evaluation Harness
 https://github.com/EleutherAI/lm-evaluation-harness
 
+```
 pip install lm-eval==0.3.0
-
+```
 
 https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/tasks
 
@@ -582,7 +580,7 @@ https://huggingface.co/spaces/open-llm-leaderboard-old/open_llm_leaderboard
 https://klu.ai/llm-leaderboard
 
 
-## price, tioken size, latency
+## price, token size, latency
 https://artificialanalysis.ai/leaderboards/models
 
 

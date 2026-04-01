@@ -66,3 +66,19 @@ CLIP consists of two encoders:
 - Image encoder — turns an image into an image embedding vector.
 
 
+
+# Diffusion from scratch
+https://github.com/gmongaras/Diffusion_models_from_scratch
+https://github.com/nickd16/Diffusion-Models-from-Scratch/
+https://towardsdatascience.com/diffusion-model-from-scratch-in-pytorch-ddpm-9d9760528946/
+
+
+# papers
+[Denoising Diffusion Probabilistic Models (DDPM)](https://arxiv.org/pdf/2006.11239)
+[Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)
+[Diffusion Models Beat GANs on Image Synthesis](https://arxiv.org/abs/2105.05233)
+[Denoising Diffusion Implicit Models (DDIM)](https://arxiv.org/abs/2010.02502)
+[Classifier-Free Guidance](https://arxiv.org/abs/2207.12598)
+[U-net (Convolutional Networks for Biomedical Image Segmentation)](https://arxiv.org/abs/1505.04597)
+[ConvNext (A ConvNet for the 2020s)](https://arxiv.org/abs/2201.03545)
+
