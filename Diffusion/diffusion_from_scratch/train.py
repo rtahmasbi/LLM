@@ -1,4 +1,5 @@
 
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -47,9 +48,9 @@ if checkpoint_path is not None:
 
 criterion = nn.MSELoss(reduction='mean')
 
-for i in range(num_epochs):
+for epoch in range(num_epochs):
     total_loss = 0
-    for bidx, (x,_) in enumerate(tqdm(train_loader, desc=f"Epoch {i+1}/{num_epochs}")):
+    for bidx, (x,_) in enumerate(tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")):
         x = x.cuda()
         x = F.pad(x, (2,2,2,2))
         t = torch.randint(0,num_time_steps,(batch_size,))
@@ -63,7 +64,7 @@ for i in range(num_epochs):
         loss.backward()
         optimizer.step()
         ema.update(model)
-    print(f'Epoch {i+1} | Loss {total_loss / (60000/batch_size):.5f}')
+    print(f'Epoch {epoch+1} | Loss {total_loss / (60000/batch_size):.5f}')
 
 
 checkpoint = {
@@ -71,5 +72,8 @@ checkpoint = {
     'optimizer': optimizer.state_dict(),
     'ema': ema.state_dict()
 }
-torch.save(checkpoint, 'checkpoints/ddpm_checkpoint')
+
+os.makedirs("checkpoints", exist_ok=True)
+torch.save(checkpoint, f"checkpoints/ddpm_epoch_{epoch}.pt")
+
 
