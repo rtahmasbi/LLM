@@ -30,7 +30,7 @@ checkpoint_path: str=None # can be the path
 
 set_seed(random.randint(0, 2**32-1)) if seed == -1 else set_seed(seed)
 
-train_dataset = datasets.MNIST(root='./data', train=True, download=False, transform=transforms.ToTensor())
+train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms.ToTensor())
 #sub_dataset = Subset(train_dataset, list(range(1024)))
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=4)
 
