@@ -57,7 +57,7 @@ def display_reverse(images: List):
 
 
 def main():
-    inference('checkpoints/ddpm_checkpoint')
+    inference('checkpoints/ddpm_epoch_6.pt')
 
 if __name__ == '__main__':
     main()
