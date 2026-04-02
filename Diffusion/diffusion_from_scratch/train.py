@@ -22,7 +22,7 @@ from typing import List
 # parameters
 batch_size: int=64
 num_time_steps: int=1000
-num_epochs: int=7
+num_epochs: int=20
 seed: int=-1
 ema_decay: float=0.9999
 lr=2e-5
