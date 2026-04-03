@@ -1,4 +1,10 @@
 
+""""
+The paper: https://arxiv.org/pdf/2006.11239
+Denoising Diffusion Probabilistic Models
+
+"""
+
 import os
 import torch
 import torch.nn as nn
@@ -22,7 +28,7 @@ from typing import List
 # parameters
 batch_size: int=64
 num_time_steps: int=1000
-num_epochs: int=20
+num_epochs: int=100
 seed: int=-1
 ema_decay: float=0.9999
 lr=2e-5
@@ -36,6 +42,15 @@ train_dataset = datasets.MNIST(root='./data', train=True, download=True, transfo
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=4)
 
 scheduler = DDPM_Scheduler(num_time_steps=num_time_steps)
+# It generates:
+# (Section 4):
+# forward process variances to constants increasing
+# linearly from β1 = 10−4 to βT = 0.02
+# Equation 4:
+# \alpha_t = 1-\beta_t
+# \bar{\alpha_t} = \prod_{s=1}^t \alpha_s
+# q(x_t|x_0) = N(x_t; \sqrt{α¯_t} x0}, (1 − α¯_t)I)
+
 model = UNET().cuda()
 optimizer = optim.Adam(model.parameters(), lr=lr)
 ema = ModelEmaV3(model, decay=ema_decay)
@@ -56,7 +71,7 @@ for epoch in range(num_epochs):
         t = torch.randint(0,num_time_steps,(batch_size,))
         e = torch.randn_like(x, requires_grad=False)
         a = scheduler.alpha[t].view(batch_size,1,1,1).cuda()
-        x = (torch.sqrt(a)*x) + (torch.sqrt(1-a)*e)
+        x = (torch.sqrt(a)*x) + (torch.sqrt(1-a)*e) # Equation 4 of the paper
         output = model(x, t)
         optimizer.zero_grad()
         loss = criterion(output, e)

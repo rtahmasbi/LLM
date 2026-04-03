@@ -5,6 +5,7 @@ from playwright.async_api import async_playwright
 from playwright_stealth import Stealth
 
 PROFILE_DIR = Path.home() / ".panera_profile"
+LOGIN_SENTINEL = PROFILE_DIR / ".logged_in"
 HOME_URL = "https://www.panerabread.com"
 BEVERAGES_URL = "https://www.panerabread.com/content/panerabread_com/en-us/menu/categories/beverages.html"
 
@@ -43,21 +44,22 @@ async def _login_flow():
         context = await open_persistent_context(p, headless=False)
         page = await new_stealth_page(context)
         await page.goto(HOME_URL, wait_until="networkidle", timeout=250000)
-        input()  # safe — no running event loop
+        await page.pause()  # async-safe; waits for user to click Resume in Playwright inspector
+        LOGIN_SENTINEL.touch()
         await context.close()
         print("Sign-in complete. Profile saved.")
 
 
 def ensure_logged_in():
-    """If no profile exists yet, open browser for manual login."""
-    if PROFILE_DIR.exists():
+    """If no sentinel file exists, open browser for manual login."""
+    if LOGIN_SENTINEL.exists():
         print(f"Profile found at {PROFILE_DIR} — skipping login.")
         return
 
     print("\nNo browser profile found. A Chrome window will open.")
     print("Step 1: Enter your email and click Continue.")
     print("Step 2: Enter your password and click Sign In.")
-    print("Once fully signed in, press Enter here...")
+    print("Once fully signed in, click Resume in the Playwright inspector...")
     asyncio.run(_login_flow())
 
 
