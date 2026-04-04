@@ -74,7 +74,7 @@ for epoch in range(num_epochs):
         x = (torch.sqrt(a)*x) + (torch.sqrt(1-a)*e) # Equation 4 of the paper
         output = model(x, t)
         optimizer.zero_grad()
-        loss = criterion(output, e)
+        loss = criterion(output, e) # algorithm 1 in the paper (using Eq 14)
         total_loss += loss.item()
         loss.backward()
         optimizer.step()

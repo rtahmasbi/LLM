@@ -12,6 +12,7 @@ pip install -r requirements.txt
 # train
 ```sh
 cd Diffusion/diffusion_from_scratch/
+conda activate ml
 nohup python train.py &
 
 ```
