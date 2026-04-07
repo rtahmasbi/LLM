@@ -22,43 +22,25 @@ KeywordNodePostprocessor is Used to ensure certain keywords are either excluded 
 # how-to-select-a-reranking-model
 https://www.rungalileo.io/blog/mastering-rag-how-to-select-a-reranking-model
 
-pdf
-
-
 
 https://www.llamaindex.ai/blog/using-llms-for-retrieval-and-reranking-23cf2d3a14b6
 
 
 # great
-https://github.com/NirDiamant/RAG_Techniques?tab=readme-ov-file
+https://github.com/NirDiamant/RAG_Techniques
 
-Fusion Retrieval
-
-Intelligent Reranking
-
-
-Multi-faceted Filtering
-
-Hierarchical Indices
-
-Ensemble Retrieval 
-
-Multi-modal Retrieval
-
-Retrieval with Feedback Loops
-
-Adaptive Retrieval
-
-Iterative Retrieval
-
-Explainable Retrieval 
-
-Knowledge Graph Integration (Graph RAG)
-
-GraphRag (Microsoft)
-
-RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval
-
-Self RAG
-
-Corrective RAG
+- Fusion Retrieval
+- Intelligent Reranking
+- Multi-faceted Filtering
+- Hierarchical Indices
+- Ensemble Retrieval 
+- Multi-modal Retrieval
+- Retrieval with Feedback Loops
+- Adaptive Retrieval
+- Iterative Retrieval
+- Explainable Retrieval 
+- Knowledge Graph Integration (Graph RAG)
+- GraphRag (Microsoft)
+- RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval
+- Self RAG
+- Corrective RAG
