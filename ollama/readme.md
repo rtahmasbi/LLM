@@ -31,8 +31,8 @@ ollama run qwen3.5:2b
 ollama run qwen3.5:4b
 ollama run deepseek-r1
 ollama run deepseek-r1:8b
-ollama run qwen3-vl:8b # vision+text
 ollama run phi4-reasoning:14b
+ollama run gemma4:e4b
 
 # thinking, cloud
 ollama run kimi-k2.5:cloud
@@ -41,6 +41,10 @@ ollama run qwen3-vl:235b-cloud
 # coding
 ollama run qwen3-coder
 ollama run codellama
+
+# vision
+ollama run qwen3-vl:8b
+ollama run gemma4:e4b
 
 ```
 

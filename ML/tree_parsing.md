@@ -1,5 +1,5 @@
 
-# tree parsing
+# Tree Parsing
 
 
 ## Tree Regularization - 2025 - Stanford
