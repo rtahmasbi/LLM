@@ -37,6 +37,10 @@ https://github.com/NirDiamant/RAG_Techniques/blob/main/evaluation/evaluation_dee
 https://github.com/NirDiamant/RAG_Techniques
 
 
+# chunking strategies
+- more info at [chunking_strategies.md](chunking_strategies.md)
+
+
 # reranking strategy
 - CohereRerank
 - FlashrankRerank
@@ -44,6 +48,8 @@ https://github.com/NirDiamant/RAG_Techniques
 - LLMListwiseRerank
 - Colbert
 - Jina
+- more info at [reranking_strategies.md](reranking_strategies.md)
+
 
 # retrievers
 https://python.langchain.com/docs/integrations/retrievers/

@@ -21,6 +21,36 @@ conda env create -f environment.yml
 conda activate rag-pipeline
 ```
 
+> **GPU users:** replace `cpuonly` with `pytorch-cuda=12.1` (or match your CUDA version) in `environment.yml` before creating the env.
+
+### Alternative: pip install
+
+**macOS (Apple Silicon M1/M2/M3 — MPS backend)**
+```bash
+pip install torch>=2.4          # MPS support is built-in, no extra index needed
+pip install -r requirements.txt
+```
+
+**macOS (Intel — CPU only)**
+```bash
+pip install -r requirements.txt  # torch>=2.4 included, CPU only
+```
+
+**Linux/Windows CPU**
+```bash
+pip install -r requirements.txt
+```
+
+**Linux/Windows GPU (CUDA)**
+```bash
+pip install torch>=2.4 --index-url https://download.pytorch.org/whl/cu121
+pip install -r requirements.txt
+```
+
+> **Note:** `torch>=2.4` is required by `sentence-transformers==5.3.0`. NumPy is pinned to `1.26.4` for compatibility with compiled extensions (faiss, sentence-transformers).
+>
+> On Apple Silicon, PyTorch uses the **MPS (Metal Performance Shaders)** backend instead of CUDA. The cross-encoder reranker will automatically use MPS if available, falling back to CPU.
+
 ### 2. Set environment variables
 
 ```bash
@@ -48,7 +78,7 @@ pipeline = RAGPipeline(
     rerank=True,
 )
 
-result = pipeline.run("document.pdf", "What are the main findings?")
+result = pipeline.run("Investment-Case-For-Disruptive-Innovation.pdf", "What are the main findings?")
 print(result["answer"])
 ```
 
@@ -56,7 +86,7 @@ print(result["answer"])
 
 ```python
 result = pipeline.run(
-    "document.pdf",
+    "Investment-Case-For-Disruptive-Innovation.pdf",
     "What are the main findings?",
     ground_truth="The paper concludes that ...",
 )
@@ -66,12 +96,23 @@ result = pipeline.run(
 ### Step-by-step
 
 ```python
-pipeline.load_pdf("document.pdf")
+from rag_pipeline import RAGPipeline, LLMProvider, ChunkStrategy
+
+pipeline = RAGPipeline(
+    provider=LLMProvider.CLAUDE,
+    chunk_strategy=ChunkStrategy.RECURSIVE,
+    chunk_size=512,
+    chunk_overlap=64,
+    top_k=5,
+    rerank=True,
+)
+
+pipeline.load_pdf("Investment-Case-For-Disruptive-Innovation.pdf")
 pipeline.chunk_document()
 pipeline.build_index()
 
-retrieved = pipeline.retrieve("your question")
-result = pipeline.answer("your question")
+retrieved = pipeline.retrieve("How is the field of Robotics anticipated to evolve with the advancements in AI?")
+result = pipeline.answer("How is the field of Robotics anticipated to evolve with the advancements in AI?")
 ```
 
 ## Parameters
@@ -134,5 +175,7 @@ rag_example2/
 ├── example_usage.py    # Usage examples
 ├── environment.yml     # Conda environment
 ├── requirements.txt    # Pip dependencies
+├── Investment-Case-For-Disruptive-Innovation.pdf # pdf example file
 └── README.md
+
 ```

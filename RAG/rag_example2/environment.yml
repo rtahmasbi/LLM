@@ -1,14 +1,17 @@
 name: rag-pipeline
 channels:
-  - defaults
+  - pytorch
   - conda-forge
+  - defaults
 dependencies:
   - python=3.11
+  - pytorch>=2.4
+  - cpuonly                  # replace with pytorch-cuda=12.1 for GPU
   - pip
   - pip:
       - pymupdf==1.27.2
-      - numpy==2.4.4
-      - faiss-cpu==1.13.2
+      - numpy==1.26.4
+      - faiss-cpu
       - openai==2.30.0
       - anthropic==0.49.0
       - voyageai==0.3.7
