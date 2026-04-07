@@ -1,0 +1,12 @@
+pymupdf==1.27.2
+numpy==1.26.4
+# install torch manually before running pip install -r:
+#   pip install torch>=2.4 --index-url https://download.pytorch.org/whl/cu121
+torch>=2.4
+faiss-gpu-cu12              # use faiss-gpu-cu11 for CUDA 11.x
+openai==2.30.0
+anthropic==0.49.0
+voyageai==0.3.7
+Pillow
+sentence-transformers==3.3.1
+nltk==3.9.4

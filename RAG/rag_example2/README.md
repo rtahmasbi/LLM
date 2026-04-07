@@ -14,42 +14,66 @@ Supports **OpenAI** and **Claude (Anthropic)** as interchangeable backends with 
 
 ## Setup
 
-### 1. Clone and create conda environment
+### 1. macOS (Apple Silicon M1/M2/M3 or Intel)
 
 ```bash
-conda env create -f environment.yml
+conda env create -f environment-mac.yml
 conda activate rag-pipeline
 ```
 
-> **GPU users:** replace `cpuonly` with `pytorch-cuda=12.1` (or match your CUDA version) in `environment.yml` before creating the env.
+> `faiss-cpu` is installed via conda-forge (not pip) to share the same OpenMP runtime as PyTorch. Installing via pip causes a segfault on macOS.
 
-### Alternative: pip install
-
-**macOS (Apple Silicon M1/M2/M3 — MPS backend)**
+**pip alternative (macOS)**
 ```bash
-pip install torch>=2.4          # MPS support is built-in, no extra index needed
-pip install -r requirements.txt
+conda install -c conda-forge faiss-cpu   # faiss must come from conda
+pip install -r requirements-mac.txt
 ```
 
-**macOS (Intel — CPU only)**
+### 2. Linux (CPU)
+
 ```bash
-pip install -r requirements.txt  # torch>=2.4 included, CPU only
+conda env create -f environment-linux-cpu.yml
+conda activate rag-pipeline
 ```
 
-**Linux/Windows CPU**
+**pip alternative (Linux CPU)**
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-linux-cpu.txt
 ```
 
-**Linux/Windows GPU (CUDA)**
+### 3. Linux (GPU — CUDA)
+
 ```bash
+conda env create -f environment-linux-gpu.yml
+conda activate rag-pipeline
+```
+
+**pip alternative (Linux GPU)**
+```bash
+# install torch with CUDA wheel first
 pip install torch>=2.4 --index-url https://download.pytorch.org/whl/cu121
-pip install -r requirements.txt
+pip install -r requirements-linux-gpu.txt
 ```
 
-> **Note:** `torch>=2.4` is required by `sentence-transformers==5.3.0`. NumPy is pinned to `1.26.4` for compatibility with compiled extensions (faiss, sentence-transformers).
->
-> On Apple Silicon, PyTorch uses the **MPS (Metal Performance Shaders)** backend instead of CUDA. The cross-encoder reranker will automatically use MPS if available, falling back to CPU.
+> Adjust `pytorch-cuda=12.1` / `faiss-gpu-cu12` to match your CUDA version:
+> - CUDA 11.x → `pytorch-cuda=11.8` and `faiss-gpu-cu11`
+> - CUDA 12.x → `pytorch-cuda=12.1` and `faiss-gpu-cu12`
+
+Check your CUDA version with:
+```bash
+nvidia-smi
+```
+
+### Known macOS issues
+
+| Error | Fix |
+|---|---|
+| `Segmentation fault: 11` | `faiss-cpu` installed via pip — reinstall via conda-forge |
+| `symbol not found: _mkl_blas_caxpy` | conda-forge installed MKL variant — run: `conda install -c conda-forge "faiss-cpu=*=*openblas*"` |
+| `numpy.dtype size changed` / system sklearn loaded | sklearn missing from conda env — run: `conda install -c conda-forge scikit-learn` |
+| `OMP: Error #15: libomp already initialized` | Set `KMP_DUPLICATE_LIB_OK=TRUE` or fix faiss install |
+| `bitsandbytes` warning / `NoneType` error | `pip uninstall bitsandbytes -y` |
+| `ImportError: PeftMixedModel` | Downgrade: `pip install sentence-transformers==3.3.1` |
 
 ### 2. Set environment variables
 
@@ -113,6 +137,7 @@ pipeline.build_index()
 
 retrieved = pipeline.retrieve("How is the field of Robotics anticipated to evolve with the advancements in AI?")
 result = pipeline.answer("How is the field of Robotics anticipated to evolve with the advancements in AI?")
+
 ```
 
 ## Parameters
@@ -171,11 +196,14 @@ Reranking is enabled by default (`rerank=True`) and re-scores retrieved chunks a
 
 ```
 rag_example2/
-├── rag_pipeline.py     # RAGPipeline class
-├── example_usage.py    # Usage examples
-├── environment.yml     # Conda environment
-├── requirements.txt    # Pip dependencies
-├── Investment-Case-For-Disruptive-Innovation.pdf # pdf example file
+├── rag_pipeline.py               # RAGPipeline class
+├── example_usage.py              # Usage examples
+├── environment-mac.yml           # Conda env — macOS
+├── environment-linux-cpu.yml     # Conda env — Linux CPU
+├── environment-linux-gpu.yml     # Conda env — Linux GPU (CUDA)
+├── requirements-mac.txt          # Pip deps — macOS
+├── requirements-linux-cpu.txt    # Pip deps — Linux CPU
+├── requirements-linux-gpu.txt    # Pip deps — Linux GPU (CUDA)
+├── Investment-Case-For-Disruptive-Innovation.pdf
 └── README.md
-
 ```
