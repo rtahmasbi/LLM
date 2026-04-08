@@ -600,3 +600,6 @@ The fastest way to feel the magic is to run the speedrun script speedrun.sh, whi
 - MemGPT: Towards LLMs as Operating Systems [link](https://arxiv.org/pdf/2310.08560)
 
 
+# WorldModels
+Look at [WorldModels](WorldModels/)
+
