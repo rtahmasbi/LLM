@@ -28,6 +28,6 @@ Cosmos-H-Surgical-Predict is a fine-tuned world foundation model for surgical ro
 - https://arxiv.org/pdf/2511.19584
 - https://huggingface.co/datasets/nicklashansen/mmbench
 
-![newt](assets/newt.png)
+![newt](../assets/newt.png)
 
 
