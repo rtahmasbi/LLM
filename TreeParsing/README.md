@@ -15,7 +15,7 @@ inductive biases into a given circuit of the transformer: TREEREG. TREEREG is si
 
 SCIN: Span Contextual Independence Score
 
-**Important**: They use **Berkeley Neural Parser** to make the parse trees. So there is no tree structure prediction on the fly.
+**Important**: They use **Berkeley Neural Parser** to make the parse trees. So there is no tree structure prediction on the fly. We can assume that Berkeley Neural Parser acs as a prior info, they can reconstruct the parsed tree in Algorithm 2.
 
 
 
@@ -25,6 +25,9 @@ SCIN: Span Contextual Independence Score
 
 A syntactic language model (SLM) incrementally generates a sentence with its syntactic tree in a left-to-right manner. We present Generative Pretrained Structured Transformers (GPST), an unsupervised SLM at scale capable  of being pre-trained from scratch on raw texts with high parallelism.
 
+- (Fruit (flies (like a banana))) or ((Fruit flies) (like (a banana)))
+
+
 
 ## Unsupervised Morphological Tree Tokenizer - 2024
 - [Unsupervised Morphological Tree Tokenizer](https://aclanthology.org/2025.findings-acl.1146.pdf)
@@ -33,6 +36,7 @@ A syntactic language model (SLM) incrementally generates a sentence with its syn
 
 ## DIORA - 2019
 Unsupervised Latent Tree Induction with Deep Inside-Outside Recursive Autoencoders
+- It uses CKY
 - [Paper](https://aclanthology.org/N19-1116.pdf)
 - [GitHub](https://github.com/iesl/diora)
 
@@ -47,6 +51,8 @@ Unsupervised Latent Tree Induction with Deep Inside-Outside Recursive Autoencode
 
 
 ## A Systematic Assessment of Syntactic Generalization in Neural Language Models - 2005
+It is for Assessment: SG score and Perplexity
+
 - [Paper](https://arxiv.org/pdf/2005.03692)
 - [Github](https://github.com/cpllab/syntactic-generalization)
 
