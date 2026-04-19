@@ -588,6 +588,8 @@ https://artificialanalysis.ai/leaderboards/models
 
 # [Diffusion models](Diffusion/)
 
+# [hermes-agent](hermes-agent/)
+
 
 # nanochat
 https://github.com/karpathy/nanochat
@@ -604,15 +606,17 @@ The fastest way to feel the magic is to run the speedrun script speedrun.sh, whi
 Look at [WorldModels](WorldModels/)
 
 
+# Web serach engines for AI agents
+https://www.tavily.com/
+https://serpapi.com/search-api
+
 
 # Browser Agenets
-https://www.tavily.com/
-
-
 - https://www.browserbase.com/ - > Let me control a real browser
 - Playwright
 - Selenium
 - Firecrawl -> Give me clean data from the web
+
 
 
 
