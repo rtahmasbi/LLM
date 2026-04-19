@@ -603,3 +603,16 @@ The fastest way to feel the magic is to run the speedrun script speedrun.sh, whi
 # WorldModels
 Look at [WorldModels](WorldModels/)
 
+
+
+# Browser Agenets
+https://www.tavily.com/
+
+
+- https://www.browserbase.com/ - > Let me control a real browser
+- Playwright
+- Selenium
+- Firecrawl -> Give me clean data from the web
+
+
+
