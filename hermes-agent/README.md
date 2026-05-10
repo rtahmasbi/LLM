@@ -1,4 +1,12 @@
 
+# Hermes Agent
+a self-improving AI worker (focus: learning + execution)
+
+
+>> The self-improving AI agent built by Nous Research. The only agent with a built-in learning loop — it creates skills from experience, improves them during use, nudges itself to persist knowledge, and builds a deepening model of who you are across sessions.
+
+
+
 # install
 ```sh
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash

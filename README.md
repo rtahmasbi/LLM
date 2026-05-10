@@ -590,6 +590,15 @@ https://artificialanalysis.ai/leaderboards/models
 
 # [hermes-agent](hermes-agent/)
 
+# [OpenShell](OpenShell/)
+AI agents are most useful when they can read files, install packages, call APIs, and use credentials. That same access can create material risk. OpenShell is designed for this tradeoff: preserve agent capability while enforcing explicit controls over what the agent can access.
+
+# [NemoClaw](NemoClaw/)
+
+# [Atropos](Atropos/)
+LLM RL Gym: Atropos is an environment microservice framework for async RL with LLMs.
+
+
 
 # nanochat
 https://github.com/karpathy/nanochat
