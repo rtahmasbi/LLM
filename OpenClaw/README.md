@@ -17,6 +17,12 @@ openclaw gateway status
 openclaw dashboard
 ```
 
+# gateway stop
+```sh
+openclaw gateway stop
+```
+
+
 
 You can also run it through `Ollama`, check commands there.
 
