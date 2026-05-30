@@ -26,3 +26,21 @@ openclaw gateway stop
 
 You can also run it through `Ollama`, check commands there.
 
+
+
+```sh
+openclaw channels enable --channel slack --account default
+openclaw channels status
+
+openclaw gateway restart
+openclaw channels list --all
+
+openclaw status --deep
+
+openclaw message send \
+  --channel slack \
+  --target channel:<CHANNEL_ID> \
+  --message "Hello from OpenClaw"
+  
+
+```
