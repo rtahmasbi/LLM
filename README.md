@@ -588,10 +588,15 @@ https://artificialanalysis.ai/leaderboards/models
 
 # [Diffusion models](Diffusion/)
 
-# [hermes-agent](hermes-agent/)
+# [Hermes Agent](hermes-agent/)
+A self-improving AI worker (focus: learning + execution)
+
 
 # [OpenShell](OpenShell/)
 AI agents are most useful when they can read files, install packages, call APIs, and use credentials. That same access can create material risk. OpenShell is designed for this tradeoff: preserve agent capability while enforcing explicit controls over what the agent can access.
+
+# [OpenClaw](OpenClaw/)
+
 
 # [NemoClaw](NemoClaw/)
 
@@ -627,5 +632,18 @@ https://serpapi.com/search-api
 - Firecrawl -> Give me clean data from the web
 
 
+
+
+# FSDP - Fully Sharded Data Parallel
+```py
+from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+```
+
+
+# cline
+- https://github.com/cline/cline
+- https://cline.bot/
+
+The open source coding agent in your IDE and terminal.
 
 
