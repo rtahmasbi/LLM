@@ -371,9 +371,9 @@ def generate_preview(n=3):
         print()
 
 if __name__ == "__main__":
-    generate_preview(n=2)
+    generate_preview(n=5)
 
     print("\n── Weighted batch of 20 ──")
-    for col in generate_column_names(20):
+    for col in generate_column_names(100):
         print(col)
     
