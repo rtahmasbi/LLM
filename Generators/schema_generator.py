@@ -21,6 +21,7 @@ def gen_category_label():
 
 # ── 4. Dashboard / assessment name ────────────────────────────────────────
 def gen_dashboard_name():
+    sep = ['___', '__', '_', '-', '--', '/']
     prefixes = ['KPI_Dashboard', 'Opp_Assessment', 'Revenue_Report', 'Usage_Metrics', 'Member_Summary']
     clients  = ['Humana', 'OakStreet', 'Bancorp', 'Stride', 'Cigna', 'Chime', 'Aetna', 'Goofy',
                 'Disney', 'AcmeCorp', 'Globex', 'Initech', 'Umbrella', 'Hooli', 'Vehement', 'MassiveDynamic',
@@ -32,7 +33,7 @@ def gen_dashboard_name():
                 'Walmart', 'Target', 'Costco', 'BestBuy', 'HomeDepot', 'Lowes', 'Kroger', 'Safeway',
                 'Amazon', 'eBay', 'Etsy', 'Shopify', 'Wayfair', 'Zillow', 'Redfin', 'Trulia', 'RealtorCom',
                 'redfin', 'compass', 'opendoor', 'offerpad', 'realogy', 'kellerwilliams', 'coldwellbanker']
-    return f"{random.choice(prefixes)}___{random.choice(clients)}"
+    return f"{random.choice(prefixes)}{random.choice(sep)}{random.choice(clients)}"
 
 # ── 5. Email-style username ────────────────────────────────────────────────
 def gen_email_username():
