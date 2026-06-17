@@ -1,9 +1,9 @@
 import rstr
 import random
 import re
-#from faker import Faker
+from faker import Faker
 
-#fake = Faker()
+fake = Faker()
 
 # ── 1. UUID with underscores ───────────────────────────────────────────────
 def gen_uuid_underscore():
@@ -27,7 +27,7 @@ def gen_dashboard_name():
 
 # ── 5. Email-style username ────────────────────────────────────────────────
 def gen_email_username():
-    domain = random.choice(['strivehealth_com', 'company_org', 'corp_net', 'healthco_io'])
+    domain = random.choice(['gmail_com', 'company_org', 'corp_net', 'yahoo_com', 'outlook_com', 'example_com', 'mail_com'])
     return f"{fake.first_name()[0].lower()}{fake.last_name().lower()}_{domain}"
 
 # ── 6. AWS region ──────────────────────────────────────────────────────────
