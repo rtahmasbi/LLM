@@ -163,7 +163,7 @@ GRPO is an online learning algorithm, meaning it improves iteratively by using t
 Kahneman-Tversky Optimization (KTO) is a training method designed to align a language model using only a binary signal of whether an output is desirable or undesirable for a given input, rather than pairs of preferred/dispreferred completions. Drawing on the prospect theory of Kahneman and Tversky, it defines a human-aware loss (HALO) that directly maximizes the utility of generations, weighting desirable and undesirable examples asymmetrically to reflect human loss aversion.
 
 
-## BCOTrainer - Binary Classifier Optimization
+## `BCOTrainer` - Binary Classifier Optimization
 The BCO authors train a binary classifier whose logit serves as a reward so that the classifier maps {prompt, chosen completion} pairs to 1 and {prompt, rejected completion} pairs to 0.
 
 
