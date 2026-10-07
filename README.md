@@ -410,10 +410,10 @@ demo.launch()
 
 
 
-# train LLM from scartch
+# Train LLM from scartch
 ## What you need
 
-**Step 0** Download text data
+### Step 0: Download text data
 
 texts:
 https://huggingface.co/datasets/karpathy/climbmix-400b-shuffle
@@ -425,7 +425,7 @@ Size: 400 billion tokens
 
 
 
-**Step 1:** train tokenizer or use laready tokenized corpus
+### Step 1: train tokenizer or use laready tokenized corpus
 
 Your Tokenizer class should have
 ```py
@@ -442,12 +442,12 @@ decoded = tokenizer.decode(encoded)
 `rustbpe` is a lightweight, high-performance Rust library for training GPT-style Byte Pair Encoding (BPE) tokenizers.
 
 
-**Step 2** train the model
+### Step 2: train the model
 You need your GPT model, GPT2 for example.
 
-**Step 3** SFT
+### Step 3: SFT
 
-**Step 4** Reinforcement learning (RL)
+### Step 4: Reinforcement learning (RL)
 
 
 
