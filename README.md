@@ -410,7 +410,55 @@ demo.launch()
 
 
 
-# train LLM from scartch time
+# train LLM from scartch
+## What you need
+
+**Step 0** Download text data
+
+texts:
+https://huggingface.co/datasets/karpathy/climbmix-400b-shuffle
+
+
+Tokenized:
+https://huggingface.co/datasets/nvidia/Nemotron-ClimbMix
+Size: 400 billion tokens
+
+
+
+**Step 1:** train tokenizer or use laready tokenized corpus
+
+Your Tokenizer class should have
+```py
+import rustbpe
+import tiktoken
+
+encoded = tokenizer.encode(test_text)
+decoded = tokenizer.decode(encoded)
+
+```
+
+`tiktoken` is a fast, open-source Byte Pair Encoding (BPE) tokenizer developed by OpenAI to convert text into numeric token sequences.
+
+`rustbpe` is a lightweight, high-performance Rust library for training GPT-style Byte Pair Encoding (BPE) tokenizers.
+
+
+**Step 2** train the model
+You need your GPT model, GPT2 for example.
+
+**Step 3** SFT
+
+**Step 4** Reinforcement learning (RL)
+
+
+
+## nanochat
+https://github.com/karpathy/nanochat
+
+The fastest way to feel the magic is to run the speedrun script speedrun.sh, which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours.
+
+
+
+## microsoft
 https://github.com/microsoft/DeepSpeedExamples/tree/master/applications/DeepSpeed-Chat
 ```
 GPU SKUs	OPT-1.3B	OPT-6.7B	OPT-13.2B	OPT-30B	OPT-66B	OPT-175B
@@ -422,6 +470,8 @@ GPU SKUs	OPT-1.3B	OPT-6.7B	OPT-13.2B	OPT-30B	OPT-66B	OPT-175B
 8x A100 80G	1.4 hrs($45)	4.1 hrs ($132)	9 hrs ($290)	18 hrs ($580)	2.1 days ($1620)	
 64x A100 80G	31 minutes	51 minutes	1.25 hrs ($320)	4 hrs ($1024)	7.5 hrs ($1920)	20 hrs ($5120)
 ```
+
+
 
 # arcprize
 https://arcprize.org/arc
@@ -603,12 +653,6 @@ AI agents are most useful when they can read files, install packages, call APIs,
 # [Atropos](Atropos/)
 LLM RL Gym: Atropos is an environment microservice framework for async RL with LLMs.
 
-
-
-# nanochat
-https://github.com/karpathy/nanochat
-
-The fastest way to feel the magic is to run the speedrun script speedrun.sh, which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours.
 
 
 
