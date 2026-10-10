@@ -701,6 +701,9 @@ Joint Embedding Predictive Architecture
 - https://github.com/punkpeye/awesome-mcp-servers
 - https://github.com/wong2/awesome-mcp-servers
 - https://glama.ai/mcp/servers
+- [MCP.so](https://mcp.so/)
+- https://mcp.casdoor.org/
+
 
 
 ## example
@@ -795,4 +798,32 @@ python mcp_cli.py https://vaultbags.app/api/mcp get_todays_allocation '{}'
 MCP_TOKEN=xxxx python mcp_cli.py <url> <tool> '{"key": "value"}'
 
 ```
+
+
+# threat-hunting-mcp-server
+- https://hunt.io/products/threat-intelligence-api
+- https://github.com/thorcollective/threat-hunting-mcp-server
+```
+# Credential Access Behaviors
+"Hunt for any process accessing LSASS memory (T1003.001)"
+"Find credential dumping patterns regardless of tool used"
+
+# Lateral Movement Behaviors
+"Detect lateral movement via remote execution (T1021.*)"
+"Hunt for RDP/WMI/PsExec execution patterns"
+
+# Process Injection Behaviors
+"Find process injection into system processes (T1055)"
+"Detect CreateRemoteThread patterns across all tools"
+
+# Living-off-the-Land Behaviors
+"Hunt for PowerShell download cradles (T1059.001)"
+"Detect LOLBin abuse patterns (certutil, bitsadmin, etc.)"
+
+# Command and Control Behaviors
+"Find C2 beaconing patterns regardless of infrastructure"
+"Detect DNS tunneling behaviors (T1071.004)"
+```
+- https://cyberdom.blog/sentinel-mcp-for-threat-hunting-and-investigations/
+- https://docs.censys.com/docs/platform-threat-hunting-mcp-server
 
