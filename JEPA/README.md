@@ -1,3 +1,6 @@
+Joint Embedding Predictive Architecture
+
+
 # JEPA / H-JEPA
 This is the conceptual root and a starting point. Yann LeCun’s framework defines JEPA as prediction in representation space, and H-JEPA adds the crucial idea of hierarchical, multi-timescale world modeling and planning.
 

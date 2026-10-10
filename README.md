@@ -378,11 +378,11 @@ accelerate launch --config_file=examples/accelerate_configs/deepspeed_zero{1,2,3
 
 
 ## cloud GPU
-https://vast.ai/
-https://www.runpod.io/pricing
-https://lambda.ai/
-https://coreweave.com/pricing
-https://www.crusoe.ai/cloud/pricing
+- https://vast.ai/
+- https://www.runpod.io/pricing
+- https://lambda.ai/
+- https://coreweave.com/pricing
+- https://www.crusoe.ai/cloud/pricing
 
 
 
@@ -665,8 +665,8 @@ Look at [WorldModels](WorldModels/)
 
 
 # Web serach engines for AI agents
-https://www.tavily.com/
-https://serpapi.com/search-api
+- https://www.tavily.com/
+- https://serpapi.com/search-api
 
 
 # Browser Agenets
@@ -690,4 +690,109 @@ from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 
 The open source coding agent in your IDE and terminal.
 
+
+# [JEPA](JEPA/)
+Joint Embedding Predictive Architecture
+
+
+# List of MCP servers
+- https://registry.modelcontextprotocol.io/ MCP Registry is the official, authoritative repository for publicly-available MCP servers.
+- https://mcpservers.org/
+- https://github.com/punkpeye/awesome-mcp-servers
+- https://github.com/wong2/awesome-mcp-servers
+- https://glama.ai/mcp/servers
+
+
+## example
+This site has SSL issue:
+```py
+# pip install mcp
+
+import asyncio
+from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client
+
+
+MCP_URL = "https://google-news.b77.ai/mcp"
+
+async def main():
+    async with streamable_http_client(MCP_URL) as (read, write, _):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            for t in tools.tools:
+                print(t.name, "-", t.description)
+                print(t.inputSchema)
+
+
+asyncio.run(main())
+
+```
+
+
+## `mcp_cli.py`
+
+```py
+import asyncio
+import json
+import os
+import sys
+
+from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client, create_mcp_http_client
+
+URL = sys.argv[1]
+TOOL = sys.argv[2] if len(sys.argv) > 2 else None
+ARGS = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
+TOKEN = os.environ.get("MCP_TOKEN")  # optional
+
+
+def get_schema(tool):
+    # mcp 2.x uses input_schema; older versions use inputSchema
+    return getattr(tool, "input_schema", None) or getattr(tool, "inputSchema", None)
+
+
+async def run(read, write):
+    async with ClientSession(read, write) as session:
+        await session.initialize()
+
+        if TOOL is None:
+            tools = await session.list_tools()
+            for t in tools.tools:
+                print(f"\n{t.name} - {t.description}")
+                print(json.dumps(get_schema(t), indent=2))
+            return
+
+        result = await session.call_tool(TOOL, ARGS)
+        printed = False
+        for block in result.content:
+            if getattr(block, "type", None) == "text":
+                print(block.text)
+                printed = True
+        if not printed:
+            print(result)  # fall back to the raw result
+
+
+async def main():
+    if TOKEN:
+        client = create_mcp_http_client(headers={"Authorization": f"Bearer {TOKEN}"})
+        async with client:
+            async with streamable_http_client(URL, http_client=client) as (r, w):
+                await run(r, w)
+    else:
+        async with streamable_http_client(URL) as (r, w):
+            await run(r, w)
+
+
+asyncio.run(main())
+
+```
+
+Then run
+```sh
+python mcp_cli.py https://vaultbags.app/api/mcp
+python mcp_cli.py https://vaultbags.app/api/mcp get_todays_allocation '{}'
+MCP_TOKEN=xxxx python mcp_cli.py <url> <tool> '{"key": "value"}'
+
+```
 
