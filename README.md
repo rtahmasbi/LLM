@@ -120,6 +120,12 @@ Reasoning_Score = Σ(dimension_scores) / 12   # normalized 0–1
 
 
 
+- [verl](https://github.com/verl-project/verl)
+- [Nvidia rl](https://docs.nvidia.com/nemo/rl/0.7.0/index.html) and [here](https://github.com/nvidia-nemo/rl)
+
+
+
+
 # [llama.cpp](llama.cpp/)
 LLM inference in C/C++
 

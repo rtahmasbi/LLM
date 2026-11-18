@@ -467,3 +467,9 @@ Tradeoff: cheaper (no critic to train, no critic-induced bias), and it's a natur
 - Entropy bonus: adding a small entropy term to the objective discourages the policy from collapsing to a single deterministic output too early, preserving exploration during training even as the policy sharpens.
 
 
+
+# large scale RL
+- [verl](https://github.com/verl-project/verl)
+- [Nvidia rl](https://docs.nvidia.com/nemo/rl/0.7.0/index.html) and [here](https://github.com/nvidia-nemo/rl)
+
+
